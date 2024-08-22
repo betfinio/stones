@@ -1,0 +1,45 @@
+{
+	"victoryDetails": {
+		"totalBets": "35,5k",
+		"totalUsers": "1k",
+		"winAmount": "200,000",
+		"bonusAmount": "23,050",
+		"crystalImage": "path/to/crystal.png",
+		"figureImage": "path/to/figure.png"
+	},
+	"ranking": [
+		{
+			"position": 1,
+			"player": "Niiiga_777",
+			"toBeWon": "250k",
+			"bonus": "20k",
+			"badge": "gold"
+		},
+		{
+			"position": 2,
+			"player": "Niiiga_777",
+			"toBeWon": "250k",
+			"bonus": "20k",
+			"badge": "silver"
+		},
+		{
+			"position": 3,
+			"player": "Niiiga_777",
+			"toBeWon": "250k",
+			"bonus": "20k",
+			"badge": "bronze"
+		},
+		{
+			"position": 4,
+			"player": "Niiiga_777",
+			"toBeWon": "250k",
+			"bonus": "20k"
+		},
+		{
+			"position": 5,
+			"player": "Niiiga_777",
+			"toBeWon": "250k",
+			"bonus": "20k"
+		}
+	]
+}

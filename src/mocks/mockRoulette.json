@@ -1,0 +1,73 @@
+{
+	"roundID": 12345,
+	"winningPool": "32.2k users",
+	"bonusPool": "300,000 BET",
+	"countdown": "00:33",
+	"items": [
+		{
+			"id": 1,
+			"price": "0.345643",
+			"bonus": "150 + 100 BONUS"
+		},
+		{
+			"id": 2,
+			"price": "0.345643",
+			"bonus": "150 + 100 BONUS"
+		},
+		{
+			"id": 3,
+			"price": "0.345643",
+			"bonus": "150 + 100 BONUS"
+		},
+		{
+			"id": 4,
+			"price": "0.345643",
+			"bonus": "150 + 100 BONUS"
+		},
+		{
+			"id": 5,
+			"price": "0.345643",
+			"bonus": "150 + 100 BONUS"
+		},
+		{
+			"id": 6,
+			"price": "0.345643",
+			"bonus": "150 + 100 BONUS"
+		},
+		{
+			"id": 7,
+			"price": "0.345643",
+			"bonus": "150 + 100 BONUS"
+		},
+		{
+			"id": 8,
+			"price": "0.345643",
+			"bonus": "150 + 100 BONUS"
+		},
+		{
+			"id": 9,
+			"price": "0.345643",
+			"bonus": "150 + 100 BONUS"
+		},
+		{
+			"id": 10,
+			"price": "0.345643",
+			"bonus": "150 + 100 BONUS"
+		},
+		{
+			"id": 11,
+			"price": "0.345643",
+			"bonus": "150 + 100 BONUS"
+		},
+		{
+			"id": 12,
+			"price": "0.345643",
+			"bonus": "150 + 100 BONUS"
+		}
+	],
+	"backgroundWheel": "",
+	"winner": {
+		"amount": "200,000",
+		"bonus": "23,050 BONUS"
+	}
+}

@@ -1,0 +1,51 @@
+{
+	"name": "@betfinio/stones",
+	"private": true,
+	"version": "1.0.0",
+	"scripts": {
+		"build": "rsbuild build",
+		"check": "biome check --write",
+		"dev": "rsbuild dev --open",
+		"prod": "rsbuild dev --env-mode production --open",
+		"local": "rsbuild dev --env-mode localhost --open",
+		"format": "biome format --write",
+		"preview": "rsbuild preview"
+	},
+	"dependencies": {
+		"@module-federation/enhanced": "^0.3.5",
+		"@supabase/supabase-js": "^2.45.1",
+		"@tanstack/react-query": "^5.52.0",
+		"@tanstack/react-router": "^1.49.2",
+		"@tanstack/react-table": "^8.20.1",
+		"@types/canvas-confetti": "^1.6.4",
+		"canvas-confetti": "^1.9.3",
+		"class-variance-authority": "^0.7.0",
+		"framer-motion": "^11.3.29",
+		"i18next": "^23.14.0",
+		"i18next-icu": "^2.3.0",
+		"lefthook": "^1.7.14",
+		"lucide-react": "^0.417.0",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
+		"react-i18next": "^15.0.1",
+		"react-icons": "^5.3.0",
+		"react-responsive": "^10.0.0",
+		"react-responsive-carousel": "^3.2.23",
+		"react-slick": "^0.30.2",
+		"slick-carousel": "^1.8.1",
+		"tailwind-merge": "^2.5.2",
+		"tailwindcss": "^3.4.10",
+		"tailwindcss-animate": "^1.0.7",
+		"wagmi": "^2.12.7"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^1.8.3",
+		"@rsbuild/core": "^1.0.1-beta.15",
+		"@rsbuild/plugin-react": "^1.0.1-beta.15",
+		"@tanstack/router-plugin": "^1.49.3",
+		"@types/react": "^18.3.4",
+		"@types/react-dom": "^18.3.0",
+		"@types/react-slick": "^0.23.13",
+		"typescript": "^5.5.4"
+	}
+}
