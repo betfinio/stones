@@ -1,0 +1,36 @@
+{
+	"metrics": [
+		{
+			"id": "1",
+			"value": "35,5k",
+			"icon": "yellowIcon",
+			"color": "#FFC700"
+		},
+		{
+			"id": "2",
+			"value": "1k",
+			"icon": "greenIcon",
+			"color": "#1BC47D"
+		},
+		{
+			"id": "3",
+			"value": "35,5k",
+			"icon": "blueIcon",
+			"color": "#35A2EB"
+		}
+	],
+	"betInfo": {
+		"yourBet": {
+			"label": "Your BET",
+			"value": "35,5k",
+			"color": "#FFC700"
+		},
+		"potentialWin": {
+			"label": "Potential win",
+			"value": "12,8k",
+			"multiplier": "3,96x",
+			"valueColor": "#6A5ED9",
+			"multiplierColor": "#7C8A9E"
+		}
+	}
+}
