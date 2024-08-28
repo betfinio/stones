@@ -13,12 +13,12 @@ export const Route = createFileRoute('/stones/')({
 function Index() {
 	return (
 		<div className="w-full px-4 py-2 rounded-md text-white h-full flex flex-col overflow-auto">
-			<div className="w-full flex flex-col lg:flex-row justify-between">
-				<div className="flex-grow flex flex-col w-full">
+			<div className="w-full flex flex-col lg:flex-row justify-center">
+				<div className="flex flex-col max-w-[810px]">
 					<Roulette />
 					<CardList />
 					<BetAmount />
-					{/* Mover BetHistory e BetSummary para baixo de BetAmount em telas menores */}
+
 					<div className="lg:hidden">
 						<div className="bg-[#131624] rounded-xl lg:h-[670px] flex items-center justify-center">
 							<BetHistory />
@@ -29,7 +29,7 @@ function Index() {
 					</div>
 					<TableBet />
 				</div>
-				{/* Seção lateral apenas para telas grandes */}
+
 				<div className="hidden lg:flex lg:flex-col lg:w-[290px] lg:ml-6">
 					<div className="bg-[#131624] rounded-xl h-[670px] flex items-center justify-center">
 						<BetHistory />

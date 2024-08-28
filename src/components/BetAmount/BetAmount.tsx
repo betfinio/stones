@@ -28,7 +28,7 @@ const BetAmount = () => {
 	};
 
 	return (
-		<div className="flex flex-col md:flex-row justify-center items-center md:items-end space-y-4 md:space-y-0 md:space-x-6 p-4 w-full mt-6">
+		<div className="flex flex-col md:flex-row justify-center items-center md:items-end space-y-4 md:space-y-0 md:space-x-6 p-4 w-full">
 			{/* Bet Amount Section */}
 			<div className="flex flex-col h-[110px] w-full md:w-[244px] max-w-[300px]">
 				<span className="text-white font-bold text-[14px] mb-2">Bet amount</span>
