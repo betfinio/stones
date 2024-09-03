@@ -1,4 +1,4 @@
-import { useSpin } from '@/src/lib/query';
+import { useCurrentRound, useSpin } from '@/src/lib/query';
 import { Button } from 'betfinio_app/button';
 import { type ChangeEvent, useState } from 'react';
 import cash from '../../assets/Roulette/cash.svg';
@@ -8,6 +8,9 @@ import crystal3 from '../../assets/Roulette/crystal3.svg';
 import crystal4 from '../../assets/Roulette/crystal4.svg';
 import crystal5 from '../../assets/Roulette/crystal5.svg';
 import betData from '../../mocks/mockBetAmount.json';
+import { Input } from 'betfinio_app/input';
+import { useBalance } from 'betfinio_app/lib/query/token';
+import { useAccount } from 'wagmi';
 
 const images: { [key: string]: string } = {
 	crystal1,
@@ -18,22 +21,31 @@ const images: { [key: string]: string } = {
 };
 
 const BetAmount = () => {
-	const [betPercentage, setBetPercentage] = useState(30);
+	const [betPercentage, setBetPercentage] = useState(0);
 	const [selectedCrystal, setSelectedCrystal] = useState<string | null>(null);
 
+	const { data: round = 0 } = useCurrentRound();
 	const { mutate: spin } = useSpin();
+	const { address } = useAccount();
+	const { data: balance = 0n } = useBalance(address);
+	const [amount, setAmount] = useState<string>('10000');
 
 	const handleSliderChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setBetPercentage(Number(e.target.value));
+		setAmount(((balance * BigInt(e.target.value)) / 100n / 10n ** 18n).toString());
 	};
 
 	const handleCrystalClick = (crystal: string) => {
 		setSelectedCrystal(crystal);
 	};
 
+	const handleAmountChange = (e: ChangeEvent<HTMLInputElement>) => {
+		setAmount(e.target.value);
+		setBetPercentage(Math.min((Number(e.target.value) * 100) / Number((balance / 10n ** 18n).toString()), 100));
+	};
+
 	const handleSpin = () => {
-		console.log('Spin');
-		spin({ amount: 1000, side: 1, round: 0 });
+		spin({ amount: Number(amount), side: 1, round: round });
 	};
 
 	return (
@@ -43,7 +55,7 @@ const BetAmount = () => {
 				<span className="text-white font-semibold mb-2">Bet amount</span>
 				<div className="flex items-center px-4 space-x-2 border border-gray-500 rounded-lg p-2 w-full h-[40px]">
 					<img src={cash} alt="cash" className="h-[20px]" />
-					<span className="text-white text-[12px]">{betData.betAmount}</span>
+					<Input className="text-white text-[12px] border-0" value={amount} onChange={handleAmountChange} type={'number'} min={0} />
 				</div>
 				<div className="relative mt-2 h-[24px]">
 					<div className="w-full bg-gray-700 h-[2px] rounded-full mt-1 relative">
@@ -60,7 +72,7 @@ const BetAmount = () => {
 					</div>
 					<div className="flex justify-between text-gray-500 text-[11px] mt-2">
 						<span>0%</span>
-						<span className="text-yellow-500 font-semibold text-[14px]">{betPercentage}%</span>
+						<span className="text-yellow-500 font-semibold text-[14px]">{betPercentage.toFixed(2)}%</span>
 						<span>100%</span>
 					</div>
 				</div>

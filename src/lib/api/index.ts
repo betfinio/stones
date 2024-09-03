@@ -1,8 +1,9 @@
 import { PARTNER, STONES } from '@/src/lib/global.ts';
-import { PartnerContract, StonesContract } from '@betfinio/abi';
-import { readContract, writeContract } from '@wagmi/core';
+import { arrayFrom, PartnerContract, StonesContract } from '@betfinio/abi';
+import { multicall, readContract, writeContract } from '@wagmi/core';
 import type { Options } from 'betfinio_app/lib/types';
 import { encodeAbiParameters, parseAbiParameters } from 'viem';
+import type { StoneInfo } from '@/src/lib/types.ts';
 
 export const fetchCurrentRound = async (options: Options): Promise<number> => {
 	return Number(
@@ -24,6 +25,38 @@ export const fetchRoundBank = async (round: number, options: Options): Promise<b
 			functionName: 'roundBankBySide',
 			args: [BigInt(round), BigInt(0)],
 		})) as bigint
+	);
+};
+
+export const fetchRoundStones = async (round: number, options: Options): Promise<StoneInfo[]> => {
+	if (round === 0) return [];
+	// biome-ignore lint/style/noNonNullAssertion: <explanation>
+	const probabilities = await multicall(options.config!, {
+		contracts: arrayFrom(6).map((_, i) => ({
+			abi: StonesContract.abi,
+			address: STONES,
+			functionName: 'roundProbabilities',
+			args: [BigInt(round), BigInt(i)],
+		})),
+	});
+	// biome-ignore lint/style/noNonNullAssertion: <explanation>
+	const banks = await multicall(options.config!, {
+		contracts: arrayFrom(6).map((_, i) => ({
+			abi: StonesContract.abi,
+			address: STONES,
+			functionName: 'roundBankBySide',
+			args: [BigInt(round), BigInt(i)],
+		})),
+	});
+	return arrayFrom(5).map(
+		(_, i) =>
+			({
+				bank: banks[i + 1].result as bigint,
+				probability: probabilities[i + 1].result as bigint,
+				round,
+				side: i + 1,
+				totalProbability: probabilities[0].result as bigint,
+			}) as StoneInfo,
 	);
 };
 

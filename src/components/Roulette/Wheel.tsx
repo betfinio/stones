@@ -38,9 +38,6 @@ const Wheel = () => {
 	const [scale, setScale] = useState(1);
 	const [currentRotation, setCurrentRotation] = useState(initialRotation);
 
-	// Define breakpoints using react-responsive
-	const isDesktop = useMediaQuery({ minWidth: 1024 });
-	const isTablet = useMediaQuery({ minWidth: 750, maxWidth: 1023 });
 	const isMobile = useMediaQuery({ maxWidth: 749 });
 
 	const shootConfetti = () => {

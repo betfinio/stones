@@ -1,9 +1,7 @@
 import { useCurrentRound, useRoundBank } from '@/src/lib/query';
 import { BetValue } from 'betfinio_app/BetValue';
 import { useMediaQuery } from 'react-responsive';
-import howtoplay from '../../assets/Roulette/howtoplay.svg';
-import playtable from '../../assets/Roulette/playtable.svg';
-import report from '../../assets/Roulette/report.svg';
+import { CircleAlert, CircleHelp, TriangleAlert } from 'lucide-react';
 
 const Header = () => {
 	const { data: round = 0 } = useCurrentRound();
@@ -34,15 +32,15 @@ const Header = () => {
 					</div>
 					<div className="flex flex-col items-start space-y-7">
 						<div className="flex flex-row items-center space-x-1">
-							<img src={playtable} alt="Paytable" className="w-[20px]" />
+							<CircleHelp className={'w-5 h-5'} />
 							<span className="text-[14px]">Paytable</span>
 						</div>
 						<div className="flex flex-row items-center space-x-1">
-							<img src={howtoplay} alt="How to play" className="w-[20px]" />
+							<CircleAlert className={'w-5 h-5'} />
 							<span className="text-[14px]">How to play</span>
 						</div>
 						<div className="flex flex-row items-center space-x-1">
-							<img src={report} alt="Report" className="w-[20px]" />
+							<TriangleAlert className={'w-5 h-5'} />
 							<span className="text-[14px]">Report</span>
 						</div>
 					</div>
@@ -72,15 +70,15 @@ const Header = () => {
 					</div>
 					<div className="flex items-center space-x-6">
 						<div className="flex flex-col items-center">
-							<img src={playtable} alt="Paytable" className="w-[20px]" />
+							<CircleHelp className={'w-5 h-5'} />
 							<span className="text-[14px]">Paytable</span>
 						</div>
 						<div className="flex flex-col items-center">
-							<img src={howtoplay} alt="How to play" />
+							<CircleAlert className={'w-5 h-5'} />
 							<span className="text-[14px]">How to play</span>
 						</div>
 						<div className="flex flex-col items-center">
-							<img src={report} alt="Report" />
+							<TriangleAlert className={'w-5 h-5'} />
 							<span className="text-[14px]">Report</span>
 						</div>
 					</div>

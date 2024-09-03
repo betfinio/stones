@@ -12,6 +12,7 @@ import crystal4 from '../../assets/Roulette/crystal4.svg';
 import crystal5 from '../../assets/Roulette/crystal5.svg';
 import cardData from '../../mocks/mockCards.json';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
+import { useCurrentRound, useStonesInfo } from '@/src/lib/query';
 
 type CrystalKeys = 'crystal1' | 'crystal2' | 'crystal3' | 'crystal4' | 'crystal5';
 
@@ -28,6 +29,9 @@ export const CardList = () => {
 	const isDesktop = useMediaQuery({ minWidth: 1024 });
 	const isTablet = useMediaQuery({ minWidth: 750, maxWidth: 1023 });
 	const isMobile = useMediaQuery({ maxWidth: 749 });
+	const { data: round = 0 } = useCurrentRound();
+	const { data: stones = [] } = useStonesInfo(round);
+	console.log(stones)
 
 	let centerSlidePercentage: any;
 	if (isDesktop) {
