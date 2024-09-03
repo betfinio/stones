@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { type ChangeEvent, useState } from 'react';
 import cash from '../../assets/Roulette/cash.svg';
 import crystal2 from '../../assets/Roulette/crystal1.svg';
 import crystal1 from '../../assets/Roulette/crystal2.svg';
@@ -6,6 +6,8 @@ import crystal3 from '../../assets/Roulette/crystal3.svg';
 import crystal4 from '../../assets/Roulette/crystal4.svg';
 import crystal5 from '../../assets/Roulette/crystal5.svg';
 import betData from '../../mocks/mockBetAmount.json';
+import { Button } from 'betfinio_app/button';
+import { useSpin } from '@/src/lib/query';
 
 const images: { [key: string]: string } = {
 	crystal1,
@@ -19,7 +21,9 @@ const BetAmount = () => {
 	const [betPercentage, setBetPercentage] = useState(30);
 	const [selectedCrystal, setSelectedCrystal] = useState<string | null>(null);
 
-	const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const { mutate: spin } = useSpin();
+
+	const handleSliderChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setBetPercentage(Number(e.target.value));
 	};
 
@@ -27,11 +31,16 @@ const BetAmount = () => {
 		setSelectedCrystal(crystal);
 	};
 
+	const handleSpin = () => {
+		console.log('Spin');
+		spin({ amount: 1000, side: 1, round: 0 });
+	};
+
 	return (
 		<div className="flex flex-col md:flex-row justify-center items-center md:items-end space-y-4 md:space-y-0 md:space-x-6 p-4 w-full">
 			{/* Bet Amount Section */}
 			<div className="flex flex-col h-[110px] w-full md:w-[244px] max-w-[300px]">
-				<span className="text-white font-semibold text-[14px] mb-2">Bet amount</span>
+				<span className="text-white font-semibold mb-2">Bet amount</span>
 				<div className="flex items-center px-4 space-x-2 border border-gray-500 rounded-lg p-2 w-full h-[40px]">
 					<img src={cash} alt="cash" className="h-[20px]" />
 					<span className="text-white text-[12px]">{betData.betAmount}</span>
@@ -59,12 +68,9 @@ const BetAmount = () => {
 
 			{/* Button Section */}
 			<div className="flex flex-col items-center w-full md:w-[224px] max-w-[300px]">
-				<button
-					type="button"
-					className="bg-yellow-500 text-black text-[12px] px-6 py-2 h-[40px] rounded-lg font-semibold transition-all duration-300 hover:bg-[#f6ee65] w-full"
-				>
+				<Button className={'hover:scale-105'} type="button" onClick={handleSpin}>
 					{betData.buttonText}
-				</button>
+				</Button>
 				<div className="flex space-x-1 mt-4 h-[25px] w-full justify-center items-start">
 					{betData.crystals.map((crystal, index) => (
 						<div

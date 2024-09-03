@@ -17,3 +17,5 @@ dist/
 .env*
 
 bun.lockb
+
+.npmrc

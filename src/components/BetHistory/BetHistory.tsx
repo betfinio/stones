@@ -77,7 +77,7 @@ const BetHistory = () => {
 	};
 
 	return (
-		<div className="w-full lg:h-[650px] mt-6 mb-4 overflow-hidden px-4">
+		<div className="w-full lg:h-[650px] p-2 md:p-3 lg:p-4">
 			{/* Crystal Selector */}
 			<div className="flex space-x-1 h-[25px] w-full justify-center items-start my-2">
 				{['crystal1', 'crystal2', 'crystal3', 'crystal4', 'crystal5'].map((crystal, index) => (

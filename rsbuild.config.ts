@@ -18,8 +18,6 @@ export default defineConfig({
 	},
 	dev: {
 		assetPrefix: 'http://localhost:7777',
-		hmr: true,
-		liveReload: true,
 	},
 	html: {
 		title: 'BetFin Stones',

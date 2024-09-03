@@ -81,7 +81,7 @@ export const CardList = () => {
 									<div className="absolute -top-14 w-[60px] h-[60px] rounded-full bg-blue-500 opacity-[0.65] blur-xl" />
 								</div>
 								<div className="mt-6 text-center">
-									<span className="block text-lg text-[14px] font-semibold">1 x</span>
+									<span className="block text-lg font-semibold">1 x</span>
 									<button
 										type="button"
 										className="border-2 border-yellow-500 text-white text-[12px] px-3 py-1 rounded-lg mt-2 transition-all duration-300 ease-out group-hover:bg-yellow-500 group-hover:text-black"

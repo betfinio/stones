@@ -5,12 +5,7 @@ import { useMediaQuery } from 'react-responsive';
 import arrowdown from '../../assets/Roulette/arrow-down.svg';
 import cash from '../../assets/Roulette/cash.svg';
 import neonImage from '../../assets/Roulette/neon-glow.png';
-import ComplexRoulette from './ComplexRoulette'; // Certifique-se de que o caminho esteja correto
-// import crystal1 from "../../assets/Roulette/crystal1.svg";
-// import crystal2 from "../../assets/Roulette/crystal2.svg";
-// import crystal3 from "../../assets/Roulette/crystal3.svg";
-// import crystal4 from "../../assets/Roulette/crystal4.svg";
-// import crystal5 from "../../assets/Roulette/crystal5.svg";
+import ComplexRoulette from './ComplexRoulette';
 import CrystalAnimation1 from './Crystals/CrystalAnimation1';
 import CrystalAnimation2 from './Crystals/CrystalAnimation2';
 import CrystalAnimation3 from './Crystals/CrystalAnimation3';
@@ -407,12 +402,17 @@ const Wheel = () => {
 				</AnimatePresence>
 
 				<div className="absolute -top-1/2 right-4 w-fit text-xs z-7">
-					<select onChange={(e) => handleDebugClick(Number.parseInt(e.target.value))} className="bg-white text-black p-2 rounded" disabled={isSpinning}>
-						<option value="" disabled selected>
+					<select
+						defaultValue={'-1'}
+						onChange={(e) => handleDebugClick(Number.parseInt(e.target.value))}
+						className="bg-white text-black p-2 rounded"
+						disabled={isSpinning}
+					>
+						<option value="-1" disabled>
 							Select Crystal
 						</option>
-						{crystals.map((crystal) => (
-							<option key={crystal.name} value={crystal.angle}>
+						{crystals.map((crystal, i) => (
+							<option key={i} value={crystal.angle}>
 								{crystal.name} ({crystal.angle}°)
 							</option>
 						))}

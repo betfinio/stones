@@ -29,11 +29,11 @@ function Index() {
 					<TableBet />
 				</div>
 
-				<div className="hidden lg:flex lg:flex-col">
-					<div className="bg-primaryLight rounded-xl h-[670px] flex items-center justify-center">
+				<div className="hidden lg:flex lg:flex-col gap-2 md:gap-3 lg:gap-4">
+					<div className="bg-primaryLight rounded-xl border border-gray-800 flex items-center justify-center">
 						<BetHistory />
 					</div>
-					<div className="bg-primaryLight rounded-xl mt-4 h-[116px] flex items-center justify-center">
+					<div className="bg-primaryLight rounded-xl border overflow-hidden border-gray-800 flex items-center justify-center">
 						<BetSummary />
 					</div>
 				</div>
