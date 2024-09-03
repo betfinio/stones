@@ -1,5 +1,5 @@
+import { type SpinParams, fetchCurrentRound, fetchRoundBank, spin } from '@/src/lib/api';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { fetchCurrentRound, fetchRoundBank, spin, type SpinParams } from '@/src/lib/api';
 import type { WriteContractErrorType, WriteContractReturnType } from 'viem';
 import { useConfig } from 'wagmi';
 

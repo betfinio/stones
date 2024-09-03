@@ -1,9 +1,9 @@
+import { useCurrentRound, useRoundBank } from '@/src/lib/query';
+import { BetValue } from 'betfinio_app/BetValue';
 import { useMediaQuery } from 'react-responsive';
 import howtoplay from '../../assets/Roulette/howtoplay.svg';
 import playtable from '../../assets/Roulette/playtable.svg';
 import report from '../../assets/Roulette/report.svg';
-import { useCurrentRound, useRoundBank } from '@/src/lib/query';
-import { BetValue } from 'betfinio_app/BetValue';
 
 const Header = () => {
 	const { data: round = 0 } = useCurrentRound();

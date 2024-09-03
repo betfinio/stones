@@ -1,8 +1,8 @@
-import { encodeAbiParameters, parseAbiParameters } from 'viem';
-import type { Options } from 'betfinio_app/lib/types';
-import { readContract, writeContract } from '@wagmi/core';
 import { PARTNER, STONES } from '@/src/lib/global.ts';
 import { PartnerContract, StonesContract } from '@betfinio/abi';
+import { readContract, writeContract } from '@wagmi/core';
+import type { Options } from 'betfinio_app/lib/types';
+import { encodeAbiParameters, parseAbiParameters } from 'viem';
 
 export const fetchCurrentRound = async (options: Options): Promise<number> => {
 	return Number(

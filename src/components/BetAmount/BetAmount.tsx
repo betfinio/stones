@@ -1,3 +1,5 @@
+import { useSpin } from '@/src/lib/query';
+import { Button } from 'betfinio_app/button';
 import { type ChangeEvent, useState } from 'react';
 import cash from '../../assets/Roulette/cash.svg';
 import crystal2 from '../../assets/Roulette/crystal1.svg';
@@ -6,8 +8,6 @@ import crystal3 from '../../assets/Roulette/crystal3.svg';
 import crystal4 from '../../assets/Roulette/crystal4.svg';
 import crystal5 from '../../assets/Roulette/crystal5.svg';
 import betData from '../../mocks/mockBetAmount.json';
-import { Button } from 'betfinio_app/button';
-import { useSpin } from '@/src/lib/query';
 
 const images: { [key: string]: string } = {
 	crystal1,
