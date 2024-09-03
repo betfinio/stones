@@ -1,8 +1,8 @@
-import {type SpinParams, fetchCurrentRound, fetchRoundBank, spin, fetchRoundStones} from '@/src/lib/api';
+import { type SpinParams, fetchCurrentRound, fetchRoundBank, fetchRoundStones, spin } from '@/src/lib/api';
+import type { StoneInfo } from '@/src/lib/types.ts';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import type { WriteContractErrorType, WriteContractReturnType } from 'viem';
 import { useConfig } from 'wagmi';
-import type {StoneInfo} from "@/src/lib/types.ts";
 
 export const useCurrentRound = () => {
 	const config = useConfig();

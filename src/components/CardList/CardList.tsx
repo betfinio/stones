@@ -31,7 +31,7 @@ export const CardList = () => {
 	const isMobile = useMediaQuery({ maxWidth: 749 });
 	const { data: round = 0 } = useCurrentRound();
 	const { data: stones = [] } = useStonesInfo(round);
-	console.log(stones)
+	console.log(stones);
 
 	let centerSlidePercentage: any;
 	if (isDesktop) {

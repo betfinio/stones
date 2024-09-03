@@ -1,6 +1,9 @@
 import { useCurrentRound, useSpin } from '@/src/lib/query';
 import { Button } from 'betfinio_app/button';
+import { Input } from 'betfinio_app/input';
+import { useBalance } from 'betfinio_app/lib/query/token';
 import { type ChangeEvent, useState } from 'react';
+import { useAccount } from 'wagmi';
 import cash from '../../assets/Roulette/cash.svg';
 import crystal2 from '../../assets/Roulette/crystal1.svg';
 import crystal1 from '../../assets/Roulette/crystal2.svg';
@@ -8,9 +11,6 @@ import crystal3 from '../../assets/Roulette/crystal3.svg';
 import crystal4 from '../../assets/Roulette/crystal4.svg';
 import crystal5 from '../../assets/Roulette/crystal5.svg';
 import betData from '../../mocks/mockBetAmount.json';
-import { Input } from 'betfinio_app/input';
-import { useBalance } from 'betfinio_app/lib/query/token';
-import { useAccount } from 'wagmi';
 
 const images: { [key: string]: string } = {
 	crystal1,

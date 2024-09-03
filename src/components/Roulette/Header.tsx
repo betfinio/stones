@@ -1,7 +1,7 @@
 import { useCurrentRound, useRoundBank } from '@/src/lib/query';
 import { BetValue } from 'betfinio_app/BetValue';
-import { useMediaQuery } from 'react-responsive';
 import { CircleAlert, CircleHelp, TriangleAlert } from 'lucide-react';
+import { useMediaQuery } from 'react-responsive';
 
 const Header = () => {
 	const { data: round = 0 } = useCurrentRound();
