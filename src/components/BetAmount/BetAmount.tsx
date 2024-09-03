@@ -31,7 +31,7 @@ const BetAmount = () => {
 		<div className="flex flex-col md:flex-row justify-center items-center md:items-end space-y-4 md:space-y-0 md:space-x-6 p-4 w-full">
 			{/* Bet Amount Section */}
 			<div className="flex flex-col h-[110px] w-full md:w-[244px] max-w-[300px]">
-				<span className="text-white font-bold text-[14px] mb-2">Bet amount</span>
+				<span className="text-white font-semibold text-[14px] mb-2">Bet amount</span>
 				<div className="flex items-center px-4 space-x-2 border border-gray-500 rounded-lg p-2 w-full h-[40px]">
 					<img src={cash} alt="cash" className="h-[20px]" />
 					<span className="text-white text-[12px]">{betData.betAmount}</span>
@@ -69,7 +69,7 @@ const BetAmount = () => {
 					{betData.crystals.map((crystal, index) => (
 						<div
 							key={index}
-							className={`relative flex items-center justify-center border-1 border-[#151A2A]  w-[44px] h-[25px] bg-[#131624] rounded-md cursor-pointer hover:scale-110 transition-all ease-in ${
+							className={`relative flex items-center justify-center border-1 border-[#151A2A]  w-[44px] h-[25px] bg-primaryLight rounded-md cursor-pointer hover:scale-110 transition-all ease-in ${
 								selectedCrystal === crystal ? 'border-2 border-yellow-500' : ''
 							}`}
 							onClick={() => handleCrystalClick(crystal)}

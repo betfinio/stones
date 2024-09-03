@@ -19,21 +19,20 @@ function Finished() {
 					<BetRanking />
 					{/* Mover BetHistory e BetSummary para baixo de BetAmount em telas menores */}
 					<div className="lg:hidden">
-						<div className="bg-[#131624] rounded-xl lg:h-[670px] flex items-center justify-center">
+						<div className="bg-primaryLight rounded-xl lg:h-[670px] flex items-center justify-center">
 							<BetHistory />
 						</div>
-						<div className="bg-[#131624] rounded-xl mt-8 mb-14 h-[80px] sm:h-[100px] md:h-[100px] flex items-center justify-center">
+						<div className="bg-primaryLight rounded-xl mt-8 mb-14 h-[80px] sm:h-[100px] md:h-[100px] flex items-center justify-center">
 							<BetSummary />
 						</div>
 					</div>
 					<TableBet />
 				</div>
-				{/* Seção lateral apenas para telas grandes */}
-				<div className="hidden lg:flex lg:flex-col lg:w-[290px] lg:ml-6">
-					<div className="bg-[#131624] rounded-xl h-[670px] flex items-center justify-center">
+				<div className="hidden lg:flex lg:flex-col">
+					<div className="bg-primaryLight rounded-xl h-[670px] flex items-center justify-center">
 						<BetHistory />
 					</div>
-					<div className="bg-[#131624] rounded-xl mt-4 h-[116px] flex items-center justify-center">
+					<div className="bg-primaryLight rounded-xl mt-4 h-[116px] flex items-center justify-center">
 						<BetSummary />
 					</div>
 				</div>

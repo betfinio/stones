@@ -73,7 +73,7 @@ export const CardList = () => {
 			>
 				{cardData.cards.map((card) => (
 					<div key={card.id} className="px-2 mt-16 pb-16">
-						<div className="group relative bg-[#131624] p-4 rounded-xl h-fit flex-shrink-0 text-white transition-all duration-300 transform hover:scale-105 max-w-[143px] mx-auto">
+						<div className="group relative bg-primaryLight p-4 rounded-xl h-fit flex-shrink-0 text-white transition-all duration-300 transform hover:scale-105 max-w-[143px] mx-auto">
 							<div className="absolute inset-0 rounded-xl bg-gradient-to-tr from-transparent to-[#7366FF] via-[#7366ff21] opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100 z-0" />
 							<div className="relative z-10">
 								<div className="absolute left-1/2 transform -translate-x-1/2 w-[80px] h-[80px] flex justify-center items-center">
@@ -81,7 +81,7 @@ export const CardList = () => {
 									<div className="absolute -top-14 w-[60px] h-[60px] rounded-full bg-blue-500 opacity-[0.65] blur-xl" />
 								</div>
 								<div className="mt-6 text-center">
-									<span className="block text-lg text-[14px] font-bold">1 x</span>
+									<span className="block text-lg text-[14px] font-semibold">1 x</span>
 									<button
 										type="button"
 										className="border-2 border-yellow-500 text-white text-[12px] px-3 py-1 rounded-lg mt-2 transition-all duration-300 ease-out group-hover:bg-yellow-500 group-hover:text-black"
@@ -90,7 +90,7 @@ export const CardList = () => {
 									</button>
 									<div className="flex w-fit items-center mt-2 h-[18px] mx-auto mb-4">
 										<img src={cash} alt="cash" className="h-[12px]" />
-										<span className="text-[12px] leading-[16.56px] font-medium">{card.price}</span>
+										<span className="text-[12px]  font-medium">{card.price}</span>
 									</div>
 									<span className="block text-blue-500 text-[12px] font-[600]">{card.bonus}</span>
 									<div className="mt-4 space-y-1 text-sm text-gray-400">

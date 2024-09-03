@@ -83,7 +83,7 @@ const BetHistory = () => {
 				{['crystal1', 'crystal2', 'crystal3', 'crystal4', 'crystal5'].map((crystal, index) => (
 					<div
 						key={index}
-						className={`relative overflow-hidden flex items-center justify-center border-2 border-[#151A2A] w-[44px] h-[25px] bg-[#131624] rounded-md cursor-pointer hover:scale-110 transition-all ease-in ${
+						className={`relative overflow-hidden flex items-center justify-center border-2 border-[#151A2A] w-[44px] h-[25px] bg-primaryLight rounded-md cursor-pointer hover:scale-110 transition-all ease-in ${
 							selectedCrystal === crystal ? 'border-2 border-yellow-500' : ''
 						}`}
 						onClick={() => handleCrystalClick(crystal)}
@@ -110,7 +110,7 @@ const BetHistory = () => {
 						type="button"
 						key={tab}
 						className={`px-4 py-2 rounded-lg font-semibold text-[12px] ${
-							activeTab === tab.toLowerCase() ? 'bg-yellow-500 text-black' : 'bg-[#131624] text-white'
+							activeTab === tab.toLowerCase() ? 'bg-yellow-500 text-black' : 'bg-primaryLight text-white'
 						}`}
 						onClick={() => setActiveTab(tab.toLowerCase() as any)}
 					>
@@ -136,7 +136,7 @@ const BetHistory = () => {
 					{data.map((item, index) => (
 						<motion.div
 							key={item.id}
-							className={`flex items-center justify-between p-4 mb-2 rounded-xl border-2 ${index % 2 === 0 ? 'bg-[#1a1f3d]' : 'bg-[#131624]'} ${
+							className={`flex items-center justify-between p-4 mb-2 rounded-xl border-2 ${index % 2 === 0 ? 'bg-[#1a1f3d]' : 'bg-primaryLight'} ${
 								isPlayerData(item) || isBonusData(item)
 									? item.trophy === 'gold_trophy'
 										? 'border-yellow-500'
@@ -155,7 +155,7 @@ const BetHistory = () => {
 							<div className="flex items-center space-x-4">
 								<img src={foxIcon} alt="fox" className="h-[24px]" />
 								<div className="flex flex-col w-fit pr-1">
-									<span className="text-white text-[12px] font-bold flex items-center">
+									<span className="text-white text-[12px] font-semibold flex items-center">
 										{item.nickname.replace(/(.{5}).*(.{4})/, '$1..$2')}
 										{(isPlayerData(item) || isBonusData(item)) && item.trophy && <img src={icons[item.trophy]} alt="trophy" className="h-[16px] ml-2" />}
 									</span>

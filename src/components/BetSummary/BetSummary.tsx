@@ -16,7 +16,7 @@ const BetSummary = () => {
 	const { metrics, betInfo } = mockBetSummary;
 
 	return (
-		<div className="w-full bg-[#131624] p-4 rounded-lg shadow-md mt-8">
+		<div className="w-full bg-primaryLight p-4 rounded-lg shadow-md mt-8">
 			<div className="flex justify-between mb-4">
 				{metrics.map((metric) => (
 					<div key={metric.id} className="flex items-center">

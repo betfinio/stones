@@ -41,8 +41,8 @@ const BetRanking = () => {
 						</div>
 					</div>
 					<div className="flex flex-col">
-						<div className="flex w-full items-center justify-center text-white text-[24px] font-bold">WIN!</div>
-						<div className="flex items-center w-full text-yellow-500 font-bold">
+						<div className="flex w-full items-center justify-center text-white text-[24px] font-semibold">WIN!</div>
+						<div className="flex items-center w-full text-yellow-500 font-semibold">
 							<span className="text-[20px]">{victoryDetails.winAmount}</span>
 							<img src={cashIcon} alt="Cash" className="h-[20px] ml-1" />
 						</div>
@@ -68,13 +68,13 @@ const BetRanking = () => {
 						key={index}
 						className={`flex items-center h-[40px] px-4 rounded-lg   relative overflow-hidden ${
 							row.badge === 'gold'
-								? 'bg-gradient-to-r from-[#e5b10875] via-[#131624] to-transparent shadow-[inset_0_0_0_1px_rgba(255,223,0,0.6),inset_0_0_0_1px_rgba(0,0,0,0.4)]'
+								? 'bg-gradient-to-r from-[#e5b10875] via-primaryLight to-transparent shadow-[inset_0_0_0_1px_rgba(255,223,0,0.6),inset_0_0_0_1px_rgba(0,0,0,0.4)]'
 								: row.badge === 'silver'
-									? 'bg-gradient-to-r from-[#989fab49] via-[#131624] to-transparent shadow-[inset_0_0_0_1px_rgba(192,192,192,0.6),inset_0_0_0_1px_rgba(0,0,0,0.4)]'
+									? 'bg-gradient-to-r from-[#989fab49] via-primaryLight to-transparent shadow-[inset_0_0_0_1px_rgba(192,192,192,0.6),inset_0_0_0_1px_rgba(0,0,0,0.4)]'
 									: row.badge === 'bronze'
-										? 'bg-gradient-to-r from-[#f48e3b63] via-[#131624] to-transparent shadow-[inset_0_0_0_1px_rgba(205,127,50,0.6),inset_0_0_0_1px_rgba(0,0,0,0.4)]'
+										? 'bg-gradient-to-r from-[#f48e3b63] via-primaryLight to-transparent shadow-[inset_0_0_0_1px_rgba(205,127,50,0.6),inset_0_0_0_1px_rgba(0,0,0,0.4)]'
 										: index % 2 === 0
-											? 'bg-[#131624]'
+											? 'bg-primaryLight'
 											: 'bg-transparent'
 						} hover:bg-[#282c46] transition-all duration-300`}
 					>

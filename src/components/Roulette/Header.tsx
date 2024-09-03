@@ -10,19 +10,19 @@ const Header = ({ roundID, winningPool, bonusPool }: any) => {
 		<>
 			{isMobile ? (
 				// Mobile Layout
-				<div className="flex w-full flex-row justify-between items-start bg-[#131624] text-white p-4 rounded-xl z-10">
+				<div className="flex w-full flex-row justify-between items-start bg-primaryLight text-white p-4 rounded-xl ">
 					<div className="flex flex-col items-start space-y-2">
 						<div className="flex flex-col items-start">
-							<span className="text-[14px] leading-[19.32px]">Round ID</span>
-							<span className="text-xs leading-[16.56px] font-bold">{roundID}</span>
+							<span className="">Round ID</span>
+							<span className="text-xs  font-semibold">{roundID}</span>
 						</div>
 						<div className="flex flex-col items-start">
 							<span className="text-[14px] leading-[19.32px] font-semibold text-yellow-500">WINNING POOL</span>
-							<span className="text-xs leading-[16.56px] font-bold">{winningPool}</span>
+							<span className="text-xs  font-semibold">{winningPool}</span>
 						</div>
 						<div className="flex flex-col items-start">
 							<span className="text-[14px] leading-[19.32px] font-semibold text-blue-500">BONUS POOL</span>
-							<span className="text-xs leading-[16.56px] font-bold">{bonusPool}</span>
+							<span className="text-xs  font-semibold">{bonusPool}</span>
 						</div>
 					</div>
 					<div className="flex flex-col items-start space-y-7">
@@ -42,21 +42,21 @@ const Header = ({ roundID, winningPool, bonusPool }: any) => {
 				</div>
 			) : (
 				// Desktop and Tablet Layout
-				<div className="flex w-full justify-between items-center bg-[#131624] text-white p-4 rounded-xl z-10">
+				<div className="flex w-full justify-between items-center bg-primaryLight text-white p-4 rounded-xl border border-gray-800">
 					<div className="flex items-center justify-between space-x-8">
 						<div className="flex flex-col items-start">
 							<span className="text-[14px] leading-[19.32px]">Round ID</span>
-							<span className="text-xs leading-[16.56px] font-bold">{roundID}</span>
+							<span className="text-xs  font-semibold">{roundID}</span>
 						</div>
 						<div className="bg-white w-[1px] h-[32px]" />
 						<div className="flex flex-col items-start">
 							<span className="text-[14px] leading-[19.32px] font-semibold text-yellow-500">WINNING POOL</span>
-							<span className="text-xs leading-[16.56px] font-bold">{winningPool}</span>
+							<span className="text-xs  font-semibold">{winningPool}</span>
 						</div>
 						<div className="bg-white w-[1px] h-[32px]" />
 						<div className="flex flex-col items-start">
 							<span className="text-[14px] leading-[19.32px] font-semibold text-blue-500">BONUS POOL</span>
-							<span className="text-xs leading-[16.56px] font-bold">{bonusPool}</span>
+							<span className="text-xs  font-semibold">{bonusPool}</span>
 						</div>
 					</div>
 					<div className="flex items-center space-x-6">

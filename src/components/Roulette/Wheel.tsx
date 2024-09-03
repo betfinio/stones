@@ -374,7 +374,7 @@ const Wheel = () => {
 								}}
 							/>
 							<h2
-								className="font-bold"
+								className="font-semibold"
 								style={{
 									fontSize: `${24 * scale}px`,
 									zIndex: 6,
@@ -383,7 +383,7 @@ const Wheel = () => {
 								You win:
 							</h2>
 							<p
-								className="font-bold"
+								className="font-semibold"
 								style={{
 									fontSize: `${40 * scale}px`,
 									color: '#FFD700',

@@ -22,11 +22,11 @@ function Popup() {
 					<TableBet />
 				</div>
 				<div className="w-[290px] ml-6 flex flex-col">
-					<div className="bg-[#131624] rounded-xl h-[670px] flex items-center justify-center">
+					<div className="bg-primaryLight rounded-xl h-[670px] flex items-center justify-center">
 						{/* Conteúdo da seção lateral */}
 						<BetHistory />
 					</div>
-					<div className="bg-[#131624] rounded-xl mt-4 h-[116px] flex items-center justify-center">
+					<div className="bg-primaryLight rounded-xl mt-4 h-[116px] flex items-center justify-center">
 						{/* Bloco abaixo da seção lateral */}
 						<BetSummary />
 					</div>

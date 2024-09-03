@@ -97,7 +97,7 @@ export const routeTree = rootRoute.addChildren({
       ]
     },
     "/": {
-      "filePath": "index.ts"
+      "filePath": "index.tsx"
     },
     "/finished": {
       "filePath": "finished.tsx"

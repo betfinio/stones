@@ -125,7 +125,7 @@ const TableBet = () => {
 				whileHover={{ scale: 1.1 }}
 				whileTap={{ scale: 0.9 }}
 				className={`px-2 py-2 w-[32px] rounded-md text-[12px] font-semibold ${
-					currentPage === page ? 'bg-[#282c46] text-white' : 'bg-[#131624] text-gray-400'
+					currentPage === page ? 'bg-[#282c46] text-white' : 'bg-primaryLight text-gray-400'
 				} ${typeof page === 'string' ? 'cursor-default' : 'cursor-pointer'}`}
 				disabled={typeof page === 'string'}
 			>
@@ -140,14 +140,14 @@ const TableBet = () => {
 			<div className="flex space-x-4 mb-4">
 				<button
 					type="button"
-					className={`px-4 py-2 rounded-lg font-semibold text-[12px] ${activeTab === 'myBets' ? 'bg-yellow-500 text-black' : 'bg-[#131624] text-white'}`}
+					className={`px-4 py-2 rounded-lg font-semibold text-[12px] ${activeTab === 'myBets' ? 'bg-yellow-500 text-black' : 'bg-primaryLight text-white'}`}
 					onClick={() => setActiveTab('myBets')}
 				>
 					My bets
 				</button>
 				<button
 					type="button"
-					className={`px-4 py-2 rounded-lg font-semibold text-[12px] ${activeTab === 'allRounds' ? 'bg-yellow-500 text-black' : 'bg-[#131624] text-white'}`}
+					className={`px-4 py-2 rounded-lg font-semibold text-[12px] ${activeTab === 'allRounds' ? 'bg-yellow-500 text-black' : 'bg-primaryLight text-white'}`}
 					onClick={() => setActiveTab('allRounds')}
 				>
 					All rounds
@@ -170,7 +170,7 @@ const TableBet = () => {
 						/>
 					</div>
 
-					<div className="flex items-center space-x-2 bg-[#131624] p-2 rounded-lg">
+					<div className="flex items-center space-x-2 bg-primaryLight p-2 rounded-lg">
 						<img src={searchIcon} alt="search" className="h-[16px] w-[16px]" />
 						<input type="text" placeholder="Search bet" className="bg-transparent text-white text-sm outline-none" />
 					</div>
@@ -185,7 +185,7 @@ const TableBet = () => {
 				</div>
 				<div
 					ref={dropdownRef}
-					className="relative flex items-center justify-between space-x-2 border-[#131624] border-[2px] p-2 rounded-lg cursor-pointer w-[113px]"
+					className="relative flex items-center justify-between space-x-2 border-primaryLight border-[2px] p-2 rounded-lg cursor-pointer w-[113px]"
 					onClick={() => setIsDropdownOpen(!isDropdownOpen)}
 				>
 					<img src={showIcon} alt="show" className="h-[16px] w-[16px]" />
@@ -242,7 +242,7 @@ const TableBet = () => {
 							{currentData.map((row, index) => (
 								<motion.tr
 									key={index}
-									className={`${index % 2 === 0 ? 'bg-[#131624]' : ''} hover:bg-[#282c46] transition-all duration-300`}
+									className={`${index % 2 === 0 ? 'bg-primaryLight' : ''} hover:bg-[#282c46] transition-all duration-300`}
 									variants={{
 										hidden: { opacity: 0, y: 20 },
 										visible: { opacity: 1, y: 0 },

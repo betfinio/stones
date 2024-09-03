@@ -12,29 +12,28 @@ export const Route = createFileRoute('/stones/')({
 
 function Index() {
 	return (
-		<div className="w-full px-4 py-2 rounded-md text-white h-full flex flex-col overflow-auto">
-			<div className="w-full flex flex-col lg:flex-row justify-center">
-				<div className="flex flex-col max-w-[810px]">
+		<div className="w-full p-2 md:p-3 lg:p-4  rounded-md text-white h-full flex flex-col overflow-auto">
+			<div className="w-full flex flex-col lg:flex-row justify-center gap-2 md:gap-3 lg:gap-4">
+				<div className="flex flex-col w-full">
 					<Roulette />
 					<CardList />
 					<BetAmount />
-
 					<div className="lg:hidden">
-						<div className="bg-[#131624] rounded-xl lg:h-[670px] flex items-center justify-center">
+						<div className="bg-primaryLight rounded-xl lg:h-[670px] flex items-center justify-center">
 							<BetHistory />
 						</div>
-						<div className="bg-[#131624] rounded-xl mt-8 mb-14 h-[80px] sm:h-[100px] md:h-[100px] flex items-center justify-center">
+						<div className="bg-primaryLight rounded-xl mt-8 mb-14 h-[80px] sm:h-[100px] md:h-[100px] flex items-center justify-center">
 							<BetSummary />
 						</div>
 					</div>
 					<TableBet />
 				</div>
 
-				<div className="hidden lg:flex lg:flex-col lg:w-[290px] lg:ml-6">
-					<div className="bg-[#131624] rounded-xl h-[670px] flex items-center justify-center">
+				<div className="hidden lg:flex lg:flex-col">
+					<div className="bg-primaryLight rounded-xl h-[670px] flex items-center justify-center">
 						<BetHistory />
 					</div>
-					<div className="bg-[#131624] rounded-xl mt-4 h-[116px] flex items-center justify-center">
+					<div className="bg-primaryLight rounded-xl mt-4 h-[116px] flex items-center justify-center">
 						<BetSummary />
 					</div>
 				</div>
