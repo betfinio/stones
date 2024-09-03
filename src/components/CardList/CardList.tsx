@@ -1,18 +1,17 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
-import Slider, { type Settings } from 'react-slick';
+import { FaArrowLeftLong, FaArrowRightLong } from 'react-icons/fa6';
+import { useMediaQuery } from 'react-responsive';
+import { Carousel } from 'react-responsive-carousel';
 import bets from '../../assets/CardList/bets.svg';
 import users from '../../assets/CardList/users.svg';
 import volume from '../../assets/CardList/volume.svg';
 import cash from '../../assets/Roulette/cash.svg';
-import crystal2 from '../../assets/Roulette/crystal1.svg';
-import crystal1 from '../../assets/Roulette/crystal2.svg';
+import crystal1 from '../../assets/Roulette/crystal1.svg';
+import crystal2 from '../../assets/Roulette/crystal2.svg';
 import crystal3 from '../../assets/Roulette/crystal3.svg';
 import crystal4 from '../../assets/Roulette/crystal4.svg';
 import crystal5 from '../../assets/Roulette/crystal5.svg';
 import cardData from '../../mocks/mockCards.json';
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
+import 'react-responsive-carousel/lib/styles/carousel.min.css';
 
 type CrystalKeys = 'crystal1' | 'crystal2' | 'crystal3' | 'crystal4' | 'crystal5';
 
@@ -24,124 +23,74 @@ const images: Record<CrystalKeys, string> = {
 	crystal5,
 };
 
-// NextArrow component
-const NextArrow = ({ onClick, currentSlide, slideCount }: any) => {
-	const isDisabled = currentSlide >= slideCount - 1;
-	return (
-		<FaArrowRight
-			onClick={onClick}
-			className={`cursor-pointer text-lg ${isDisabled ? 'text-[#47486D]' : 'text-[#FFC800]'}`}
-			style={{ position: 'absolute', bottom: '-25px', right: '10px' }}
-		/>
-	);
-};
+export const CardList = () => {
+	// Define breakpoints using react-responsive
+	const isDesktop = useMediaQuery({ minWidth: 1024 });
+	const isTablet = useMediaQuery({ minWidth: 750, maxWidth: 1023 });
+	const isMobile = useMediaQuery({ maxWidth: 749 });
 
-// PrevArrow component
-const PrevArrow = ({ onClick, currentSlide }: any) => {
-	const isDisabled = currentSlide === 0;
-	return (
-		<FaArrowLeft
-			onClick={onClick}
-			className={`cursor-pointer text-lg ${isDisabled ? 'text-[#47486D]' : 'text-[#FFC800]'}`}
-			style={{ position: 'absolute', bottom: '-25px', left: '10px' }}
-		/>
-	);
-};
-
-const CardList = () => {
-	const [sliderRef, setSliderRef] = useState<Slider | null>(null);
-	const containerRef = useRef<HTMLDivElement>(null);
-	const [containerWidth, setContainerWidth] = useState(0);
-
-	const settings: Settings = {
-		dots: false,
-		infinite: false,
-		speed: 500,
-		slidesToShow: 5,
-		slidesToScroll: 1,
-		nextArrow: <NextArrow />,
-		prevArrow: <PrevArrow />,
-		responsive: [
-			{
-				breakpoint: 1440,
-				settings: {
-					slidesToShow: 6,
-				},
-			},
-			{
-				breakpoint: 1280,
-				settings: {
-					slidesToShow: 5,
-				},
-			},
-			{
-				breakpoint: 1024,
-				settings: {
-					slidesToShow: 4,
-				},
-			},
-			{
-				breakpoint: 768,
-				settings: {
-					slidesToShow: 3,
-				},
-			},
-			{
-				breakpoint: 480,
-				settings: {
-					slidesToShow: 2,
-				},
-			},
-			{
-				breakpoint: 320,
-				settings: {
-					slidesToShow: 1,
-				},
-			},
-		],
-	};
-
-	const handleResize = () => {
-		if (containerRef.current) {
-			setContainerWidth(containerRef.current.offsetWidth);
-			if (sliderRef) {
-				sliderRef.slickGoTo(0); // Reset the carousel to the first slide
-			}
-		}
-	};
-
-	useEffect(() => {
-		handleResize();
-		window.addEventListener('resize', handleResize);
-
-		return () => {
-			window.removeEventListener('resize', handleResize);
-		};
-	}, [sliderRef]);
+	let centerSlidePercentage: any;
+	if (isDesktop) {
+		centerSlidePercentage = 100 / 5; // 5 slides on desktop
+	} else if (isTablet) {
+		centerSlidePercentage = 100 / 3; // 3 slides on tablet
+	} else if (isMobile) {
+		centerSlidePercentage = 100 / 2; // 2 slides on mobile
+	}
 
 	return (
-		<div className="relative w-full" ref={containerRef}>
-			<Slider ref={setSliderRef} {...settings}>
+		<div className="relative w-full">
+			<Carousel
+				className=""
+				showThumbs={false}
+				showArrows={!isDesktop}
+				showIndicators={false}
+				centerMode={true}
+				centerSlidePercentage={centerSlidePercentage}
+				swipeable={true}
+				emulateTouch={true}
+				showStatus={false}
+				renderArrowPrev={(clickHandler, hasPrev) =>
+					hasPrev && (
+						<div
+							className="absolute top-72 bottom-0 left-0 flex justify-center items-center p-3 opacity-50 hover:opacity-100 cursor-pointer z-20"
+							onClick={clickHandler}
+						>
+							<FaArrowLeftLong className="w-6 h-6 text-[#FFC800]" />
+						</div>
+					)
+				}
+				renderArrowNext={(clickHandler, hasNext) =>
+					hasNext && (
+						<div
+							className="absolute top-72 bottom-0 right-0 flex justify-center items-center p-3 opacity-50 hover:opacity-100 cursor-pointer z-20"
+							onClick={clickHandler}
+						>
+							<FaArrowRightLong className="w-6 h-6 text-[#FFC800]" />
+						</div>
+					)
+				}
+			>
 				{cardData.cards.map((card) => (
-					<div key={card.id} className="px-2 mt-20 mb-4">
-						<div className="group relative bg-[#131624] p-4 rounded-xl h-fit flex-shrink-0 text-white transition-all duration-300 transform hover:scale-105">
+					<div key={card.id} className="px-2 mt-16 pb-16">
+						<div className="group relative bg-[#131624] p-4 rounded-xl h-fit flex-shrink-0 text-white transition-all duration-300 transform hover:scale-105 max-w-[143px] mx-auto">
 							<div className="absolute inset-0 rounded-xl bg-gradient-to-tr from-transparent to-[#7366FF] via-[#7366ff21] opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100 z-0" />
 							<div className="relative z-10">
-								<div className="absolute top-[-40px] left-1/2 transform -translate-x-1/2 w-[80px] h-[80px] flex justify-center items-center">
-									<img src={images[card.image as CrystalKeys]} alt={`crystal-${card.id}`} className="h-[60px] z-40 absolute -top-6" />
-									<div className="absolute inset-0 -top-[30px] rounded-full bg-blue-500 opacity-[0.45] blur-xl" />
+								<div className="absolute left-1/2 transform -translate-x-1/2 w-[80px] h-[80px] flex justify-center items-center">
+									<img src={images[card.image as CrystalKeys]} alt={`crystal-${card.id}`} className="h-[60px] z-40 absolute -top-16" />
+									<div className="absolute -top-14 w-[60px] h-[60px] rounded-full bg-blue-500 opacity-[0.65] blur-xl" />
 								</div>
-								<div className="mt-4 text-center">
-									<span className="block text-lg text-[14px]">1 x</span>
+								<div className="mt-6 text-center">
+									<span className="block text-lg text-[14px] font-bold">1 x</span>
 									<button
 										type="button"
-										className="border-2 border-yellow-500 text-white text-[12px] px-6 py-2 rounded-lg mt-2 transition-all duration-300 ease-out group-hover:bg-yellow-500 group-hover:text-black"
+										className="border-2 border-yellow-500 text-white text-[12px] px-3 py-1 rounded-lg mt-2 transition-all duration-300 ease-out group-hover:bg-yellow-500 group-hover:text-black"
 									>
 										Choose
 									</button>
-									<div className="flex items-center justify-center mt-2 space-x-1 h-[18px]">
+									<div className="flex w-fit items-center mt-2 h-[18px] mx-auto mb-4">
 										<img src={cash} alt="cash" className="h-[12px]" />
-										<span className="text-[12px] leading-[16.56px]">{card.price}</span>
+										<span className="text-[12px] leading-[16.56px] font-medium">{card.price}</span>
 									</div>
 									<span className="block text-blue-500 text-[12px] font-[600]">{card.bonus}</span>
 									<div className="mt-4 space-y-1 text-sm text-gray-400">
@@ -155,7 +104,7 @@ const CardList = () => {
 												<span className="text-[9px]">{card.bets}</span>
 											</div>
 										</div>
-										<div className="flex items-center justify-center space-x-1 text-nowrap">
+										<div className="flex w-fit mx-auto items-center justify-center space-x-1 text-nowrap">
 											<img src={volume} alt="volume" className="h-[12px]" />
 											<span className="text-[9px]">{card.volume}</span>
 										</div>
@@ -165,7 +114,7 @@ const CardList = () => {
 						</div>
 					</div>
 				))}
-			</Slider>
+			</Carousel>
 		</div>
 	);
 };
