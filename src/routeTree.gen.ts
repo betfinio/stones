@@ -75,12 +75,54 @@ declare module '@tanstack/react-router' {
 
 // Create and export the route tree
 
-export const routeTree = rootRoute.addChildren({
-  IndexRoute,
-  FinishedRoute,
-  PopupRoute,
-  StonesIndexRoute,
-})
+export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
+  '/finished': typeof FinishedRoute
+  '/popup': typeof PopupRoute
+  '/stones': typeof StonesIndexRoute
+}
+
+export interface FileRoutesByTo {
+  '/': typeof IndexRoute
+  '/finished': typeof FinishedRoute
+  '/popup': typeof PopupRoute
+  '/stones': typeof StonesIndexRoute
+}
+
+export interface FileRoutesById {
+  __root__: typeof rootRoute
+  '/': typeof IndexRoute
+  '/finished': typeof FinishedRoute
+  '/popup': typeof PopupRoute
+  '/stones/': typeof StonesIndexRoute
+}
+
+export interface FileRouteTypes {
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths: '/' | '/finished' | '/popup' | '/stones'
+  fileRoutesByTo: FileRoutesByTo
+  to: '/' | '/finished' | '/popup' | '/stones'
+  id: '__root__' | '/' | '/finished' | '/popup' | '/stones/'
+  fileRoutesById: FileRoutesById
+}
+
+export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
+  FinishedRoute: typeof FinishedRoute
+  PopupRoute: typeof PopupRoute
+  StonesIndexRoute: typeof StonesIndexRoute
+}
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  FinishedRoute: FinishedRoute,
+  PopupRoute: PopupRoute,
+  StonesIndexRoute: StonesIndexRoute,
+}
+
+export const routeTree = rootRoute
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()
 
 /* prettier-ignore-end */
 
