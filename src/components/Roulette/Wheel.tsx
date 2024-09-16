@@ -1,7 +1,6 @@
-import confetti from 'canvas-confetti';
-import { AnimatePresence, motion, useAnimation } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
-import { useMediaQuery } from 'react-responsive';
+import {AnimatePresence, motion, useAnimation} from 'framer-motion';
+import {useEffect, useRef, useState} from 'react';
+import {useMediaQuery} from 'react-responsive';
 import arrowdown from '../../assets/Roulette/arrow-down.svg';
 import cash from '../../assets/Roulette/cash.svg';
 import neonImage from '../../assets/Roulette/neon-glow.png';
@@ -11,6 +10,9 @@ import CrystalAnimation2 from './Crystals/CrystalAnimation2';
 import CrystalAnimation3 from './Crystals/CrystalAnimation3';
 import CrystalAnimation4 from './Crystals/CrystalAnimation4';
 import CrystalAnimation5 from './Crystals/CrystalAnimation5';
+import {shootConfetti} from '@/src/lib/utils.ts';
+import Time from '@/src/components/Roulette/Time.tsx';
+import {useCurrentRound} from '@/src/lib/query';
 
 const crystals = [
 	{ name: 'Topaz', image: CrystalAnimation1, angle: 0 },
@@ -30,6 +32,7 @@ const initialRotation = 0; // Rotação inicial de 18 graus
 
 const Wheel = () => {
 	const controls = useAnimation();
+	const { data: round = 0 } = useCurrentRound();
 	const arrowControls = useAnimation();
 	const [isSpinning, setIsSpinning] = useState(false);
 	const [showWinnerMessage, setShowWinnerMessage] = useState(false);
@@ -39,29 +42,6 @@ const Wheel = () => {
 	const [currentRotation, setCurrentRotation] = useState(initialRotation);
 
 	const isMobile = useMediaQuery({ maxWidth: 749 });
-
-	const shootConfetti = () => {
-		confetti({
-			particleCount: 100,
-			angle: -90,
-			spread: 360,
-			startVelocity: 30,
-			origin: { x: 0.5, y: 0.1 },
-			colors: ['#FF2A51', '#B100A8', '#FFB300', '#B0D100', '#2462E7'],
-		});
-
-		confetti({
-			particleCount: 50,
-			spread: 360,
-			startVelocity: 40,
-			gravity: 0,
-			decay: 0.96,
-			scalar: 2,
-			shapes: ['circle'],
-			colors: ['#FF2A51', '#B100A8', '#FFB300', '#B0D100', '#2462E7'],
-			origin: { x: 0.5, y: 0.4 },
-		});
-	};
 
 	const spinWheel = async (targetAngle: number) => {
 		if (isSpinning) return;
@@ -283,38 +263,7 @@ const Wheel = () => {
 				<AnimatePresence mode="sync">
 					{showCountdown && (
 						<>
-							<motion.div
-								key="countdown"
-								className="absolute flex flex-col text-center w-full text-white"
-								style={{
-									top: `-${420 * scale}px`,
-									fontSize: `${20 * scale}px`,
-									zIndex: 4,
-								}}
-								initial={{ opacity: 0, scale: 0.5 }}
-								animate={{ opacity: 1, scale: 1.2 }}
-								exit={{ opacity: 0, scale: 0.8 }}
-								transition={{ duration: 0.3, stiffness: 500 }}
-							>
-								<span
-									style={{
-										fontSize: `${14 * scale * 2}px`,
-										lineHeight: `${17 * scale * 2}px`,
-										opacity: 0.4,
-									}}
-								>
-									Stop game in:
-								</span>
-								<span
-									className="font-medium"
-									style={{
-										fontSize: `${30 * scale * 1.4}px`,
-										lineHeight: `${36 * scale * 1.4}px`,
-									}}
-								>
-									10
-								</span>
-							</motion.div>
+							<Time round={round} scale={scale} />
 
 							<motion.div
 								key="arrow"

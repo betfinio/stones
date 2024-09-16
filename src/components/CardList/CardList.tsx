@@ -1,6 +1,6 @@
-import { FaArrowLeftLong, FaArrowRightLong } from 'react-icons/fa6';
-import { useMediaQuery } from 'react-responsive';
-import { Carousel } from 'react-responsive-carousel';
+import {FaArrowLeftLong, FaArrowRightLong} from 'react-icons/fa6';
+import {useMediaQuery} from 'react-responsive';
+import {Carousel} from 'react-responsive-carousel';
 import bets from '../../assets/CardList/bets.svg';
 import users from '../../assets/CardList/users.svg';
 import volume from '../../assets/CardList/volume.svg';
@@ -12,7 +12,7 @@ import crystal4 from '../../assets/Roulette/crystal4.svg';
 import crystal5 from '../../assets/Roulette/crystal5.svg';
 import cardData from '../../mocks/mockCards.json';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
-import { useCurrentRound, useStonesInfo } from '@/src/lib/query';
+import {useCurrentRound, useStonesInfo} from '@/src/lib/query';
 
 type CrystalKeys = 'crystal1' | 'crystal2' | 'crystal3' | 'crystal4' | 'crystal5';
 
@@ -33,7 +33,7 @@ export const CardList = () => {
 	const { data: stones = [] } = useStonesInfo(round);
 	console.log(stones);
 
-	let centerSlidePercentage: any;
+	let centerSlidePercentage = 0;
 	if (isDesktop) {
 		centerSlidePercentage = 100 / 5; // 5 slides on desktop
 	} else if (isTablet) {

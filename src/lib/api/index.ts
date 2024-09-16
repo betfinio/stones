@@ -1,14 +1,14 @@
-import { PARTNER, STONES } from '@/src/lib/global.ts';
-import type { StoneInfo } from '@/src/lib/types.ts';
-import { PartnerContract, StonesContract, arrayFrom } from '@betfinio/abi';
-import { multicall, readContract, writeContract } from '@wagmi/core';
-import type { Options } from 'betfinio_app/lib/types';
-import { encodeAbiParameters, parseAbiParameters } from 'viem';
+import {PARTNER, STONES} from '@/src/lib/global.ts';
+import type {StoneInfo} from '@/src/lib/types.ts';
+import {arrayFrom, PartnerContract, StonesContract} from '@betfinio/abi';
+import {multicall, readContract, writeContract} from '@wagmi/core';
+import type {Options} from 'betfinio_app/lib/types';
+import {encodeAbiParameters, parseAbiParameters} from 'viem';
 
 export const fetchCurrentRound = async (options: Options): Promise<number> => {
+	if (!options.config) throw new Error('Config is required');
 	return Number(
-		// biome-ignore lint/style/noNonNullAssertion: <explanation>
-		await readContract(options.config!, {
+		await readContract(options.config, {
 			abi: StonesContract.abi,
 			address: STONES,
 			functionName: 'getCurrentRound',
@@ -79,4 +79,10 @@ export const spin = async (params: SpinParams, options: Options) => {
 		functionName: 'placeBet',
 		args: [STONES, BigInt(params.amount) * 10n ** 18n, data],
 	});
+};
+
+export const getRoundTimes = (round: number): number[] => {
+	const start = round * 60 * 10;
+	const end = start + 60 * 10;
+	return [start, end];
 };
