@@ -1,5 +1,6 @@
-import {motion} from 'framer-motion';
-import {useState} from 'react';
+import { Tabs, TabsTrigger } from 'betfinio_app/tabs';
+import { motion } from 'framer-motion';
+import { useState } from 'react';
 import foxIcon from '../../assets/BetHistory/fox.svg';
 import bronze_trophy from '../../assets/BetHistory/trophy-bronze.svg';
 import gold_trophy from '../../assets/BetHistory/trophy-gold.svg';
@@ -12,7 +13,6 @@ import crystal3 from '../../assets/Roulette/crystal3.svg';
 import crystal4 from '../../assets/Roulette/crystal4.svg';
 import crystal5 from '../../assets/Roulette/crystal5.svg';
 import mockBetHistory from '../../mocks/mockBetHistory.json';
-import {Tabs, TabsTrigger} from "betfinio_app/tabs";
 
 const icons: { [key: string]: string } = {
 	gold_trophy,
