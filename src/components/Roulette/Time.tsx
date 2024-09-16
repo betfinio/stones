@@ -1,7 +1,7 @@
-import {type FC, useEffect, useState} from 'react';
-import {getRoundTimes} from '@/src/lib/api';
-import {motion} from 'framer-motion';
 import logger from '@/src/config/logger';
+import { getRoundTimes } from '@/src/lib/api';
+import { motion } from 'framer-motion';
+import { type FC, useEffect, useState } from 'react';
 
 const Time: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 	const [start, end] = getRoundTimes(round);

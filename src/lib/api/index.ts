@@ -1,9 +1,9 @@
-import {PARTNER, STONES} from '@/src/lib/global.ts';
-import type {StoneInfo} from '@/src/lib/types.ts';
-import {arrayFrom, PartnerContract, StonesContract} from '@betfinio/abi';
-import {multicall, readContract, writeContract} from '@wagmi/core';
-import type {Options} from 'betfinio_app/lib/types';
-import {encodeAbiParameters, parseAbiParameters} from 'viem';
+import { PARTNER, STONES } from '@/src/lib/global.ts';
+import type { StoneInfo } from '@/src/lib/types.ts';
+import { PartnerContract, StonesContract, arrayFrom } from '@betfinio/abi';
+import { multicall, readContract, writeContract } from '@wagmi/core';
+import type { Options } from 'betfinio_app/lib/types';
+import { encodeAbiParameters, parseAbiParameters } from 'viem';
 
 export const fetchCurrentRound = async (options: Options): Promise<number> => {
 	if (!options.config) throw new Error('Config is required');

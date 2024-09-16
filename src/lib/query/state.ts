@@ -1,5 +1,5 @@
-import {useEffect, useState} from 'react';
-import {useQuery, useQueryClient} from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 
 export const useSelectedStone = () => {
 	const [selectedStone, setSelectedStone] = useState<number>(1);

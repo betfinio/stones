@@ -1,20 +1,20 @@
-import {useCurrentRound, useSpin} from '@/src/lib/query';
-import {Button} from 'betfinio_app/button';
-import {Input} from 'betfinio_app/input';
-import {useBalance} from 'betfinio_app/lib/query/token';
-import {type ChangeEvent, useEffect, useState} from 'react';
-import {useAccount} from 'wagmi';
+import { useCurrentRound, useSpin } from '@/src/lib/query';
+import { useSelectedStone } from '@/src/lib/query/state.ts';
+import { arrayFrom } from '@betfinio/abi';
+import { BetValue } from 'betfinio_app/BetValue';
+import { Button } from 'betfinio_app/button';
+import { Input } from 'betfinio_app/input';
+import { useBalance } from 'betfinio_app/lib/query/token';
+import { LoaderIcon } from 'lucide-react';
+import { type ChangeEvent, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAccount } from 'wagmi';
 import cash from '../../assets/Roulette/cash.svg';
 import crystal2 from '../../assets/Roulette/crystal1.svg';
 import crystal1 from '../../assets/Roulette/crystal2.svg';
 import crystal3 from '../../assets/Roulette/crystal3.svg';
 import crystal4 from '../../assets/Roulette/crystal4.svg';
 import crystal5 from '../../assets/Roulette/crystal5.svg';
-import {arrayFrom} from '@betfinio/abi';
-import {useSelectedStone} from '@/src/lib/query/state.ts';
-import {useTranslation} from 'react-i18next';
-import {BetValue} from 'betfinio_app/BetValue';
-import {LoaderIcon} from 'lucide-react';
 
 const images: { [key: string]: string } = {
 	crystal1,

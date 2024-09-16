@@ -1,4 +1,4 @@
-import confetti from "canvas-confetti";
+import confetti from 'canvas-confetti';
 
 export const shootConfetti = () => {
 	confetti({
@@ -9,7 +9,7 @@ export const shootConfetti = () => {
 		origin: { x: 0.5, y: 0.1 },
 		colors: ['#FF2A51', '#B100A8', '#FFB300', '#B0D100', '#2462E7'],
 	});
-	
+
 	confetti({
 		particleCount: 50,
 		spread: 360,

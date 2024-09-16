@@ -1,6 +1,9 @@
-import {AnimatePresence, motion, useAnimation} from 'framer-motion';
-import {useEffect, useRef, useState} from 'react';
-import {useMediaQuery} from 'react-responsive';
+import Time from '@/src/components/Roulette/Time.tsx';
+import { useCurrentRound } from '@/src/lib/query';
+import { shootConfetti } from '@/src/lib/utils.ts';
+import { AnimatePresence, motion, useAnimation } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
+import { useMediaQuery } from 'react-responsive';
 import arrowdown from '../../assets/Roulette/arrow-down.svg';
 import cash from '../../assets/Roulette/cash.svg';
 import neonImage from '../../assets/Roulette/neon-glow.png';
@@ -10,9 +13,6 @@ import CrystalAnimation2 from './Crystals/CrystalAnimation2';
 import CrystalAnimation3 from './Crystals/CrystalAnimation3';
 import CrystalAnimation4 from './Crystals/CrystalAnimation4';
 import CrystalAnimation5 from './Crystals/CrystalAnimation5';
-import {shootConfetti} from '@/src/lib/utils.ts';
-import Time from '@/src/components/Roulette/Time.tsx';
-import {useCurrentRound} from '@/src/lib/query';
 
 const crystals = [
 	{ name: 'Topaz', image: CrystalAnimation1, angle: 0 },
