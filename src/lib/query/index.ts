@@ -1,5 +1,5 @@
-import { type SpinParams, fetchCurrentRound, fetchRoundBank, fetchRoundStones, spin } from '@/src/lib/api';
-import type { StoneInfo } from '@/src/lib/types.ts';
+import { type SpinParams, fetchCurrentRound, fetchRoundBank, fetchRoundBets, fetchRoundStones, spin } from '@/src/lib/api';
+import type { StoneInfo, StonesBet } from '@/src/lib/types.ts';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import type { WriteContractErrorType, WriteContractReturnType } from 'viem';
 import { useConfig } from 'wagmi';
@@ -17,6 +17,15 @@ export const useRoundBank = (round: number) => {
 	return useQuery<bigint>({
 		queryKey: ['stones', 'round', round, 'bank'],
 		queryFn: () => fetchRoundBank(round, { config }),
+	});
+};
+
+export const useRoundBets = (round: number) => {
+	const config = useConfig();
+	return useQuery<StonesBet[]>({
+		queryKey: ['stones', 'round', round, 'bets'],
+		queryFn: () => fetchRoundBets(round, { config }),
+		throwOnError: true,
 	});
 };
 

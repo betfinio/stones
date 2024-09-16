@@ -1,8 +1,13 @@
 import { useCurrentRound, useSpin } from '@/src/lib/query';
+import { useSelectedStone } from '@/src/lib/query/state.ts';
+import { arrayFrom } from '@betfinio/abi';
+import { BetValue } from 'betfinio_app/BetValue';
 import { Button } from 'betfinio_app/button';
 import { Input } from 'betfinio_app/input';
 import { useBalance } from 'betfinio_app/lib/query/token';
-import { type ChangeEvent, useState } from 'react';
+import { LoaderIcon } from 'lucide-react';
+import { type ChangeEvent, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
 import cash from '../../assets/Roulette/cash.svg';
 import crystal2 from '../../assets/Roulette/crystal1.svg';
@@ -10,7 +15,6 @@ import crystal1 from '../../assets/Roulette/crystal2.svg';
 import crystal3 from '../../assets/Roulette/crystal3.svg';
 import crystal4 from '../../assets/Roulette/crystal4.svg';
 import crystal5 from '../../assets/Roulette/crystal5.svg';
-import betData from '../../mocks/mockBetAmount.json';
 
 const images: { [key: string]: string } = {
 	crystal1,
@@ -21,22 +25,33 @@ const images: { [key: string]: string } = {
 };
 
 const BetAmount = () => {
+	const { t } = useTranslation('', { keyPrefix: 'stones.controls' });
 	const [betPercentage, setBetPercentage] = useState(0);
-	const [selectedCrystal, setSelectedCrystal] = useState<string | null>(null);
-
+	const { data: selectedCrystal, setSelectedStone } = useSelectedStone();
 	const { data: round = 0 } = useCurrentRound();
-	const { mutate: spin } = useSpin();
+	const { mutate: spin, isPending } = useSpin();
 	const { address } = useAccount();
 	const { data: balance = 0n } = useBalance(address);
 	const [amount, setAmount] = useState<string>('10000');
 
+	const [potentialWin, setPotentialWin] = useState<bigint>(0n);
+
+	useEffect(() => {
+		setPotentialWin(BigInt(amount) * 5n);
+	}, [amount]);
+
 	const handleSliderChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setBetPercentage(Number(e.target.value));
+		if (e.target.value === '0') {
+			setAmount('1000');
+			return;
+		}
 		setAmount(((balance * BigInt(e.target.value)) / 100n / 10n ** 18n).toString());
 	};
 
-	const handleCrystalClick = (crystal: string) => {
-		setSelectedCrystal(crystal);
+	const handleCrystalClick = (crystal: number) => {
+		console.log(crystal);
+		setSelectedStone(crystal);
 	};
 
 	const handleAmountChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -45,7 +60,7 @@ const BetAmount = () => {
 	};
 
 	const handleSpin = () => {
-		spin({ amount: Number(amount), side: 1, round: round });
+		spin({ amount: Number(amount), side: selectedCrystal, round: round });
 	};
 
 	return (
@@ -80,26 +95,30 @@ const BetAmount = () => {
 
 			{/* Button Section */}
 			<div className="flex flex-col items-center w-full md:w-[224px] max-w-[300px]">
-				<Button className={'hover:scale-105'} type="button" onClick={handleSpin}>
-					{betData.buttonText}
+				<Button className={'hover:scale-105 duration-200 transition-all flex gap-1 w-full'} type="button" disabled={isPending} onClick={handleSpin}>
+					{isPending ? (
+						<LoaderIcon className={'animate-spin'} />
+					) : (
+						<>
+							{t('placeBet')} <BetValue value={Number(potentialWin)} withIcon iconClassName={'border border-gray-800 rounded-full'} />
+						</>
+					)}
 				</Button>
 				<div className="flex space-x-1 mt-4 h-[25px] w-full justify-center items-start">
-					{betData.crystals.map((crystal, index) => (
+					{arrayFrom(5).map((crystal, index) => (
 						<div
 							key={index}
 							className={`relative flex items-center justify-center border-1 border-[#151A2A]  w-[44px] h-[25px] bg-primaryLight rounded-md cursor-pointer hover:scale-110 transition-all ease-in ${
-								selectedCrystal === crystal ? 'border-2 border-yellow-500' : ''
+								selectedCrystal === (crystal + 1) ? 'border-2 border-yellow-500' : ''
 							}`}
-							onClick={() => handleCrystalClick(crystal)}
+							onClick={() => handleCrystalClick(crystal + 1)}
 							onKeyDown={(e) => {
 								if (e.key === 'Enter' || e.key === ' ') {
-									handleCrystalClick(crystal);
+									handleCrystalClick(crystal + 1);
 								}
 							}}
-							tabIndex={0}
-							role="button"
 						>
-							<img src={images[crystal]} alt={`crystal-${index}`} className="h-[15px] z-20" />
+							<img src={images[`crystal${crystal + 1}`]} alt={`crystal-${index}`} className="h-[15px] z-20" />
 							{index === 0 && (
 								<div className="absolute top-[2px] w-[20px] h-[20px] rounded-full bg-blue-500 opacity-70 blur-sm z-10 hover:scale-110 transition-all ease-linear" />
 							)}

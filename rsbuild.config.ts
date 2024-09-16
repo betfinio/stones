@@ -14,10 +14,10 @@ function getOutput() {
 
 export default defineConfig({
 	server: {
-		port: 7777,
+		port: 4002,
 	},
 	dev: {
-		assetPrefix: 'http://localhost:7777',
+		assetPrefix: 'http://localhost:4002',
 	},
 	html: {
 		title: 'BetFin Stones',
