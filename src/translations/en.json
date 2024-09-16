@@ -3,5 +3,9 @@
 
 	"controls": {
 		"placeBet": "Place a bet to win"
+	},
+	"info": {
+		"yourBet": "Your BET",
+		"potentialWin": "Potential win"
 	}
 }

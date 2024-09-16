@@ -42,6 +42,10 @@ const BetAmount = () => {
 
 	const handleSliderChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setBetPercentage(Number(e.target.value));
+		if (e.target.value === '0') {
+			setAmount('1000');
+			return;
+		}
 		setAmount(((balance * BigInt(e.target.value)) / 100n / 10n ** 18n).toString());
 	};
 

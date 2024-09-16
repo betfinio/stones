@@ -13,6 +13,7 @@
 	},
 	"dependencies": {
 		"@betfinio/abi": "^1.0.5",
+		"@betfinio/ui": "^1.0.5",
 		"@module-federation/enhanced": "^0.3.5",
 		"@supabase/supabase-js": "^2.45.4",
 		"@tanstack/react-query": "^5.56.2",
