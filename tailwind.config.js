@@ -2,7 +2,7 @@
 module.exports = {
 	darkMode: ['class'],
 	important: '.stones',
-	content: ['./pages/**/*.{ts,tsx}', './components/**/*.{ts,tsx}', './app/**/*.{ts,tsx}', './src/**/*.{ts,tsx}', './@mf-types/**/*.*'],
+	content: ['./src/**/*.{ts,tsx}'],
 	prefix: '',
 	theme: {
 		container: {
