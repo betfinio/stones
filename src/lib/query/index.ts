@@ -1,8 +1,8 @@
-import {fetchCurrentRound, fetchRoundBank, fetchRoundBets, fetchRoundStones, spin, type SpinParams} from '@/src/lib/api';
-import type {StoneInfo, StonesBet} from '@/src/lib/types.ts';
-import {useMutation, useQuery} from '@tanstack/react-query';
-import type {WriteContractErrorType, WriteContractReturnType} from 'viem';
-import {useConfig} from 'wagmi';
+import { type SpinParams, fetchCurrentRound, fetchRoundBank, fetchRoundBets, fetchRoundStones, spin } from '@/src/lib/api';
+import type { StoneInfo, StonesBet } from '@/src/lib/types.ts';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import type { WriteContractErrorType, WriteContractReturnType } from 'viem';
+import { useConfig } from 'wagmi';
 
 export const useCurrentRound = () => {
 	const config = useConfig();

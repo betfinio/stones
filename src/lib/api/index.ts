@@ -1,10 +1,10 @@
 import logger from '@/src/config/logger';
-import {PARTNER, STONES} from '@/src/lib/global.ts';
-import type {StoneInfo, StonesBet} from '@/src/lib/types.ts';
-import {arrayFrom, PartnerContract, StonesBetContract, StonesContract} from '@betfinio/abi';
-import {multicall, readContract, writeContract} from '@wagmi/core';
-import type {Options} from 'betfinio_app/lib/types';
-import {type Address, encodeAbiParameters, parseAbiParameters} from 'viem';
+import { PARTNER, STONES } from '@/src/lib/global.ts';
+import type { StoneInfo, StonesBet } from '@/src/lib/types.ts';
+import { PartnerContract, StonesBetContract, StonesContract, arrayFrom } from '@betfinio/abi';
+import { multicall, readContract, writeContract } from '@wagmi/core';
+import type { Options } from 'betfinio_app/lib/types';
+import { type Address, encodeAbiParameters, parseAbiParameters } from 'viem';
 
 export const fetchCurrentRound = async (options: Options): Promise<number> => {
 	if (!options.config) throw new Error('Config is required');

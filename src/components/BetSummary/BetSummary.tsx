@@ -1,12 +1,12 @@
+import { useCurrentRound, useRoundBank, useRoundBets } from '@/src/lib/query';
+import { ZeroAddress } from '@betfinio/abi'; // Define a type for the icon keys
+import { MoneyHand } from '@betfinio/ui';
+import { Stones } from '@betfinio/ui/dist/icons/StoneBet';
+import { BetValue } from 'betfinio_app/BetValue';
+import { UserIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useAccount } from 'wagmi';
 import mockBetSummary from '../../mocks/mockBetSummary.json';
-import {useCurrentRound, useRoundBank, useRoundBets} from '@/src/lib/query';
-import {BetValue} from 'betfinio_app/BetValue';
-import {Stones} from '@betfinio/ui/dist/icons/StoneBet';
-import {UserIcon} from 'lucide-react';
-import {MoneyHand} from '@betfinio/ui';
-import {useTranslation} from 'react-i18next';
-import {useAccount} from 'wagmi';
-import {ZeroAddress} from '@betfinio/abi'; // Define a type for the icon keys
 
 const BetSummary = () => {
 	const { betInfo } = mockBetSummary;
