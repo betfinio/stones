@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion';
-import { useState } from 'react';
+import {motion} from 'framer-motion';
+import {useState} from 'react';
 import foxIcon from '../../assets/BetHistory/fox.svg';
 import bronze_trophy from '../../assets/BetHistory/trophy-bronze.svg';
 import gold_trophy from '../../assets/BetHistory/trophy-gold.svg';
@@ -12,6 +12,7 @@ import crystal3 from '../../assets/Roulette/crystal3.svg';
 import crystal4 from '../../assets/Roulette/crystal4.svg';
 import crystal5 from '../../assets/Roulette/crystal5.svg';
 import mockBetHistory from '../../mocks/mockBetHistory.json';
+import {Tabs, TabsTrigger} from "betfinio_app/tabs";
 
 const icons: { [key: string]: string } = {
 	gold_trophy,
@@ -78,31 +79,11 @@ const BetHistory = () => {
 
 	return (
 		<div className="w-full lg:h-[650px] p-2 md:p-3 lg:p-4">
-			{/* Crystal Selector */}
-			<div className="flex space-x-1 h-[25px] w-full justify-center items-start my-2">
-				{['crystal1', 'crystal2', 'crystal3', 'crystal4', 'crystal5'].map((crystal, index) => (
-					<div
-						key={index}
-						className={`relative overflow-hidden flex items-center justify-center border-2 border-[#151A2A] w-[44px] h-[25px] bg-primaryLight rounded-md cursor-pointer hover:scale-110 transition-all ease-in ${
-							selectedCrystal === crystal ? 'border-2 border-yellow-500' : ''
-						}`}
-						onClick={() => handleCrystalClick(crystal)}
-						onKeyDown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								handleCrystalClick(crystal);
-							}
-						}}
-						tabIndex={0}
-						role="button"
-					>
-						<img src={icons[crystal]} alt={`crystal-${index}`} className="h-[15px] z-20" />
-						{index === 0 && (
-							<div className="absolute top-[2px] w-[20px] h-[20px] rounded-full bg-blue-500 opacity-70 blur-sm z-10 hover:scale-110 transition-all ease-linear" />
-						)}
-					</div>
-				))}
-			</div>
-
+			<Tabs>
+				<TabsTrigger value={'players'}>Players</TabsTrigger>
+				<TabsTrigger value={'bets'}>Bets</TabsTrigger>
+				<TabsTrigger value={'bonuses'}>Bonuses</TabsTrigger>
+			</Tabs>
 			{/* Tabs */}
 			<div className="flex justify-center space-x-4 mb-4">
 				{['Players', 'Bonuses', 'Bets'].map((tab) => (
