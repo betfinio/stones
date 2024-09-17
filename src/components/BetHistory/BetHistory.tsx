@@ -1,75 +1,35 @@
-import PlayersTab from '@/src/components/BetHistory/PlayersTab.tsx';
+import BetsTab from '@/src/components/BetHistory/BetsTab';
+import BonusTab from '@/src/components/BetHistory/BonusTab';
+import PlayersTab from '@/src/components/BetHistory/PlayersTab';
 import { useCurrentRound } from '@/src/lib/query';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from 'betfinio_app/tabs';
-import bronze_trophy from '../../assets/BetHistory/trophy-bronze.svg';
-import gold_trophy from '../../assets/BetHistory/trophy-gold.svg';
-import silver_trophy from '../../assets/BetHistory/trophy-silver.svg';
-import cashBlue from '../../assets/BetTable/cash-blue.svg';
-import cash from '../../assets/Roulette/cash.svg';
-import crystal2 from '../../assets/Roulette/crystal1.svg';
-import crystal1 from '../../assets/Roulette/crystal2.svg';
-import crystal3 from '../../assets/Roulette/crystal3.svg';
-import crystal4 from '../../assets/Roulette/crystal4.svg';
-import crystal5 from '../../assets/Roulette/crystal5.svg';
-
-const icons: { [key: string]: string } = {
-	gold_trophy,
-	silver_trophy,
-	bronze_trophy,
-	crystal1,
-	crystal2,
-	crystal3,
-	crystal4,
-	crystal5,
-	cash,
-	cashBlue,
-};
-
-// Type definitions
-type PlayerData = {
-	id: string;
-	nickname: string;
-	address: string;
-	share: string;
-	amount: string;
-	trophy?: string;
-};
-
-type BonusData = {
-	id: string;
-	nickname: string;
-	address: string;
-	amount: string;
-	bonus: string;
-	trophy?: string;
-};
-
-type BetData = {
-	id: string;
-	nickname: string;
-	address: string;
-	bet: string;
-	crystal: string;
-};
+import { useTranslation } from 'react-i18next';
 
 const BetHistory = () => {
+	const { t } = useTranslation('', { keyPrefix: 'stones.history.tabs' });
 	const { data: round = 0 } = useCurrentRound();
 	return (
-		<div className="w-full lg:h-[650px] p-2 md:p-3 lg:p-4">
-			<Tabs defaultValue={'players'} className={'min-w-[300px]'}>
-				<TabsList className={'w-full justify-between gap-2 grid grid-cols-3'}>
-					<TabsTrigger variant={'contained'} value={'players'}>
-						Players
+		<div className="w-full lg:h-[650px] p-2 md:p-3">
+			<Tabs defaultValue={'bets'} className={'min-w-[300px] md:max-w-[350px]'}>
+				<TabsList className={'w-full bg-transparent justify-between gap-2 grid grid-cols-3'}>
+					<TabsTrigger className={'bg-primary'} variant={'contained'} value={'bets'}>
+						{t('bets')}
 					</TabsTrigger>
-					<TabsTrigger variant={'contained'} value={'bets'}>
-						Bets
+					<TabsTrigger className={'bg-primary'} variant={'contained'} value={'players'}>
+						{t('players')}
 					</TabsTrigger>
-					<TabsTrigger variant={'contained'} value={'bonuses'}>
-						Bonuses
+					<TabsTrigger className={'bg-primary'} variant={'contained'} value={'bonuses'}>
+						{t('bonus')}
 					</TabsTrigger>
 				</TabsList>
-				<TabsContent value={'players'}>
+				<TabsContent value={'players'} className={'overflow-hidden'}>
 					<PlayersTab round={round} />
+				</TabsContent>
+				<TabsContent value={'bets'} className={'overflow-hidden'}>
+					<BetsTab round={round} />
+				</TabsContent>
+				<TabsContent value={'bonuses'} className={'overflow-hidden'}>
+					<BonusTab round={round} />
 				</TabsContent>
 			</Tabs>
 
@@ -102,7 +62,7 @@ const BetHistory = () => {
 			{/*				style={{ width: '100%', height: '78px' }}*/}
 			{/*			>*/}
 			{/*				<div className="flex items-center space-x-4">*/}
-			{/*					<img src={foxIcon} alt="fox" className="h-[24px]" />*/}
+			{/*					<img src={foxIcon} alt="fox" className="h-h-6" />*/}
 			{/*					<div className="flex flex-col w-fit pr-1">*/}
 			{/*						<span className="text-white text-[12px] font-semibold flex items-center">*/}
 			{/*							{item.nickname.replace(/(.{5}).*(.{4})/, '$1..$2')}*/}

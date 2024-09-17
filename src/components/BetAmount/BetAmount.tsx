@@ -1,5 +1,6 @@
-import { useCurrentRound, useSpin } from '@/src/lib/query';
-import { useSelectedStone } from '@/src/lib/query/state.ts';
+import { useCurrentRound } from '@/src/lib/query';
+import { usePlaceBet } from '@/src/lib/query/mutations';
+import { useSelectedStone } from '@/src/lib/query/state';
 import { arrayFrom } from '@betfinio/abi';
 import { BetValue } from 'betfinio_app/BetValue';
 import { Button } from 'betfinio_app/button';
@@ -10,8 +11,8 @@ import { type ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
 import cash from '../../assets/Roulette/cash.svg';
-import crystal2 from '../../assets/Roulette/crystal1.svg';
-import crystal1 from '../../assets/Roulette/crystal2.svg';
+import crystal1 from '../../assets/Roulette/crystal1.svg';
+import crystal2 from '../../assets/Roulette/crystal2.svg';
 import crystal3 from '../../assets/Roulette/crystal3.svg';
 import crystal4 from '../../assets/Roulette/crystal4.svg';
 import crystal5 from '../../assets/Roulette/crystal5.svg';
@@ -29,7 +30,7 @@ const BetAmount = () => {
 	const [betPercentage, setBetPercentage] = useState(0);
 	const { data: selectedCrystal, setSelectedStone } = useSelectedStone();
 	const { data: round = 0 } = useCurrentRound();
-	const { mutate: spin, isPending } = useSpin();
+	const { mutate: placeBet, isPending } = usePlaceBet();
 	const { address } = useAccount();
 	const { data: balance = 0n } = useBalance(address);
 	const [amount, setAmount] = useState<string>('10000');
@@ -60,7 +61,7 @@ const BetAmount = () => {
 	};
 
 	const handleSpin = () => {
-		spin({ amount: Number(amount), side: selectedCrystal, round: round });
+		placeBet({ amount: Number(amount), side: selectedCrystal, round: round });
 	};
 
 	return (
@@ -70,9 +71,9 @@ const BetAmount = () => {
 				<span className="text-white font-semibold mb-2">Bet amount</span>
 				<div className="flex items-center px-4 space-x-2 border border-gray-500 rounded-lg p-2 w-full h-[40px]">
 					<img src={cash} alt="cash" className="h-[20px]" />
-					<Input className="text-white text-[12px] border-0" value={amount} onChange={handleAmountChange} type={'number'} min={0} />
+					<Input className="text-white text-sm border-0" value={amount} onChange={handleAmountChange} type={'number'} min={0} />
 				</div>
-				<div className="relative mt-2 h-[24px]">
+				<div className="relative mt-2 h-h-6">
 					<div className="w-full bg-gray-700 h-[2px] rounded-full mt-1 relative">
 						<div className="absolute bg-yellow-500 h-[2px] rounded-full" style={{ width: `${betPercentage}%` }} />
 						<div className="absolute bg-yellow-500 w-[10px] h-[10px] top-[-4px] rounded-full" style={{ left: `calc(${betPercentage}% - 5px)` }} />

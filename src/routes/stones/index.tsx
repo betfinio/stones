@@ -1,9 +1,9 @@
-import BetAmount from '@/src/components/BetAmount/BetAmount.tsx';
-import BetHistory from '@/src/components/BetHistory/BetHistory.tsx';
-import BetSummary from '@/src/components/BetSummary/BetSummary.tsx';
-import CardList from '@/src/components/CardList/CardList.tsx';
-import Roulette from '@/src/components/Roulette/Roulette.tsx';
-import TableBet from '@/src/components/TableBet/TableBet.tsx';
+import BetAmount from '@/src/components/BetAmount/BetAmount';
+import BetHistory from '@/src/components/BetHistory/BetHistory';
+import BetSummary from '@/src/components/BetSummary/BetSummary';
+import CardList from '@/src/components/CardList/CardList';
+import Roulette from '@/src/components/Roulette/Roulette';
+import TableBet from '@/src/components/TableBet/TableBet';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/stones/')({

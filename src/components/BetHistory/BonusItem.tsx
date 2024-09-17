@@ -1,5 +1,5 @@
 import { ETHSCAN } from '@/src/lib/global';
-import { useRoundBank, useRoundBets } from '@/src/lib/query';
+import { useRoundBank } from '@/src/lib/query';
 import type { StonesBet } from '@/src/lib/types';
 import { truncateEthAddress } from '@betfinio/abi';
 import { Fox } from '@betfinio/ui';
@@ -7,20 +7,14 @@ import { BetValue } from 'betfinio_app/BetValue';
 import { useCustomUsername, useUsername } from 'betfinio_app/lib/query/username';
 import { cx } from 'class-variance-authority';
 import type { FC } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
 
-const PlayerItem: FC<{ bet: StonesBet; round: number; className?: string }> = ({ bet, round, className }) => {
-	const { t } = useTranslation('', { keyPrefix: 'stones.history' });
-
+const BonusItem: FC<{ bet: StonesBet; round: number; className?: string }> = ({ bet, round, className }) => {
 	const { data: bank = 0n } = useRoundBank(round);
-	const share = Number(bet.amount * 100n) / Number(bank);
-	const { data: bets = [] } = useRoundBets(round);
+	const bonusPool = (bank * 5n) / 100n;
 	const { address } = useAccount();
-	const betsNumber = bets.filter((b) => b.player === bet.player).length;
 	const { data: username } = useUsername(bet.player);
 	const { data: customUsername } = useCustomUsername(address, bet.player);
-
 	return (
 		<div className={cx('rounded-lg flex bg-primary justify-between', className)}>
 			<div className={'py-3 px-2 flex justify-between items-center grow gap-2'}>
@@ -35,18 +29,17 @@ const PlayerItem: FC<{ bet: StonesBet; round: number; className?: string }> = ({
 						>
 							{customUsername || username || truncateEthAddress(bet.player)}
 						</a>
-						<span className={cx('opacity-0', betsNumber > 0 && 'opacity-100')}>{t('betCount', { count: betsNumber })}</span>
+						<a href={`${ETHSCAN}/address/${bet.address}`} target={'_blank'} rel={'noreferrer'}>
+							{truncateEthAddress(bet.address)}
+						</a>
 					</div>
 				</div>
 				<div className={'flex flex-col items-end text-xs gap-2'}>
-					<span className={'font-semibold text-sm'}>{share.toFixed(2)}%</span>
-					<span>
-						<BetValue precision={2} value={bet.amount} withIcon />
-					</span>
+					<BetValue precision={2} value={bet.amount} withIcon />
 				</div>
 			</div>
 		</div>
 	);
 };
 
-export default PlayerItem;
+export default BonusItem;

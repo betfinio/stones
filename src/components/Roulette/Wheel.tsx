@@ -1,6 +1,6 @@
-import Time from '@/src/components/Roulette/Time.tsx';
+import Time from '@/src/components/Roulette/Time';
 import { useCurrentRound } from '@/src/lib/query';
-import { shootConfetti } from '@/src/lib/utils.ts';
+import { shootConfetti } from '@/src/lib/utils';
 import { AnimatePresence, motion, useAnimation } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { useMediaQuery } from 'react-responsive';

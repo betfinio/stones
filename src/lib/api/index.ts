@@ -1,6 +1,6 @@
 import logger from '@/src/config/logger';
-import { PARTNER, STONES } from '@/src/lib/global.ts';
-import type { StoneInfo, StonesBet } from '@/src/lib/types.ts';
+import { PARTNER, STONES } from '@/src/lib/global';
+import type { StoneInfo, StonesBet } from '@/src/lib/types';
 import { PartnerContract, StonesBetContract, StonesContract, arrayFrom } from '@betfinio/abi';
 import { multicall, readContract, writeContract } from '@wagmi/core';
 import type { Options } from 'betfinio_app/lib/types';
@@ -117,15 +117,15 @@ export interface SpinParams {
 	side: number; // 1-5,
 	round: number;
 }
-export const spin = async (params: SpinParams, options: Options) => {
+export const placeBet = async (params: SpinParams, options: Options) => {
+	if (!options.config) throw new Error('Config is required');
 	const data = encodeAbiParameters(parseAbiParameters('uint256 amount, uint256 side, uint256 round'), [
 		BigInt(params.amount),
 		BigInt(params.side),
 		BigInt(params.round),
 	]);
 
-	// biome-ignore lint/style/noNonNullAssertion: should be there
-	return writeContract(options.config!, {
+	return writeContract(options.config, {
 		address: PARTNER,
 		abi: PartnerContract.abi,
 		functionName: 'placeBet',

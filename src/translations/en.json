@@ -2,10 +2,26 @@
 	"title": "Template",
 
 	"controls": {
-		"placeBet": "Place a bet to win"
+		"placeBet": "Place a bet to win",
+		"pending": {
+			"title": "Placing a bet",
+			"message": "Please wait while your bet is being placed"
+		},
+		"success": {
+			"title": "Bet placed",
+			"message": "Your bet has been placed successfully"
+		}
 	},
 	"info": {
 		"yourBet": "Your BET",
 		"potentialWin": "Potential win"
+	},
+	"history": {
+		"tabs": {
+			"bets": "Bets",
+			"players": "Players",
+			"bonus": "Bonuses"
+		},
+		"betCount": "{count, plural, =0 {No bets} =1 {# bet} other {# bets}}"
 	}
 }
