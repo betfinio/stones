@@ -1,9 +1,9 @@
 import Time from '@/src/components/Roulette/Time';
-import { useCurrentRound } from '@/src/lib/query';
-import { shootConfetti } from '@/src/lib/utils';
+import { useCurrentRound, useSideBank } from '@/src/lib/query';
+import { useSelectedStone } from '@/src/lib/query/state.ts';
+import { BetValue } from 'betfinio_app/BetValue';
 import { AnimatePresence, motion, useAnimation } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
-import { useMediaQuery } from 'react-responsive';
 import arrowdown from '../../assets/Roulette/arrow-down.svg';
 import cash from '../../assets/Roulette/cash.svg';
 import neonImage from '../../assets/Roulette/neon-glow.png';
@@ -15,57 +15,80 @@ import CrystalAnimation4 from './Crystals/CrystalAnimation4';
 import CrystalAnimation5 from './Crystals/CrystalAnimation5';
 
 const crystals = [
-	{ name: 'Topaz', image: CrystalAnimation1, angle: 0 },
-	{ name: 'Topaz', image: CrystalAnimation1, angle: 180 },
-	{ name: 'Ruby', image: CrystalAnimation2, angle: 36 },
-	{ name: 'Ruby', image: CrystalAnimation2, angle: 216 },
-	{ name: 'Emerald', image: CrystalAnimation3, angle: 72 },
-	{ name: 'Emerald', image: CrystalAnimation3, angle: 252 },
-	{ name: 'Citrine', image: CrystalAnimation4, angle: 108 },
-	{ name: 'Citrine', image: CrystalAnimation4, angle: 288 },
-	{ name: 'Zircon', image: CrystalAnimation5, angle: 144 },
-	{ name: 'Zircon', image: CrystalAnimation5, angle: 324 },
+	{ name: 1, image: CrystalAnimation1, angle: 180 },
+	{ name: 1, image: CrystalAnimation1, angle: 0 },
+	{ name: 2, image: CrystalAnimation2, angle: 216 },
+	{ name: 2, image: CrystalAnimation2, angle: 36 },
+	{ name: 3, image: CrystalAnimation3, angle: 252 },
+	{ name: 3, image: CrystalAnimation3, angle: 72 },
+	{ name: 4, image: CrystalAnimation4, angle: 288 },
+	{ name: 4, image: CrystalAnimation4, angle: 108 },
+	{ name: 5, image: CrystalAnimation5, angle: 324 },
+	{ name: 5, image: CrystalAnimation5, angle: 144 },
 ];
 
 const baseSize = 1000; // Tamanho base para cálculo de escala
-const initialRotation = 0; // Rotação inicial de 18 graus
 
 const Wheel = () => {
 	const controls = useAnimation();
-	const { data: round = 0 } = useCurrentRound();
 	const arrowControls = useAnimation();
+
+	const { data: round = 0 } = useCurrentRound();
+	const { data: selectedStone = 1 } = useSelectedStone();
+	const { data: sideBank = [0n, 0n, 0n, 0n, 0n] } = useSideBank(round);
+	console.log(sideBank);
 	const [isSpinning, setIsSpinning] = useState(false);
+	const [scale, setScale] = useState(1);
+
+	const containerRef = useRef<HTMLDivElement>(null);
+
 	const [showWinnerMessage, setShowWinnerMessage] = useState(false);
 	const [showCountdown, setShowCountdown] = useState(true);
-	const containerRef = useRef<HTMLDivElement>(null);
-	const [scale, setScale] = useState(1);
-	const [currentRotation, setCurrentRotation] = useState(initialRotation);
 
-	const isMobile = useMediaQuery({ maxWidth: 749 });
+	useEffect(() => {
+		const angle = crystals.find((crystal) => crystal.name === selectedStone)?.angle || 0;
+		rotateWheel(-angle);
+	}, [selectedStone]);
 
-	const spinWheel = async (targetAngle: number) => {
+	const rotateWheel = async (targetAngle: number) => {
+		let rotationNeeded = targetAngle;
+		if (rotationNeeded <= 0) {
+			rotationNeeded += 360;
+		}
+		await controls.start({
+			rotate: rotationNeeded,
+			transition: {
+				duration: 0.5,
+				ease: [0.33, 1, 0.68, 1],
+			},
+		});
+	};
+
+	const spinWheel = async (targetAngle: number, spins = 4) => {
 		if (isSpinning) return;
 		setIsSpinning(true);
 
-		let rotationNeeded = targetAngle - (currentRotation % 360);
+		let rotationNeeded = targetAngle;
 		if (rotationNeeded <= 0) {
 			rotationNeeded += 360;
 		}
 
-		const extraSpins = 360 * 4; // Adiciona 4 voltas completas
-		const finalRotation = currentRotation + extraSpins + rotationNeeded;
+		const extraSpins = 360 * spins; // Adiciona 4 voltas completas
+		const finalRotation = extraSpins + rotationNeeded;
 
 		// Iniciar a animação da seta com oscilações mais realistas
-		arrowControls.start({
-			rotate: [
-				0, 10, 0, 15, 0, 20, 0, 30, 0, 40, 0, 45, 0, 45, 0, 45, 0, 45, 0, 45, 0, 45, 0, 45, 0, 45, 0, 45, 0, 45, 0, 45, 0, 45, 0, 45, 0, 30, 0, 30, 0, 20, 0,
-				10, 0, 10, 0, 5, 0, 5, 0, 0, 0, 0, 0, 0,
-			],
-			transition: {
-				duration: 3, // Oscilações iniciais rápidas
-				ease: [0.33, 1, 0.68, 1],
-			},
-		});
+		arrowControls
+			.start({
+				rotate: [
+					0, 10, 0, 15, 0, 20, 0, 30, 0, 40, 0, 45, 0, 45, 0, 45, 0, 45, 0, 45, 0, 45, 0, 45, 0, 45, 0, 45, 0, 45, 0, 45, 0, 45, 0, 45, 0, 30, 0, 30, 0, 20, 0,
+					10, 0, 10, 0, 5, 0, 5, 0, 0, 0, 0, 0, 0,
+				],
+				transition: {
+					duration: 3, // Oscilações iniciais rápidas
+					ease: [0.33, 1, 0.68, 1],
+				},
+			})
+			.then();
 
 		// Iniciar o giro da roleta
 		await controls.start({
@@ -76,41 +99,39 @@ const Wheel = () => {
 			},
 		});
 
-		setShowCountdown(false);
-		setShowWinnerMessage(true);
-		shootConfetti();
+		setIsSpinning(false);
 
-		setTimeout(() => {
-			setShowWinnerMessage(false);
+		// setShowCountdown(false);
+		// setShowWinnerMessage(true);
+		// shootConfetti();
 
-			const remainder = finalRotation % 360;
-			const nearestZeroAngle = finalRotation - remainder;
-
-			controls
-				.start({
-					rotate: nearestZeroAngle + initialRotation, // Inclui a rotação inicial ao parar
-					transition: {
-						duration: 1,
-						ease: 'easeOut', // Suave ao parar
-					},
-				})
-				.then(() => {
-					setCurrentRotation(initialRotation); // Reseta a rotação para a inicial
-					controls.set({ rotate: initialRotation }); // Garante que a roleta volte à posição inicial
-					setIsSpinning(false);
-					setShowCountdown(true);
-
-					// Terminar a animação da seta
-					arrowControls.start({
-						rotate: 0, // Volta ao ponto neutro
-						transition: { duration: 0.3, ease: 'easeOut' },
-					});
-				});
-		}, 2200);
-	};
-
-	const handleDebugClick = (angle: number) => {
-		spinWheel(angle);
+		// setTimeout(() => {
+		// 	setShowWinnerMessage(false);
+		//
+		// 	const remainder = finalRotation % 360;
+		// 	const nearestZeroAngle = finalRotation - remainder;
+		//
+		// 	controls
+		// 		.start({
+		// 			rotate: nearestZeroAngle + initialRotation, // Inclui a rotação inicial ao parar
+		// 			transition: {
+		// 				duration: 1,
+		// 				ease: 'easeOut', // Suave ao parar
+		// 			},
+		// 		})
+		// 		.then(() => {
+		// 			setCurrentRotation(initialRotation); // Reseta a rotação para a inicial
+		// 			controls.set({ rotate: initialRotation }); // Garante que a roleta volte à posição inicial
+		// 			setIsSpinning(false);
+		// 			setShowCountdown(true);
+		//
+		// 			// Terminar a animação da seta
+		// 			arrowControls.start({
+		// 				rotate: 0, // Volta ao ponto neutro
+		// 				transition: { duration: 0.3, ease: 'easeOut' },
+		// 			});
+		// 		});
+		// }, 2200);
 	};
 
 	useEffect(() => {
@@ -122,10 +143,8 @@ const Wheel = () => {
 				setScale(newScale);
 			}
 		};
-
 		updateContainerSize();
 		window.addEventListener('resize', updateContainerSize);
-
 		return () => {
 			window.removeEventListener('resize', updateContainerSize);
 		};
@@ -141,15 +160,7 @@ const Wheel = () => {
 				paddingTop: `${500 * scale}px`,
 			}}
 		>
-			<div
-				className={`absolute top-[-50%] mx-auto ${isSpinning ? 'cursor-not-allowed' : ''}`}
-				style={{
-					width: '100%',
-					aspectRatio: '1 / 1',
-					position: 'relative',
-					zIndex: 3, // Garantir que a roleta SVG esteja na frente dos elementos de fundo
-				}}
-			>
+			<div className={'relative w-full mx-auto aspect-square z-[3]'}>
 				<motion.div
 					key="wheel"
 					className="relative mx-auto -top-[100%] cursor-pointer"
@@ -175,7 +186,6 @@ const Wheel = () => {
 							times: [0, 0.5, 1], // Define os momentos das transições
 						}}
 					/>
-					{/* Renderiza a roleta ComplexRoulette com controles de animação */}
 					<motion.div animate={controls}>
 						<ComplexRoulette />
 					</motion.div>
@@ -196,7 +206,6 @@ const Wheel = () => {
 									className="relative flex flex-col items-center justify-center space-y-[16%]"
 								>
 									<div className="text-xs text-white transform -scale-y-100 -scale-x-100 flex items-center space-x-[3%]">
-										{/* Brilho atrás do cristal */}
 										<motion.div
 											className="absolute rounded-full bg-[#7366FF] opacity-[0.85] blur-xl"
 											style={{
@@ -217,7 +226,6 @@ const Wheel = () => {
 										<motion.img
 											src={cash}
 											alt={`cash-${crystal.name}`}
-											style={{ height: `${18 * scale}px` }}
 											initial={{ opacity: 0 }}
 											animate={{ opacity: [0, 1, 1] }}
 											transition={{
@@ -225,12 +233,9 @@ const Wheel = () => {
 												ease: 'easeInOut', // Suavidade para a entrada e saída
 												times: [0, 0.5, 1], // Define os momentos das transições
 											}}
-											className="z-20"
+											className="z-20 aspect-square md:w-4 md:h-4 h-3 w-3"
 										/>
 										<motion.span
-											style={{
-												fontSize: `${(isMobile ? 26 : 18) * scale}px`,
-											}}
 											initial={{ opacity: 0 }}
 											animate={{ opacity: [0, 1, 1] }}
 											transition={{
@@ -240,7 +245,7 @@ const Wheel = () => {
 											}}
 											className="z-20"
 										>
-											100
+											<BetValue value={sideBank[crystal.name - 1] || 0n} className={'text-base md:text-lg'} />
 										</motion.span>
 									</div>
 
@@ -323,7 +328,7 @@ const Wheel = () => {
 							>
 								You win:
 							</h2>
-							<p
+							<div
 								className="font-semibold"
 								style={{
 									fontSize: `${40 * scale}px`,
@@ -332,7 +337,7 @@ const Wheel = () => {
 								}}
 							>
 								500
-							</p>
+							</div>
 							<p
 								className="font-semibold"
 								style={{
@@ -346,24 +351,6 @@ const Wheel = () => {
 						</motion.div>
 					)}
 				</AnimatePresence>
-
-				<div className="absolute -top-1/2 right-4 w-fit text-xs z-7">
-					<select
-						defaultValue={'-1'}
-						onChange={(e) => handleDebugClick(Number.parseInt(e.target.value))}
-						className="bg-white text-black p-2 rounded"
-						disabled={isSpinning}
-					>
-						<option value="-1" disabled>
-							Select Crystal
-						</option>
-						{crystals.map((crystal, i) => (
-							<option key={i} value={crystal.angle}>
-								{crystal.name} ({crystal.angle}°)
-							</option>
-						))}
-					</select>
-				</div>
 			</div>
 		</div>
 	);

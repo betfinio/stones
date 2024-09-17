@@ -1,7 +1,6 @@
 import BetAmount from '@/src/components/BetAmount/BetAmount';
 import BetHistory from '@/src/components/BetHistory/BetHistory';
 import BetSummary from '@/src/components/BetSummary/BetSummary';
-import CardList from '@/src/components/CardList/CardList';
 import Roulette from '@/src/components/Roulette/Roulette';
 import TableBet from '@/src/components/TableBet/TableBet';
 import { createFileRoute } from '@tanstack/react-router';

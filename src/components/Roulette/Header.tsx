@@ -1,12 +1,15 @@
 import { useCurrentRound, useRoundBank } from '@/src/lib/query';
 import { BetValue } from 'betfinio_app/BetValue';
-import { CircleAlert, CircleHelp, TriangleAlert } from 'lucide-react';
+import { CircleAlert, TriangleAlert } from 'lucide-react';
+import { useCallback } from 'react';
 import { useMediaQuery } from 'react-responsive';
 
 const Header = () => {
 	const { data: round = 0 } = useCurrentRound();
 	const { data: bank = 0n } = useRoundBank(round);
 	const isMobile = useMediaQuery({ query: '(max-width: 767px)' });
+
+	const handleReport = useCallback(() => {}, []);
 	return (
 		<>
 			{isMobile ? (
@@ -31,10 +34,6 @@ const Header = () => {
 						</div>
 					</div>
 					<div className="flex flex-col items-start space-y-7">
-						<div className="flex flex-row items-center space-x-1">
-							<CircleHelp className={'w-5 h-5'} />
-							<span className="text-[14px]">Paytable</span>
-						</div>
 						<div className="flex flex-row items-center space-x-1">
 							<CircleAlert className={'w-5 h-5'} />
 							<span className="text-[14px]">How to play</span>
@@ -70,14 +69,10 @@ const Header = () => {
 					</div>
 					<div className="flex items-center space-x-6">
 						<div className="flex flex-col items-center">
-							<CircleHelp className={'w-5 h-5'} />
-							<span className="text-[14px]">Paytable</span>
-						</div>
-						<div className="flex flex-col items-center">
 							<CircleAlert className={'w-5 h-5'} />
 							<span className="text-[14px]">How to play</span>
 						</div>
-						<div className="flex flex-col items-center">
+						<div className="flex flex-col items-center" onClick={handleReport}>
 							<TriangleAlert className={'w-5 h-5'} />
 							<span className="text-[14px]">Report</span>
 						</div>

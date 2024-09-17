@@ -7,15 +7,16 @@ import type { Options } from 'betfinio_app/lib/types';
 import { type Address, encodeAbiParameters, parseAbiParameters } from 'viem';
 
 export const fetchCurrentRound = async (options: Options): Promise<number> => {
-	if (!options.config) throw new Error('Config is required');
-	return Number(
-		await readContract(options.config, {
-			abi: StonesContract.abi,
-			address: STONES,
-			functionName: 'getCurrentRound',
-			args: [],
-		}),
-	);
+	return 2877623;
+	// if (!options.config) throw new Error('Config is required');
+	// return Number(
+	// 	await readContract(options.config, {
+	// 		abi: StonesContract.abi,
+	// 		address: STONES,
+	// 		functionName: 'getCurrentRound',
+	// 		args: [],
+	// 	}),
+	// );
 };
 export const fetchRoundBank = async (round: number, options: Options): Promise<bigint> => {
 	return (
@@ -27,6 +28,20 @@ export const fetchRoundBank = async (round: number, options: Options): Promise<b
 			args: [BigInt(round), BigInt(0)],
 		})) as bigint
 	);
+};
+export const fetchRoundSideBank = async (round: number, options: Options): Promise<bigint[]> => {
+	if (!options.config) throw new Error('Config is required');
+	logger.start('fetching round side bank', round);
+	const data = await multicall(options.config, {
+		contracts: arrayFrom(5).map((_, i) => ({
+			address: STONES,
+			abi: StonesContract.abi,
+			functionName: 'roundBankBySide',
+			args: [BigInt(round), BigInt(i + 1)],
+		})),
+	});
+	logger.success('side bank', data.length);
+	return data.map((item) => item.result as bigint);
 };
 export const fetchRoundBets = async (round: number, options: Options): Promise<StonesBet[]> => {
 	if (!options.config) throw new Error('Config is required');
