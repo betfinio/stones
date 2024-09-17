@@ -12,11 +12,11 @@ export const Route = createFileRoute('/stones/')({
 
 function Index() {
 	return (
-		<div className="w-full p-2 md:p-3 lg:p-4  rounded-md text-white h-full flex flex-col overflow-auto">
+		<div className="w-full p-2 md:p-3 lg:p-4 text-white h-full flex flex-col">
 			<div className="w-full flex flex-col lg:flex-row justify-center gap-2 md:gap-3 lg:gap-4">
 				<div className="flex flex-col w-full">
 					<Roulette />
-					<CardList />
+					{/*<CardList />*/}
 					<BetAmount />
 					<div className="lg:hidden">
 						<div className="bg-primaryLight rounded-xl lg:h-[670px] flex items-center justify-center">
