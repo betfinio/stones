@@ -1,4 +1,5 @@
-import { fetchCurrentRound, fetchRoundBank, fetchRoundBets, fetchRoundSideBank, fetchRoundStones } from '@/src/lib/api';
+import { fetchCurrentRound, fetchRoundBank, fetchRoundBets, fetchRoundSideBank, fetchRoundStones, fetchRoundWinner } from '@/src/lib/api';
+import { fetchRounds } from '@/src/lib/gql';
 import type { StoneInfo, StonesBet } from '@/src/lib/types';
 import { useQuery } from '@tanstack/react-query';
 import { useConfig } from 'wagmi';
@@ -41,5 +42,20 @@ export const useStonesInfo = (round: number) => {
 	return useQuery<StoneInfo[]>({
 		queryKey: ['stones', 'round', round, 'stones'],
 		queryFn: () => fetchRoundStones(round, { config }),
+	});
+};
+
+export const useRounds = () => {
+	return useQuery({
+		queryKey: ['stones', 'rounds'],
+		queryFn: () => fetchRounds(),
+	});
+};
+
+export const useRoundWinner = (round: number) => {
+	const config = useConfig();
+	return useQuery({
+		queryKey: ['stones', 'round', round, 'winner'],
+		queryFn: () => fetchRoundWinner(round, config),
 	});
 };

@@ -1,9 +1,14 @@
 import Time from '@/src/components/Roulette/Time';
+import logger from '@/src/config/logger';
+import { STONES } from '@/src/lib/global.ts';
 import { useCurrentRound, useSideBank } from '@/src/lib/query';
 import { useSelectedStone } from '@/src/lib/query/state.ts';
+import { StonesContract } from '@betfinio/abi';
 import { BetValue } from 'betfinio_app/BetValue';
+import { Button } from 'betfinio_app/button';
 import { AnimatePresence, motion, useAnimation } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
+import { useWatchContractEvent } from 'wagmi';
 import arrowdown from '../../assets/Roulette/arrow-down.svg';
 import cash from '../../assets/Roulette/cash.svg';
 import neonImage from '../../assets/Roulette/neon-glow.png';
@@ -36,7 +41,7 @@ const Wheel = () => {
 	const { data: round = 0 } = useCurrentRound();
 	const { data: selectedStone = 1 } = useSelectedStone();
 	const { data: sideBank = [0n, 0n, 0n, 0n, 0n] } = useSideBank(round);
-	console.log(sideBank);
+
 	const [isSpinning, setIsSpinning] = useState(false);
 	const [scale, setScale] = useState(1);
 
@@ -49,6 +54,38 @@ const Wheel = () => {
 		const angle = crystals.find((crystal) => crystal.name === selectedStone)?.angle || 0;
 		rotateWheel(-angle);
 	}, [selectedStone]);
+
+	useWatchContractEvent({
+		abi: StonesContract.abi,
+		address: STONES,
+		eventName: 'RequestedCalculation',
+		strict: true,
+		onLogs: async (logs) => {
+			logger.warn('Request detected', logs[0]);
+			const round = Number.parseInt(logs[0].topics[1] || '0x0', 16);
+			console.log(round);
+		},
+	});
+
+	const startSpin = async () => {
+		await controls.start({
+			rotate: 360 * 20,
+			transition: {
+				duration: 20, // Aceleração e desaceleração suave
+				ease: [0.33, 1, 0.68, 1], // Ease mais suave, simulando aceleração e desaceleração
+			},
+		});
+	};
+	const stopSpin = async (angle: number) => {
+		controls.stop();
+		await controls.start({
+			rotate: 360 + angle,
+			transition: {
+				duration: 2, // Aceleração e desaceleração suave
+				ease: [0.33, 1, 0.68, 1], // Ease mais suave, simulando aceleração e desaceleração
+			},
+		});
+	};
 
 	const rotateWheel = async (targetAngle: number) => {
 		let rotationNeeded = targetAngle;
@@ -160,6 +197,12 @@ const Wheel = () => {
 				paddingTop: `${500 * scale}px`,
 			}}
 		>
+			<Button className={'absolute left-0 top-1/2 z-[100]'} onClick={() => startSpin()}>
+				spin
+			</Button>
+			<Button className={'absolute left-0 top-2/3 z-[100]'} onClick={() => stopSpin(crystals[1].angle)}>
+				stop
+			</Button>
 			<div className={'relative w-full mx-auto aspect-square z-[3]'}>
 				<motion.div
 					key="wheel"

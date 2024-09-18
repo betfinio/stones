@@ -1,5 +1,8 @@
+import AllRoundsTable from '@/src/components/TableBet/AllRoundsTable.tsx';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from 'betfinio_app/tabs';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import arrowDown from '../../assets/BetTable/arrow-down.svg';
 import cashBlue from '../../assets/BetTable/cash-blue.svg';
 import showIcon from '../../assets/BetTable/eye.svg';
@@ -37,6 +40,24 @@ const images: { [key: string]: string } = {
 };
 
 const TableBet = () => {
+	const { t } = useTranslation('', { keyPrefix: 'stones.table' });
+
+	return (
+		<div>
+			<Tabs defaultValue={'rounds'}>
+				<TabsList>
+					<TabsTrigger value={'rounds'}>{t('tabs.rounds')}</TabsTrigger>
+					<TabsTrigger value={'bets'}>{t('tabs.bets')}</TabsTrigger>
+				</TabsList>
+				<TabsContent value={'rounds'}>
+					<AllRoundsTable />
+				</TabsContent>
+			</Tabs>
+		</div>
+	);
+};
+
+const TableBetOLD = () => {
 	const [activeTab, setActiveTab] = useState<keyof MockTableData>('myBets');
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 	const [currentPage, setCurrentPage] = useState(1);

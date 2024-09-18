@@ -28,7 +28,7 @@ const images: { [key: string]: string } = {
 const BetAmount = () => {
 	const { t } = useTranslation('', { keyPrefix: 'stones.controls' });
 	const [betPercentage, setBetPercentage] = useState(0);
-	const { data: selectedCrystal, setSelectedStone } = useSelectedStone();
+	const { data: selected, setSelectedStone } = useSelectedStone();
 	const { data: round = 0 } = useCurrentRound();
 	const { mutate: placeBet, isPending } = usePlaceBet();
 	const { address } = useAccount();
@@ -61,7 +61,7 @@ const BetAmount = () => {
 	};
 
 	const handleSpin = () => {
-		placeBet({ amount: Number(amount), side: selectedCrystal, round: round });
+		placeBet({ amount: Number(amount), side: selected, round: round });
 	};
 
 	return (
@@ -110,7 +110,7 @@ const BetAmount = () => {
 						<div
 							key={index}
 							className={`relative flex items-center justify-center border-1 border-[#151A2A]  w-[44px] h-[25px] bg-primaryLight rounded-md cursor-pointer hover:scale-110 transition-all ease-in ${
-								selectedCrystal === (crystal + 1) ? 'border-2 border-yellow-500' : ''
+								selected === (crystal + 1) ? 'border-2 border-yellow-500' : ''
 							}`}
 							onClick={() => handleCrystalClick(crystal + 1)}
 							onKeyDown={(e) => {

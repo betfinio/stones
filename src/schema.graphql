@@ -1,0 +1,8 @@
+query AllRounds($count: Int) {
+    roundStarts(first: $count, orderBy: blockTimestamp, orderDirection: desc) {
+        round
+        blockTimestamp
+        blockNumber
+        transactionHash
+    }
+}

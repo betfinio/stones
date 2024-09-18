@@ -23,5 +23,19 @@
 			"bonus": "Bonuses"
 		},
 		"betCount": "{count, plural, =0 {No bets} =1 {# bet} other {# bets}}"
+	},
+	"table": {
+		"tabs": {
+			"rounds": "All rounds",
+			"bets": "My bets"
+		},
+		"columns": {
+			"round": "Round",
+			"bets": "Bets",
+			"betsAmount": "Total bets",
+			"bonus": "Total bonuses",
+			"winner": "Winner",
+			"staking": "Staking Earnings"
+		}
 	}
 }

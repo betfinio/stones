@@ -2,21 +2,20 @@ import logger from '@/src/config/logger';
 import { PARTNER, STONES } from '@/src/lib/global';
 import type { StoneInfo, StonesBet } from '@/src/lib/types';
 import { PartnerContract, StonesBetContract, StonesContract, arrayFrom } from '@betfinio/abi';
-import { multicall, readContract, writeContract } from '@wagmi/core';
+import { type Config, multicall, readContract, writeContract } from '@wagmi/core';
 import type { Options } from 'betfinio_app/lib/types';
 import { type Address, encodeAbiParameters, parseAbiParameters } from 'viem';
 
 export const fetchCurrentRound = async (options: Options): Promise<number> => {
-	return 2877623;
-	// if (!options.config) throw new Error('Config is required');
-	// return Number(
-	// 	await readContract(options.config, {
-	// 		abi: StonesContract.abi,
-	// 		address: STONES,
-	// 		functionName: 'getCurrentRound',
-	// 		args: [],
-	// 	}),
-	// );
+	if (!options.config) throw new Error('Config is required');
+	return Number(
+		await readContract(options.config, {
+			abi: StonesContract.abi,
+			address: STONES,
+			functionName: 'getCurrentRound',
+			args: [],
+		}),
+	);
 };
 export const fetchRoundBank = async (round: number, options: Options): Promise<bigint> => {
 	return (
@@ -127,12 +126,12 @@ export const fetchRoundStones = async (round: number, options: Options): Promise
 	);
 };
 
-export interface SpinParams {
+export interface PlaceBetParams {
 	amount: number;
 	side: number; // 1-5,
 	round: number;
 }
-export const placeBet = async (params: SpinParams, options: Options) => {
+export const placeBet = async (params: PlaceBetParams, options: Options) => {
 	if (!options.config) throw new Error('Config is required');
 	const data = encodeAbiParameters(parseAbiParameters('uint256 amount, uint256 side, uint256 round'), [
 		BigInt(params.amount),
@@ -147,9 +146,36 @@ export const placeBet = async (params: SpinParams, options: Options) => {
 		args: [STONES, BigInt(params.amount) * 10n ** 18n, data],
 	});
 };
+export interface SpinParams {
+	round: number;
+}
+
+export const spin = async (params: SpinParams, options: Options) => {
+	if (!options.config) throw new Error('Config is required');
+
+	return writeContract(options.config, {
+		address: STONES,
+		abi: StonesContract.abi,
+		functionName: 'roll',
+		args: [params.round],
+	});
+};
 
 export const getRoundTimes = (round: number): number[] => {
 	const start = round * 60 * 10;
 	const end = start + 60 * 10;
 	return [start, end];
+};
+
+export const fetchRoundWinner = async (round: number, config: Config): Promise<number> => {
+	logger.start('fetching round winner', round);
+	const data = await readContract(config, {
+		address: STONES,
+		abi: StonesContract.abi,
+		functionName: 'roundWinnerSide',
+		args: [BigInt(round)],
+	});
+	logger.success('winner', data);
+
+	return Number(data);
 };

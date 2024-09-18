@@ -19,3 +19,5 @@ dist/
 bun.lockb
 
 .npmrc
+
+.graphclient/
