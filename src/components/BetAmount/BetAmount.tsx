@@ -1,114 +1,361 @@
-import { useCurrentRound, useSpin } from '@/src/lib/query';
-import { Button } from 'betfinio_app/button';
-import { Input } from 'betfinio_app/input';
-import { useBalance } from 'betfinio_app/lib/query/token';
-import { type ChangeEvent, useState } from 'react';
-import { useAccount } from 'wagmi';
-import cash from '../../assets/Roulette/cash.svg';
-import crystal2 from '../../assets/Roulette/crystal1.svg';
-import crystal1 from '../../assets/Roulette/crystal2.svg';
-import crystal3 from '../../assets/Roulette/crystal3.svg';
-import crystal4 from '../../assets/Roulette/crystal4.svg';
-import crystal5 from '../../assets/Roulette/crystal5.svg';
-import betData from '../../mocks/mockBetAmount.json';
+import { ResponsivePie } from "@nivo/pie";
+import { useCurrentRound, useSpin } from "@/src/lib/query";
+import { Button } from "betfinio_app/button";
+import { Input } from "betfinio_app/input";
+import { useBalance } from "betfinio_app/lib/query/token";
+import { type ChangeEvent, useState } from "react";
+import { useAccount } from "wagmi";
+import cash from "../../assets/Roulette/cash.svg";
+import crystal2 from "../../assets/Roulette/crystal1.svg";
+import crystal1 from "../../assets/Roulette/crystal2.svg";
+import crystal3 from "../../assets/Roulette/crystal3.svg";
+import crystal4 from "../../assets/Roulette/crystal4.svg";
+import crystal5 from "../../assets/Roulette/crystal5.svg";
+import betData from "../../mocks/mockBetAmount.json";
+import { useMediaQuery } from "react-responsive";
+
+const pieData = [
+  {
+    id: "Zircon",
+    value: 30,
+    color: "hsl(var(--zircon-bg))",
+    borderColor: "hsl(var(--zircon-border))",
+  },
+  {
+    id: "Topaz",
+    value: 30,
+    color: "hsl(var(--topaz-bg))",
+    borderColor: "hsl(var(--topaz-border))",
+  },
+  {
+    id: "Citrine",
+    value: 20,
+    color: "hsl(var(--citrine-bg))",
+    borderColor: "hsl(var(--citrine-border))",
+  },
+  {
+    id: "Emerald",
+    value: 10,
+    color: "hsl(var(--emerald-bg))",
+    borderColor: "hsl(var(--emerald-border))",
+  },
+  {
+    id: "Ruby",
+    value: 10,
+    color: "hsl(var(--ruby-bg))",
+    borderColor: "hsl(var(--ruby-border))",
+  },
+];
 
 const images: { [key: string]: string } = {
-	crystal1,
-	crystal2,
-	crystal3,
-	crystal4,
-	crystal5,
+  crystal1,
+  crystal2,
+  crystal3,
+  crystal4,
+  crystal5,
 };
 
 const BetAmount = () => {
-	const [betPercentage, setBetPercentage] = useState(0);
-	const [selectedCrystal, setSelectedCrystal] = useState<string | null>(null);
+  const [betPercentage, setBetPercentage] = useState(0);
+  const [selectedCrystal, setSelectedCrystal] = useState<string | null>(null);
 
-	const { data: round = 0 } = useCurrentRound();
-	const { mutate: spin } = useSpin();
-	const { address } = useAccount();
-	const { data: balance = 0n } = useBalance(address);
-	const [amount, setAmount] = useState<string>('10000');
+  const { data: round = 0 } = useCurrentRound();
+  const { mutate: spin } = useSpin();
+  const { address } = useAccount();
+  const { data: balance = 0n } = useBalance(address);
+  const [amount, setAmount] = useState<string>("10000");
 
-	const handleSliderChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setBetPercentage(Number(e.target.value));
-		setAmount(((balance * BigInt(e.target.value)) / 100n / 10n ** 18n).toString());
-	};
+  const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
 
-	const handleCrystalClick = (crystal: string) => {
-		setSelectedCrystal(crystal);
-	};
+  const handleSliderChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setBetPercentage(Number(e.target.value));
+    setAmount(
+      ((balance * BigInt(e.target.value)) / 100n / 10n ** 18n).toString()
+    );
+  };
 
-	const handleAmountChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setAmount(e.target.value);
-		setBetPercentage(Math.min((Number(e.target.value) * 100) / Number((balance / 10n ** 18n).toString()), 100));
-	};
+  const handleCrystalClick = (crystal: string) => {
+    setSelectedCrystal(crystal);
+  };
 
-	const handleSpin = () => {
-		spin({ amount: Number(amount), side: 1, round: round });
-	};
+  const handleAmountChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setAmount(e.target.value);
+    setBetPercentage(
+      Math.min(
+        (Number(e.target.value) * 100) /
+          Number((balance / 10n ** 18n).toString()),
+        100
+      )
+    );
+  };
 
-	return (
-		<div className="flex flex-col md:flex-row justify-center items-center md:items-end space-y-4 md:space-y-0 md:space-x-6 p-4 w-full">
-			{/* Bet Amount Section */}
-			<div className="flex flex-col h-[110px] w-full md:w-[244px] max-w-[300px]">
-				<span className="text-white font-semibold mb-2">Bet amount</span>
-				<div className="flex items-center px-4 space-x-2 border border-gray-500 rounded-lg p-2 w-full h-[40px]">
-					<img src={cash} alt="cash" className="h-[20px]" />
-					<Input className="text-white text-[12px] border-0" value={amount} onChange={handleAmountChange} type={'number'} min={0} />
-				</div>
-				<div className="relative mt-2 h-[24px]">
-					<div className="w-full bg-gray-700 h-[2px] rounded-full mt-1 relative">
-						<div className="absolute bg-yellow-500 h-[2px] rounded-full" style={{ width: `${betPercentage}%` }} />
-						<div className="absolute bg-yellow-500 w-[10px] h-[10px] top-[-4px] rounded-full" style={{ left: `calc(${betPercentage}% - 5px)` }} />
-						<input
-							type="range"
-							min="0"
-							max="100"
-							value={betPercentage}
-							onChange={handleSliderChange}
-							className="absolute w-full h-[2px] opacity-0 cursor-pointer"
-						/>
-					</div>
-					<div className="flex justify-between text-gray-500 text-[11px] mt-2">
-						<span>0%</span>
-						<span className="text-yellow-500 font-semibold text-[14px]">{betPercentage.toFixed(2)}%</span>
-						<span>100%</span>
-					</div>
-				</div>
-			</div>
+  const handleSpin = () => {
+    spin({ amount: Number(amount), side: 1, round: round });
+  };
 
-			{/* Button Section */}
-			<div className="flex flex-col items-center w-full md:w-[224px] max-w-[300px]">
-				<Button className={'hover:scale-105'} type="button" onClick={handleSpin}>
-					{betData.buttonText}
-				</Button>
-				<div className="flex space-x-1 mt-4 h-[25px] w-full justify-center items-start">
-					{betData.crystals.map((crystal, index) => (
-						<div
-							key={index}
-							className={`relative flex items-center justify-center border-1 border-[#151A2A]  w-[44px] h-[25px] bg-primaryLight rounded-md cursor-pointer hover:scale-110 transition-all ease-in ${
-								selectedCrystal === crystal ? 'border-2 border-yellow-500' : ''
-							}`}
-							onClick={() => handleCrystalClick(crystal)}
-							onKeyDown={(e) => {
-								if (e.key === 'Enter' || e.key === ' ') {
-									handleCrystalClick(crystal);
-								}
-							}}
-							tabIndex={0}
-							role="button"
-						>
-							<img src={images[crystal]} alt={`crystal-${index}`} className="h-[15px] z-20" />
-							{index === 0 && (
-								<div className="absolute top-[2px] w-[20px] h-[20px] rounded-full bg-blue-500 opacity-70 blur-sm z-10 hover:scale-110 transition-all ease-linear" />
-							)}
-						</div>
-					))}
-				</div>
-			</div>
-		</div>
-	);
+  const tooltip = ({ datum }: { datum: any }) => (
+    <div
+      className="flex items-center justify-center space-x-2 p-2 rounded-lg text-white"
+      style={{
+        border: `2px solid ${datum.data.borderColor}`, // Acessando corretamente o borderColor de datum
+        backgroundColor: "hsl(var(--popover))",
+      }}
+    >
+      <img
+        src={
+          images[
+            `crystal${pieData.findIndex((item) => item.id === datum.id) + 1}`
+          ]
+        }
+        alt={datum.id}
+        className="h-5"
+      />
+      <div className="flex flex-col items-center justify-center tabular-nums">
+        <span>
+          <strong>{datum.id}</strong>:
+        </span>
+        <span>{datum.value}%</span>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="w-full px-4">
+      {isMobile ? (
+        <div className="flex flex-col items-center space-y-4">
+          {/* Bet Amount Section */}
+          <div className="w-full">
+            <span className="text-white font-semibold mb-2 block">
+              Bet amount
+            </span>
+            <div className="flex items-center px-4 space-x-2 border border-gray-500 rounded-lg p-2 w-full h-10">
+              <img src={cash} alt="cash" className="h-5" />
+              <Input
+                className="text-white text-xs border-0 w-full"
+                value={amount}
+                onChange={handleAmountChange}
+                type="number"
+                min={0}
+              />
+            </div>
+            <div className="relative mt-2 h-6">
+              <div className="w-full bg-gray-700 h-px rounded-full mt-1 relative">
+                <div
+                  className="absolute bg-yellow-500 h-px rounded-full"
+                  style={{ width: `${betPercentage}%` }}
+                />
+                <div
+                  className="absolute bg-yellow-500 w-2.5 h-2.5 top-[-4px] rounded-full"
+                  style={{ left: `calc(${betPercentage}% - 5px)` }}
+                />
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={betPercentage}
+                  onChange={handleSliderChange}
+                  className="absolute w-full h-px opacity-0 cursor-pointer"
+                />
+              </div>
+              <div className="flex justify-between text-gray-500 text-xs mt-2">
+                <span>0%</span>
+                <span className="text-yellow-500 font-semibold text-sm">
+                  {betPercentage.toFixed(2)}%
+                </span>
+                <span>100%</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Crystal List below Bet Amount Section */}
+          <div className="grid grid-cols-5 gap-3 w-full py-6">
+            {pieData.map((item, index) => (
+              <div
+                key={index}
+                className={`flex flex-col items-center justify-center h-16 border-2 rounded-lg cursor-pointer hover:scale-105 transition-all ease-in ${selectedCrystal === item.id ? "border-yellow-500" : ""}`}
+                style={{
+                  borderColor: item.borderColor,
+                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                }}
+                onClick={() => handleCrystalClick(item.id)}
+              >
+                <img
+                  src={images[`crystal${index + 1}`]}
+                  alt={item.id}
+                  className="h-7 mb-1"
+                />
+                <span className="text-white text-sm font-medium tabular-nums">
+                  {item.value}%
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Button Section */}
+          <div className="w-full">
+            <Button
+              className="w-full hover:scale-105 transition-all duration-300 ease-in-out"
+              type="button"
+              onClick={handleSpin}
+            >
+              {betData.buttonText}
+            </Button>
+          </div>
+
+          {/* Mini Crystal List below the Button */}
+          <div className="flex space-x-2 mt-4 h-10 w-full justify-between items-start">
+            {betData.crystals.map((crystal, index) => (
+              <div
+                key={index}
+                className={`relative flex items-center justify-center border-2 border-[#151A2A] w-16 h-10 bg-[#131624] rounded-md cursor-pointer hover:scale-110 transition-all ease-in ${
+                  selectedCrystal === crystal
+                    ? "border-2 border-yellow-500"
+                    : ""
+                }`}
+                onClick={() => handleCrystalClick(crystal)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    handleCrystalClick(crystal);
+                  }
+                }}
+                tabIndex={0}
+                role="button"
+              >
+                <img
+                  src={images[crystal]}
+                  alt={`crystal-${index}`}
+                  className="h-5 z-20"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-col md:flex-row justify-center items-center md:items-end space-y-4 md:space-y-0 md:space-x-6 p-4 w-full">
+          {/* Crystal List and Pie Chart Section */}
+          <div className="flex flex-col justify-center items-center bg-[#131624] rounded-lg h-[110px]">
+            <div className="flex flex-row h-[110px] items-center justify-center py-3">
+              {/* Crystal List */}
+              <div className="flex flex-col justify-between h-full ml-5">
+                {pieData.map((item, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <img
+                      src={images[`crystal${index + 1}`]}
+                      alt={item.id}
+                      className="w-2"
+                    />
+                    <span className="text-white text-xs font-medium tabular-nums w-8">
+                      {item.value}%
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Pie Chart with Tooltip */}
+              <div className="flex h-[110px] w-[110px] py-2">
+                <ResponsivePie
+                  startAngle={-115}
+                  data={pieData}
+                  margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
+                  innerRadius={0.45}
+                  padAngle={4}
+                  cornerRadius={1}
+                  activeOuterRadiusOffset={0}
+                  borderWidth={1}
+                  borderColor={({ data }) => data.borderColor}
+                  enableArcLinkLabels={false}
+                  enableArcLabels={false}
+                  colors={{ datum: "data.color" }}
+                  tooltip={tooltip} // Corrected tooltip logic
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Bet Amount Section */}
+          <div className="flex flex-col h-[110px] w-full md:w-[244px] max-w-[300px]">
+            <span className="text-white font-semibold mb-2">Bet amount</span>
+            <div className="flex items-center px-4 space-x-2 border border-gray-500 rounded-lg p-2 w-full h-[40px]">
+              <img src={cash} alt="cash" className="h-[20px]" />
+              <Input
+                className="text-white text-[12px] border-0 w-full"
+                value={amount}
+                onChange={handleAmountChange}
+                type="number"
+                min={0}
+              />
+            </div>
+            <div className="relative mt-2 h-[24px]">
+              <div className="w-full bg-gray-700 h-px rounded-full mt-1 relative">
+                <div
+                  className="absolute bg-yellow-500 h-px rounded-full"
+                  style={{ width: `${betPercentage}%` }}
+                />
+                <div
+                  className="absolute bg-yellow-500 w-2.5 h-2.5 top-[-4px] rounded-full"
+                  style={{ left: `calc(${betPercentage}% - 5px)` }}
+                />
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={betPercentage}
+                  onChange={handleSliderChange}
+                  className="absolute w-full h-px opacity-0 cursor-pointer"
+                />
+              </div>
+              <div className="flex justify-between text-gray-500 text-xs mt-2">
+                <span>0%</span>
+                <span className="text-yellow-500 font-semibold text-sm">
+                  {betPercentage.toFixed(2)}%
+                </span>
+                <span>100%</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Button Section */}
+          <div className="flex flex-col items-center w-full md:w-[224px] max-w-[300px]">
+            <Button
+              className="hover:scale-105 transition-all duration-300 ease-in-out"
+              type="button"
+              onClick={handleSpin}
+            >
+              {betData.buttonText}
+            </Button>
+
+            {/* Mini Crystal List under the Button */}
+            <div className="flex space-x-1 mt-4 h-[25px] w-full justify-center items-start">
+              {betData.crystals.map((crystal, index) => (
+                <div
+                  key={index}
+                  className={`relative flex items-center justify-center border-1 border-[#151A2A]  w-[44px] h-[25px] bg-primaryLight rounded-md cursor-pointer hover:scale-110 transition-all ease-in ${
+                    selectedCrystal === crystal
+                      ? "border-2 border-yellow-500"
+                      : ""
+                  }`}
+                  onClick={() => handleCrystalClick(crystal)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      handleCrystalClick(crystal);
+                    }
+                  }}
+                  tabIndex={0}
+                  role="button"
+                >
+                  <img
+                    src={images[crystal]}
+                    alt={`crystal-${index}`}
+                    className="h-[15px] z-20"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default BetAmount;
