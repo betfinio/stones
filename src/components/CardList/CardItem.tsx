@@ -13,8 +13,6 @@ const CardItem: FC<{ stone: number }> = ({ stone }) => {
 	const { data: betsCount = [0n, 0n, 0n, 0n, 0n] } = useSideBetsCount(round);
 	const { data: bank = 0n } = useRoundBank(round);
 
-	const price = 0;
-
 	const handleClick = () => {
 		setSelectedStone(stone);
 	};

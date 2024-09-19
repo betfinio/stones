@@ -7,7 +7,7 @@ import type { Options } from 'betfinio_app/lib/types';
 import { type Address, encodeAbiParameters, parseAbiParameters } from 'viem';
 
 export const fetchCurrentRound = async (options: Options): Promise<number> => {
-	// return 2877910;
+	// return 2877924;
 	if (!options.config) throw new Error('Config is required');
 	return Number(
 		await readContract(options.config, {

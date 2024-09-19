@@ -98,7 +98,7 @@ const Wheel = () => {
 		onLogs: async (logs) => {
 			logger.warn('Request detected', logs[0]);
 			const round = Number.parseInt(logs[0].topics[1] || '0x0', 16);
-			// if (round !== currentRound) return;
+			// if (round !== currentRound) return; // todo
 			setShowCountdown(false);
 			startSpin();
 		},
@@ -113,7 +113,7 @@ const Wheel = () => {
 			const round = Number.parseInt(logs[0].topics[1] || '0x0', 16);
 			const side = Number.parseInt(logs[0].topics[2] || '0x0', 16);
 			console.log(round, side);
-			// if (round !== currentRound) return;
+			// if (round !== currentRound) return; //todo
 			const angle = crystals.find((crystal) => crystal.name === side)?.angle || 0;
 			stopSpin(angle).then(() => {
 				setShowWinnerMessage(true);
@@ -354,18 +354,16 @@ const Wheel = () => {
 							}}
 						>
 							<div
-								className="absolute rounded-full opacity-30 blur-2xl"
+								className="absolute rounded-full opacity-50 blur-2xl bg-blue-700"
 								style={{
 									width: `${300 * scale}px`,
 									height: `${300 * scale}px`,
-									background: 'blue',
 								}}
 							/>
 							<h2
-								className="font-semibold"
+								className="font-semibold z-[6]"
 								style={{
 									fontSize: `${24 * scale}px`,
-									zIndex: 6,
 								}}
 							>
 								You win:
