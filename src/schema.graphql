@@ -6,3 +6,14 @@ query AllRounds($count: Int) {
         transactionHash
     }
 }
+
+query PlayerBets($round: BigInt, $player: Bytes) {
+    betCreateds(where: {round: $round, player: $player}) {
+        player
+        round
+        amount
+        bet
+        side
+        order
+    }
+}

@@ -45,10 +45,10 @@ const CardItem: FC<{ stone: number }> = ({ stone }) => {
 					Choose
 				</button>
 				<div className="flex w-fit items-center mt-4 h-4 mx-auto mb-2 text-sm">
-					<BetValue value={sideBank[stone - 1]} withIcon />
+					<BetValue prefix={'Pool:'} value={sideBank[stone - 1]} withIcon />
 				</div>
 				<div className="text-blue-500 text-sm font-medium whitespace-nowrap">
-					<BetValue value={(sideBank[stone - 1] * 5n) / 100n} withIcon className={'!text-blue-500'} iconClassName={'!text-blue-500'} />
+					<BetValue prefix={'Bonus:'} value={(sideBank[stone - 1] * 5n) / 100n} withIcon className={'!text-blue-500'} iconClassName={'!text-blue-500'} />
 				</div>
 				<div className="mt-2 space-y-1 text-sm text-gray-400">
 					<div className="flex items-center justify-center space-x-1 text-nowrap">

@@ -1,7 +1,8 @@
 import Time from '@/src/components/Roulette/Time';
+import WinnerInfo from '@/src/components/Roulette/WinnerInfo.tsx';
 import logger from '@/src/config/logger';
 import { STONES } from '@/src/lib/global.ts';
-import { useCurrentRound, useSideBank } from '@/src/lib/query';
+import { useCurrentRound, useRoundStatus, useSideBank } from '@/src/lib/query';
 import { useSelectedStone } from '@/src/lib/query/state.ts';
 import { shootConfetti } from '@/src/lib/utils.ts';
 import { StonesContract, arrayFrom } from '@betfinio/abi';
@@ -84,6 +85,15 @@ const Wheel = () => {
 
 	const [showWinnerMessage, setShowWinnerMessage] = useState(false);
 	const [showCountdown, setShowCountdown] = useState(true);
+
+	const { data: status = 0 } = useRoundStatus(currentRound);
+
+	useEffect(() => {
+		if (status > 0) {
+			setShowWinnerMessage(true);
+			setShowCountdown(false);
+		}
+	}, [status]);
 
 	useEffect(() => {
 		const angle = crystals.find((crystal) => crystal.name === selectedStone)?.angle || 0;
@@ -314,7 +324,6 @@ const Wheel = () => {
 
 				<AnimatePresence mode="sync">
 					{showCountdown && <Time round={currentRound} scale={scale} />}
-
 					<motion.div
 						key="arrow"
 						className="absolute w-full flex justify-center items-center"
@@ -339,57 +348,7 @@ const Wheel = () => {
 							animate={arrowControls}
 						/>
 					</motion.div>
-					{showWinnerMessage && (
-						<motion.div
-							key="winnerMessage"
-							className="absolute w-full flex flex-col items-center justify-center text-center text-white"
-							initial={{ opacity: 0, scale: 0.5 }}
-							animate={{ opacity: 1, scale: 1.2 }}
-							exit={{ opacity: 0, scale: 0.8 }}
-							transition={{ duration: 0.3, stiffness: 500 }}
-							style={{
-								top: `-${420 * scale}px`,
-								fontSize: `${20 * scale}px`,
-								zIndex: 5,
-							}}
-						>
-							<div
-								className="absolute rounded-full opacity-50 blur-2xl bg-blue-700"
-								style={{
-									width: `${300 * scale}px`,
-									height: `${300 * scale}px`,
-								}}
-							/>
-							<h2
-								className="font-semibold z-[6]"
-								style={{
-									fontSize: `${24 * scale}px`,
-								}}
-							>
-								You win:
-							</h2>
-							<div
-								className="font-semibold"
-								style={{
-									fontSize: `${40 * scale}px`,
-									color: '#FFD700',
-									zIndex: 6,
-								}}
-							>
-								500
-							</div>
-							<p
-								className="font-semibold"
-								style={{
-									fontSize: `${20 * scale}px`,
-									color: '#00BFFF',
-									zIndex: 6,
-								}}
-							>
-								Bonus
-							</p>
-						</motion.div>
-					)}
+					{showWinnerMessage && <WinnerInfo round={currentRound} scale={scale} />}
 				</AnimatePresence>
 			</div>
 		</div>

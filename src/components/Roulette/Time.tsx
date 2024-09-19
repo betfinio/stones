@@ -39,15 +39,24 @@ const Time: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 			exit={{ opacity: 0, scale: 0.8 }}
 			transition={{ duration: 0.3, stiffness: 500 }}
 		>
-			<span
-				className={cx((remaining !== '00:00' || !loaded) && 'hidden')}
+			<div
+				className={cx('flex flex-col', (remaining !== '00:00' || !loaded) && 'hidden')}
 				style={{
 					fontSize: `${17 * scale * 2}px`,
 					lineHeight: `${17 * scale * 2}px`,
 				}}
 			>
-				Round is Over!
-			</span>
+				<span>Round is Over!</span>
+				<span
+					style={{
+						fontSize: `${10 * scale * 2}px`,
+						lineHeight: `${14 * scale * 2}px`,
+					}}
+					className={'font-light text-gray-500'}
+				>
+					Waiting for spin, stand by!
+				</span>
+			</div>
 			<span
 				className={cx((!loaded || remaining === '00:00') && 'hidden')}
 				style={{

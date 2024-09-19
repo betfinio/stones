@@ -1,15 +1,18 @@
 import {
 	fetchCurrentRound,
+	fetchDistributedInRound,
 	fetchRoundBank,
 	fetchRoundBets,
 	fetchRoundSideBank,
 	fetchRoundSideBetsCount,
+	fetchRoundStatus,
 	fetchRoundStones,
 	fetchRoundWinner,
 } from '@/src/lib/api';
-import { fetchRounds } from '@/src/lib/gql';
+import { fetchRoundBetsByPlayer, fetchRounds } from '@/src/lib/gql';
 import type { StoneInfo, StonesBet } from '@/src/lib/types';
 import { useQuery } from '@tanstack/react-query';
+import type { Address } from 'viem';
 import { useConfig } from 'wagmi';
 
 export const useCurrentRound = () => {
@@ -25,6 +28,22 @@ export const useRoundBank = (round: number) => {
 	return useQuery<bigint>({
 		queryKey: ['stones', 'round', round, 'bank'],
 		queryFn: () => fetchRoundBank(round, { config }),
+	});
+};
+
+export const useRoundStatus = (round: number) => {
+	const config = useConfig();
+	return useQuery<number>({
+		queryKey: ['stones', 'round', round, 'status'],
+		queryFn: () => fetchRoundStatus(round, { config }),
+	});
+};
+
+export const useDistributedInRound = (round: number) => {
+	const config = useConfig();
+	return useQuery<bigint>({
+		queryKey: ['stones', 'round', round, 'distributed'],
+		queryFn: () => fetchDistributedInRound(round, { config }),
 	});
 };
 
@@ -48,7 +67,12 @@ export const useRoundBets = (round: number) => {
 	return useQuery<StonesBet[]>({
 		queryKey: ['stones', 'round', round, 'bets'],
 		queryFn: () => fetchRoundBets(round, { config }),
-		throwOnError: true,
+	});
+};
+export const useRoundBetsByPlayer = (round: number, player: Address) => {
+	return useQuery<StonesBet[]>({
+		queryKey: ['stones', 'round', round, 'bets', player],
+		queryFn: () => fetchRoundBetsByPlayer(round, player),
 	});
 };
 

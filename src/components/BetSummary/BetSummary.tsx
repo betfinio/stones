@@ -16,6 +16,10 @@ const BetSummary = () => {
 	const { address = ZeroAddress } = useAccount();
 
 	const myBet = bets.reduce((acc, bet) => (bet.player.toLowerCase() === address.toLowerCase() ? acc + bet.amount : acc), 0n);
+
+	const xFactor = myBet === 0n ? 0 : Number((bank * 9640n) / 10000n) / Number(myBet || 1n) || 0;
+
+	const potential = myBet === 0n ? 0 : (bank * 9640n) / 10000n;
 	return (
 		<div className="w-full bg-primaryLight p-4 rounded-lg">
 			<div className="flex justify-between mb-4 bg-primary p-2 rounded-lg">
@@ -46,7 +50,7 @@ const BetSummary = () => {
 				<div className="bg-primary p-2 rounded-lg flex flex-col items-center">
 					<span className="text-gray-500 font-light mb-1">{t('potentialWin')}</span>
 					<span className="font-semibold text-yellow-400 flex flex-row gap-1">
-						<BetValue value={(bank * 9640n) / 10000n} />({(Number((bank * 9640n) / 10000n) / Number(myBet || 1n) || 0).toFixed(2)}x)
+						<BetValue value={potential} />({xFactor.toFixed(2)}x)
 					</span>
 				</div>
 			</div>

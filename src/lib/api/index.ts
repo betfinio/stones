@@ -7,16 +7,16 @@ import type { Options } from 'betfinio_app/lib/types';
 import { type Address, encodeAbiParameters, parseAbiParameters } from 'viem';
 
 export const fetchCurrentRound = async (options: Options): Promise<number> => {
-	// return 2877924;
-	if (!options.config) throw new Error('Config is required');
-	return Number(
-		await readContract(options.config, {
-			abi: StonesContract.abi,
-			address: STONES,
-			functionName: 'getCurrentRound',
-			args: [],
-		}),
-	);
+	return 2877928;
+	// if (!options.config) throw new Error('Config is required');
+	// return Number(
+	// 	await readContract(options.config, {
+	// 		abi: StonesContract.abi,
+	// 		address: STONES,
+	// 		functionName: 'getCurrentRound',
+	// 		args: [],
+	// 	}),
+	// );
 };
 export const fetchRoundBank = async (round: number, options: Options): Promise<bigint> => {
 	return (
@@ -79,10 +79,7 @@ export const fetchRoundBets = async (round: number, options: Options): Promise<S
 
 	logger.success('bets', betsData.length);
 	const bets = betsData.map((bet) => bet.result as Address);
-
-	const result = await Promise.all(bets.map((bet) => fetchBetInfo(bet, options)));
-	logger.log('result', result);
-	return result;
+	return await Promise.all(bets.map((bet) => fetchBetInfo(bet, options)));
 };
 
 export const fetchBetInfo = async (bet: Address, options: Options): Promise<StonesBet> => {
@@ -107,6 +104,27 @@ export const fetchBetInfo = async (bet: Address, options: Options): Promise<Ston
 		game: info[1],
 		player: info[0],
 	} as StonesBet;
+};
+
+export const fetchRoundStatus = async (round: number, options: Options): Promise<number> => {
+	if (!options.config) throw new Error('Config is required');
+	return Number(
+		await readContract(options.config, {
+			abi: StonesContract.abi,
+			address: STONES,
+			functionName: 'roundStatus',
+			args: [BigInt(round)],
+		}),
+	);
+};
+export const fetchDistributedInRound = async (round: number, options: Options): Promise<bigint> => {
+	if (!options.config) throw new Error('Config is required');
+	return (await readContract(options.config, {
+		abi: StonesContract.abi,
+		address: STONES,
+		functionName: 'distributedInRound',
+		args: [BigInt(round)],
+	})) as bigint;
 };
 
 export const fetchRoundStones = async (round: number, options: Options): Promise<StoneInfo[]> => {
