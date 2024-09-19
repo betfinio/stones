@@ -48,12 +48,17 @@ const BetAmount = () => {
 	}, [amount]);
 
 	const handleSliderChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setBetPercentage(Number(e.target.value));
+		setBetPercentage(Math.min(Number(e.target.value), 100));
 		if (e.target.value === '0') {
 			setAmount('1000');
 			return;
 		}
 		setAmount(((balance * BigInt(e.target.value)) / 100n / 10n ** 18n).toString());
+	};
+
+	const handleAmountChange = (e: ChangeEvent<HTMLInputElement>) => {
+		setAmount(e.target.value);
+		setBetPercentage(Math.min(Number((BigInt(e.target.value) * 100n * 10n ** 18n) / balance), 100));
 	};
 
 	const handleCrystalClick = (crystal: number) => {
@@ -131,7 +136,7 @@ const BetAmount = () => {
 						<span className="text-white font-semibold mb-2 block">Bet amount</span>
 						<div className="flex items-center px-4 space-x-2 border border-gray-500 rounded-lg p-2 w-full h-10">
 							<img src={cash} alt="cash" className="h-5" />
-							<Input className="text-white text-xs border-0 w-full" value={amount} onChange={handleSliderChange} type="number" min={0} />
+							<Input className="text-white text-xs border-0 w-full" value={amount} onChange={handleAmountChange} type="number" min={1000} />
 						</div>
 						<div className="relative mt-2 h-6">
 							<div className="w-full bg-gray-700 h-px rounded-full mt-1 relative">
@@ -245,11 +250,11 @@ const BetAmount = () => {
 					</div>
 
 					{/* Bet Amount Section */}
-					<div className="flex flex-col h-[110px] w-full md:w-[244px] max-w-[300px]">
+					<div className="flex flex-col h-[110px] w-full max-w-[200px]">
 						<span className="text-white font-semibold mb-2">Bet amount</span>
 						<div className="flex items-center px-4 space-x-2 border border-gray-500 rounded-lg p-2 w-full h-[40px]">
 							<img src={cash} alt="cash" className="h-[20px]" />
-							<Input className="text-white text-[12px] border-0 w-full" value={amount} onChange={handleSliderChange} type="number" min={0} />
+							<Input className="text-white text-[12px] border-0 w-full" value={amount} onChange={handleAmountChange} type="number" min={1000} />
 						</div>
 						<div className="relative mt-2 h-[24px]">
 							<div className="w-full bg-gray-700 h-px rounded-full mt-1 relative">
@@ -274,7 +279,12 @@ const BetAmount = () => {
 
 					{/* Button Section */}
 					<div className="flex flex-col items-center w-full max-w-[320px] gap-2">
-						<Button className={'hover:scale-105 duration-200 transition-all flex gap-1 w-full'} type="button" disabled={isPending} onClick={handleSpin}>
+						<Button
+							className={'hover:scale-105 duration-200 transition-all flex gap-1 w-full max-w-[320px] '}
+							type="button"
+							disabled={isPending}
+							onClick={handleSpin}
+						>
 							{isPending ? (
 								<LoaderIcon className={'animate-spin'} />
 							) : (
