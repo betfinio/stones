@@ -7,6 +7,7 @@ import type { Options } from 'betfinio_app/lib/types';
 import { type Address, encodeAbiParameters, parseAbiParameters } from 'viem';
 
 export const fetchCurrentRound = async (options: Options): Promise<number> => {
+	// return 2877910;
 	if (!options.config) throw new Error('Config is required');
 	return Number(
 		await readContract(options.config, {
@@ -36,6 +37,20 @@ export const fetchRoundSideBank = async (round: number, options: Options): Promi
 			address: STONES,
 			abi: StonesContract.abi,
 			functionName: 'roundBankBySide',
+			args: [BigInt(round), BigInt(i + 1)],
+		})),
+	});
+	logger.success('side bank', data.length);
+	return data.map((item) => item.result as bigint);
+};
+export const fetchRoundSideBetsCount = async (round: number, options: Options): Promise<bigint[]> => {
+	if (!options.config) throw new Error('Config is required');
+	logger.start('fetching round side bank', round);
+	const data = await multicall(options.config, {
+		contracts: arrayFrom(5).map((_, i) => ({
+			address: STONES,
+			abi: StonesContract.abi,
+			functionName: 'getRoundBetsCountBySide',
 			args: [BigInt(round), BigInt(i + 1)],
 		})),
 	});

@@ -1,4 +1,12 @@
-import { fetchCurrentRound, fetchRoundBank, fetchRoundBets, fetchRoundSideBank, fetchRoundStones, fetchRoundWinner } from '@/src/lib/api';
+import {
+	fetchCurrentRound,
+	fetchRoundBank,
+	fetchRoundBets,
+	fetchRoundSideBank,
+	fetchRoundSideBetsCount,
+	fetchRoundStones,
+	fetchRoundWinner,
+} from '@/src/lib/api';
 import { fetchRounds } from '@/src/lib/gql';
 import type { StoneInfo, StonesBet } from '@/src/lib/types';
 import { useQuery } from '@tanstack/react-query';
@@ -25,6 +33,13 @@ export const useSideBank = (round: number) => {
 	return useQuery<bigint[]>({
 		queryKey: ['stones', 'round', round, 'sideBank'],
 		queryFn: () => fetchRoundSideBank(round, { config }),
+	});
+};
+export const useSideBetsCount = (round: number) => {
+	const config = useConfig();
+	return useQuery<bigint[]>({
+		queryKey: ['stones', 'round', round, 'sideBetsCount'],
+		queryFn: () => fetchRoundSideBetsCount(round, { config }),
 	});
 };
 

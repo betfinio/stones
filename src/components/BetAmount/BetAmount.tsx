@@ -62,7 +62,6 @@ const BetAmount = () => {
 	};
 
 	const handleCrystalClick = (crystal: number) => {
-		console.log(crystal);
 		setSelectedStone(crystal);
 	};
 
@@ -121,7 +120,7 @@ const BetAmount = () => {
 					<span>
 						<strong>{datum.id}</strong>:
 					</span>
-					<span>{datum.value}%</span>
+					<span>{datum.value.toFixed(2)}%</span>
 				</div>
 			</div>
 		);
@@ -172,7 +171,7 @@ const BetAmount = () => {
 								onClick={() => handleCrystalClick(item.id)}
 							>
 								<img src={images[`crystal${index + 1}`]} alt={'stone'} className="h-7 mb-1" />
-								<span className="text-white text-sm font-medium tabular-nums">{isEmpty ? 0 : item.value}%</span>
+								<span className="text-white text-sm font-medium tabular-nums">{isEmpty ? 0 : item.value.toFixed(2)}%</span>
 							</div>
 						))}
 					</div>
@@ -223,7 +222,7 @@ const BetAmount = () => {
 								{pie.map((item, index) => (
 									<div key={index} className="flex items-center space-x-2">
 										<img src={images[`crystal${index + 1}`]} alt={'stone'} className="w-2" />
-										<span className="text-white text-sm font-medium tabular-nums">{isEmpty ? 0 : item.value}%</span>
+										<span className="text-white text-sm font-medium tabular-nums">{isEmpty ? 0 : item.value.toFixed(2)}%</span>
 									</div>
 								))}
 							</div>
