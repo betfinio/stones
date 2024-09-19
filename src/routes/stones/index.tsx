@@ -26,9 +26,7 @@ function Index() {
 							<BetSummary />
 						</div>
 					</div>
-					<TableBet />
 				</div>
-
 				<div className="hidden lg:flex lg:flex-col gap-2 md:gap-3 lg:gap-4">
 					<div className="bg-primaryLight rounded-xl border border-gray-800 flex items-center justify-center">
 						<BetHistory />
@@ -38,6 +36,7 @@ function Index() {
 					</div>
 				</div>
 			</div>
+			<TableBet />
 		</div>
 	);
 }

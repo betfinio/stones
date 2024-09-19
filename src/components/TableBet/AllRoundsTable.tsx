@@ -37,11 +37,17 @@ const AllRoundsTable = () => {
 		columnHelper.accessor('round', {
 			id: 'bonus',
 			header: t('bonus'),
+			meta: {
+				className: 'md:table-cell hidden',
+			},
 			cell: (props) => <BonusAmountCell round={props.getValue()} />,
 		}),
 		columnHelper.accessor('round', {
 			id: 'staking',
 			header: t('staking'),
+			meta: {
+				className: 'md:table-cell hidden',
+			},
 			cell: (props) => <StakingEarningCell round={props.getValue()} />,
 		}),
 		columnHelper.accessor('round', {
