@@ -32,13 +32,13 @@ const WinnerInfo: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 			exit={{ opacity: 0, scale: 0.8 }}
 			transition={{ duration: 0.3, stiffness: 500 }}
 			style={{
-				top: `-${420 * scale}px`,
+				top: `-${450 * scale}px`,
 				fontSize: `${20 * scale}px`,
 				zIndex: 5,
 			}}
 		>
 			<div
-				className="absolute rounded-full opacity-50 blur-2xl bg-blue-700"
+				className="absolute rounded-full opacity-30 blur-2xl bg-red-500"
 				style={{
 					width: `${300 * scale}px`,
 					height: `${300 * scale}px`,
@@ -63,14 +63,28 @@ const WinnerNotDistributed: FC<{ round: number; scale: number }> = ({ round, sca
 	const betAmount = winBets.reduce((acc, bet) => acc + Number(bet.amount), 0);
 	// calculate win amount - fee - bonus
 	const myWin = (betAmount / Number(sideBank[winnerSide - 1])) * (Number(bank) * 0.914);
-
+	// calculate bonus todo
+	const myBonus = 0n;
 	if (myWin > 0) {
 		return (
-			<div className={'z-[6]'}>
-				<BetValue value={BigInt(myWin)} />
+			<div className={'z-[6] flex flex-col items-center text-base lg:text-2xl'}>
+				You won:
+				<BetValue prefix={'Win: '} className={'text-yellow-400 scale-110'} value={BigInt(myWin)} withIcon />
+				<BetValue prefix={'Bonus: '} className={'!text-blue-500 scale-[0.9]'} iconClassName={'!text-blue-500'} value={BigInt(myBonus)} withIcon />
 			</div>
 		);
 	}
+
+	return (
+		<div
+			className={'z-[6]'}
+			style={{
+				fontSize: `${36 * scale}px`,
+			}}
+		>
+			You did not win
+		</div>
+	);
 };
 
 export default WinnerInfo;

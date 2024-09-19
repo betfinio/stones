@@ -6,6 +6,7 @@ import { useCurrentRound, useRoundStatus, useSideBank } from '@/src/lib/query';
 import { useSelectedStone } from '@/src/lib/query/state.ts';
 import { shootConfetti } from '@/src/lib/utils.ts';
 import { StonesContract, arrayFrom } from '@betfinio/abi';
+import { useQueryClient } from '@tanstack/react-query';
 import { BetValue } from 'betfinio_app/BetValue';
 import { Button } from 'betfinio_app/button';
 import { AnimatePresence, motion, useAnimation } from 'framer-motion';
@@ -75,6 +76,8 @@ const Wheel = () => {
 	const controls = useAnimation();
 	const arrowControls = useAnimation();
 
+	const queryClient = useQueryClient();
+
 	const { data: currentRound = 0 } = useCurrentRound();
 	const { data: selectedStone } = useSelectedStone();
 	const { data: sideBank = [0n, 0n, 0n, 0n, 0n] } = useSideBank(currentRound);
@@ -125,7 +128,8 @@ const Wheel = () => {
 			console.log(round, side);
 			// if (round !== currentRound) return; //todo
 			const angle = crystals.find((crystal) => crystal.name === side)?.angle || 0;
-			stopSpin(angle).then(() => {
+			stopSpin(angle).then(async () => {
+				await queryClient.invalidateQueries({ queryKey: ['stones', 'round', round] });
 				setShowWinnerMessage(true);
 				shootConfetti();
 			});
