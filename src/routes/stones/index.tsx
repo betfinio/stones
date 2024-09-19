@@ -1,8 +1,9 @@
-import BetAmount from '@/src/components/BetAmount/BetAmount';
-import BetHistory from '@/src/components/BetHistory/BetHistory';
-import BetSummary from '@/src/components/BetSummary/BetSummary';
-import Roulette from '@/src/components/Roulette/Roulette';
-import TableBet from '@/src/components/TableBet/TableBet';
+import BetAmount from '@/src/components/BetAmount/BetAmount.tsx';
+import BetHistory from '@/src/components/BetHistory/BetHistory.tsx';
+import BetSummary from '@/src/components/BetSummary/BetSummary.tsx';
+import CardList from '@/src/components/CardList/CardList.tsx';
+import Roulette from '@/src/components/Roulette/Roulette.tsx';
+import TableBet from '@/src/components/TableBet/TableBet.tsx';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/stones/')({
@@ -11,12 +12,12 @@ export const Route = createFileRoute('/stones/')({
 
 function Index() {
 	return (
-		<div className="w-full p-2 md:p-3 lg:p-4 text-white h-full flex flex-col">
+		<div className="w-full p-2 md:p-3 lg:p-4  rounded-md text-white h-full flex flex-col overflow-auto">
 			<div className="w-full flex flex-col lg:flex-row justify-center gap-2 md:gap-3 lg:gap-4">
 				<div className="flex flex-col w-full">
 					<Roulette />
-					{/*<CardList />*/}
 					<BetAmount />
+					<CardList />
 					<div className="lg:hidden">
 						<div className="bg-primaryLight rounded-xl lg:h-[670px] flex items-center justify-center">
 							<BetHistory />
