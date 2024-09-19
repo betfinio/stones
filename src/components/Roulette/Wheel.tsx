@@ -69,7 +69,7 @@ const Wheel = () => {
 
 	const startSpin = async () => {
 		await controls.start({
-			rotate: 360 * 20,
+			rotate: 360 * 10,
 			transition: {
 				duration: 20, // Aceleração e desaceleração suave
 				ease: [0.33, 1, 0.68, 1], // Ease mais suave, simulando aceleração e desaceleração
@@ -79,7 +79,7 @@ const Wheel = () => {
 	const stopSpin = async (angle: number) => {
 		controls.stop();
 		await controls.start({
-			rotate: 360 + angle,
+			rotate: 360 * 20 + angle,
 			transition: {
 				duration: 2, // Aceleração e desaceleração suave
 				ease: [0.33, 1, 0.68, 1], // Ease mais suave, simulando aceleração e desaceleração
