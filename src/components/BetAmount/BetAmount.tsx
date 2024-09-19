@@ -1,4 +1,4 @@
-import { useCurrentRound } from '@/src/lib/query';
+import { useCurrentRound, useRoundBank, useSideBank } from '@/src/lib/query';
 import { usePlaceBet } from '@/src/lib/query/mutations';
 import { useSelectedStone } from '@/src/lib/query/state';
 import { arrayFrom } from '@betfinio/abi';
@@ -8,7 +8,7 @@ import { Button } from 'betfinio_app/button';
 import { Input } from 'betfinio_app/input';
 import { useBalance } from 'betfinio_app/lib/query/token';
 import { LoaderIcon } from 'lucide-react';
-import { type ChangeEvent, useEffect, useState } from 'react';
+import { type ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMediaQuery } from 'react-responsive';
 import { useAccount } from 'wagmi';
@@ -18,39 +18,6 @@ import crystal2 from '../../assets/Roulette/crystal2.svg';
 import crystal3 from '../../assets/Roulette/crystal3.svg';
 import crystal4 from '../../assets/Roulette/crystal4.svg';
 import crystal5 from '../../assets/Roulette/crystal5.svg';
-
-const pieData = [
-	{
-		id: 1,
-		value: 30,
-		color: 'hsl(var(--zircon-bg))',
-		borderColor: 'hsl(var(--zircon-border))',
-	},
-	{
-		id: 2,
-		value: 30,
-		color: 'hsl(var(--topaz-bg))',
-		borderColor: 'hsl(var(--topaz-border))',
-	},
-	{
-		id: 3,
-		value: 20,
-		color: 'hsl(var(--citrine-bg))',
-		borderColor: 'hsl(var(--citrine-border))',
-	},
-	{
-		id: 4,
-		value: 10,
-		color: 'hsl(var(--emerald-bg))',
-		borderColor: 'hsl(var(--emerald-border))',
-	},
-	{
-		id: 5,
-		value: 10,
-		color: 'hsl(var(--ruby-bg))',
-		borderColor: 'hsl(var(--ruby-border))',
-	},
-];
 
 const images: { [key: string]: string } = {
 	crystal1,
@@ -68,6 +35,8 @@ const BetAmount = () => {
 	const { mutate: placeBet, isPending } = usePlaceBet();
 	const { address } = useAccount();
 	const { data: balance = 0n } = useBalance(address);
+	const { data: sideBank = [0n, 0n, 0n, 0n, 0n] } = useSideBank(round);
+	const { data: bank = 0n } = useRoundBank(round);
 	const [amount, setAmount] = useState<string>('10000');
 
 	const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
@@ -95,24 +64,63 @@ const BetAmount = () => {
 	const handleSpin = () => {
 		placeBet({ amount: Number(amount), side: selected, round: round });
 	};
+	const isEmpty = bank === 0n;
 
-	const tooltip = ({ datum }: { datum: any }) => (
-		<div
-			className="flex items-center justify-center space-x-2 p-2 rounded-lg text-white"
-			style={{
-				border: `2px solid ${datum.data.borderColor}`, // Acessando corretamente o borderColor de datum
-				backgroundColor: 'hsl(var(--popover))',
-			}}
-		>
-			<img src={images[`crystal${pieData.findIndex((item) => item.id === datum.id) + 1}`]} alt={datum.id} className="h-5" />
-			<div className="flex flex-col items-center justify-center tabular-nums">
-				<span>
-					<strong>{datum.id}</strong>:
-				</span>
-				<span>{datum.value}%</span>
+	const pie = useMemo(() => {
+		return [
+			{
+				id: 1,
+				value: isEmpty ? 20 : (Number(sideBank[0]) * 100) / Number(bank || 1n),
+				color: 'hsl(var(--zircon-bg))',
+				borderColor: 'hsl(var(--zircon-border))',
+			},
+			{
+				id: 2,
+				value: isEmpty ? 20 : (Number(sideBank[1]) * 100) / Number(bank || 1n),
+				color: 'hsl(var(--topaz-bg))',
+				borderColor: 'hsl(var(--topaz-border))',
+			},
+			{
+				id: 3,
+				value: isEmpty ? 20 : (Number(sideBank[2]) * 100) / Number(bank || 1n),
+				color: 'hsl(var(--citrine-bg))',
+				borderColor: 'hsl(var(--citrine-border))',
+			},
+			{
+				id: 4,
+				value: isEmpty ? 20 : (Number(sideBank[3]) * 100) / Number(bank || 1n),
+				color: 'hsl(var(--emerald-bg))',
+				borderColor: 'hsl(var(--emerald-border))',
+			},
+			{
+				id: 5,
+				value: isEmpty ? 20 : (Number(sideBank[4]) * 100) / Number(bank || 1n),
+				color: 'hsl(var(--ruby-bg))',
+				borderColor: 'hsl(var(--ruby-border))',
+			},
+		];
+	}, [sideBank, round]);
+
+	const tooltip = ({ datum }: { datum: any }) => {
+		if (isEmpty) return null;
+		return (
+			<div
+				className="flex items-center justify-center space-x-2 p-2 rounded-lg text-white"
+				style={{
+					border: `2px solid ${datum.data.borderColor}`, // Acessando corretamente o borderColor de datum
+					backgroundColor: 'hsl(var(--popover))',
+				}}
+			>
+				<img src={images[`crystal${pie.findIndex((item) => item.id === datum.id) + 1}`]} alt={datum.id} className="h-5" />
+				<div className="flex flex-col items-center justify-center tabular-nums">
+					<span>
+						<strong>{datum.id}</strong>:
+					</span>
+					<span>{datum.value}%</span>
+				</div>
 			</div>
-		</div>
-	);
+		);
+	};
 
 	return (
 		<div className="w-full px-4">
@@ -148,7 +156,7 @@ const BetAmount = () => {
 
 					{/* Crystal List below Bet Amount Section */}
 					<div className="grid grid-cols-5 gap-3 w-full py-6">
-						{pieData.map((item, index) => (
+						{pie.map((item, index) => (
 							<div
 								key={index}
 								className={`flex flex-col items-center justify-center h-16 border-2 rounded-lg cursor-pointer hover:scale-105 transition-all ease-in ${selected === item.id ? 'border-yellow-500' : ''}`}
@@ -159,7 +167,7 @@ const BetAmount = () => {
 								onClick={() => handleCrystalClick(item.id)}
 							>
 								<img src={images[`crystal${index + 1}`]} alt={'stone'} className="h-7 mb-1" />
-								<span className="text-white text-sm font-medium tabular-nums">{item.value}%</span>
+								<span className="text-white text-sm font-medium tabular-nums">{isEmpty ? 0 : item.value}%</span>
 							</div>
 						))}
 					</div>
@@ -207,10 +215,10 @@ const BetAmount = () => {
 						<div className="flex flex-row h-[110px] items-center justify-center py-3">
 							{/* Crystal List */}
 							<div className="flex flex-col justify-between h-full ml-5">
-								{pieData.map((item, index) => (
+								{pie.map((item, index) => (
 									<div key={index} className="flex items-center space-x-2">
 										<img src={images[`crystal${index + 1}`]} alt={'stone'} className="w-2" />
-										<span className="text-white text-xs font-medium tabular-nums w-8">{item.value}%</span>
+										<span className="text-white text-sm font-medium tabular-nums">{isEmpty ? 0 : item.value}%</span>
 									</div>
 								))}
 							</div>
@@ -219,7 +227,7 @@ const BetAmount = () => {
 							<div className="flex h-[110px] w-[110px] py-2">
 								<ResponsivePie
 									startAngle={-115}
-									data={pieData}
+									data={pie}
 									margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
 									innerRadius={0.45}
 									padAngle={4}
@@ -265,7 +273,7 @@ const BetAmount = () => {
 					</div>
 
 					{/* Button Section */}
-					<div className="flex flex-col items-center w-full max-w-[350px] gap-2">
+					<div className="flex flex-col items-center w-full max-w-[320px] gap-2">
 						<Button className={'hover:scale-105 duration-200 transition-all flex gap-1 w-full'} type="button" disabled={isPending} onClick={handleSpin}>
 							{isPending ? (
 								<LoaderIcon className={'animate-spin'} />
@@ -278,7 +286,7 @@ const BetAmount = () => {
 
 						{/* Crystal List below Bet Amount Section */}
 						<div className="grid grid-cols-5 gap-3 w-full ">
-							{pieData.map((item, index) => (
+							{pie.map((item, index) => (
 								<div
 									key={index}
 									className={`relative flex items-center justify-center px-2 py-1.5 bg-primaryLight rounded-md cursor-pointer ${
