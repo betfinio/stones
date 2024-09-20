@@ -1,6 +1,7 @@
 import CardItem from '@/src/components/CardList/CardItem.tsx';
 import { arrayFrom } from '@betfinio/abi';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from 'betfinio_app/carousel';
+import { cx } from 'class-variance-authority';
 import { FaArrowLeftLong, FaArrowRightLong } from 'react-icons/fa6';
 import { useMediaQuery } from 'react-responsive';
 
@@ -11,7 +12,7 @@ export const CardList = () => {
 
 	let itemBasis: string;
 	if (isDesktop) {
-		itemBasis = 'basis-1/5'; // 5 slides on desktop
+		itemBasis = 'basis-1/4'; // 5 slides on desktop
 	} else if (isTablet) {
 		itemBasis = 'basis-1/3'; // 3 slides on tablet
 	} else if (isMobile) {
@@ -19,9 +20,9 @@ export const CardList = () => {
 	}
 
 	return (
-		<div className={`relative w-full tabular-nums ${isMobile && 'pb-8'}`}>
-			<Carousel opts={{ loop: true }}>
-				<CarouselContent className="py-4">
+		<div className={'relative w-full flex'}>
+			<Carousel className={cx('w-full', isMobile && 'mb-8')} opts={{ loop: true, slidesToScroll: 1, dragFree: isDesktop }}>
+				<CarouselContent className="py-6">
 					{arrayFrom(5).map((card) => (
 						<CarouselItem key={card} className={`${itemBasis}`}>
 							<CardItem stone={card + 1} />
@@ -30,11 +31,11 @@ export const CardList = () => {
 				</CarouselContent>
 				{isMobile && (
 					<>
-						<CarouselPrevious className="absolute top-[102%] bottom-0 left-0 flex justify-center items-center p-3 opacity-50 hover:opacity-100 cursor-pointer z-20 rounded-md">
-							<FaArrowLeftLong className="w-6 h-6 text-[#FFC800]" />
+						<CarouselPrevious className="absolute top-[108%] left-0 flex justify-center items-center  opacity-50 hover:opacity-100 cursor-pointer z-20 rounded-md">
+							<FaArrowLeftLong className="w-6 h-6 text-yellow-400" />
 						</CarouselPrevious>
-						<CarouselNext className="absolute top-[102%] bottom-0 right-0 flex justify-center items-center p-3 opacity-50 hover:opacity-100 cursor-pointer z-20 rounded-md">
-							<FaArrowRightLong className="w-6 h-6 text-[#FFC800]" />
+						<CarouselNext className="absolute top-[108%] right-0 flex justify-center items-center opacity-50 hover:opacity-100 cursor-pointer z-20 rounded-md">
+							<FaArrowRightLong className="w-6 h-6 text-yellow-400" />
 						</CarouselNext>
 					</>
 				)}

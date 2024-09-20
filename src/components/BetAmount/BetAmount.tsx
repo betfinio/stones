@@ -127,7 +127,7 @@ const BetAmount = () => {
 	};
 
 	return (
-		<div className="w-full px-4">
+		<div className="w-full">
 			{isMobile ? (
 				<div className="flex flex-col items-center space-y-4">
 					{/* Bet Amount Section */}
@@ -213,7 +213,7 @@ const BetAmount = () => {
 					</div>
 				</div>
 			) : (
-				<div className="flex flex-col md:flex-row justify-center items-center md:items-end space-y-4 md:space-y-0 md:space-x-6 p-4 w-full">
+				<div className="flex flex-col md:flex-row justify-center items-center md:items-end space-y-4 md:space-y-0 md:space-x-6 w-full">
 					{/* Crystal List and Pie Chart Section */}
 					<div className="flex flex-col justify-center items-center bg-[#131624] rounded-lg h-[110px]">
 						<div className="flex flex-row h-[110px] items-center justify-center py-3">

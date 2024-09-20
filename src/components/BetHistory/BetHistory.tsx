@@ -9,8 +9,8 @@ const BetHistory = () => {
 	const { t } = useTranslation('', { keyPrefix: 'stones.history.tabs' });
 	const { data: round = 0 } = useCurrentRound();
 	return (
-		<div className="w-full lg:h-[650px] p-2 md:p-3">
-			<Tabs defaultValue={'bets'} className={'min-w-[300px] md:max-w-[350px]'}>
+		<div className="w-full min-h-[300px] lg:h-[650px] p-2 md:p-3 border border-gray-800 rounded-lg bg-primaryLight">
+			<Tabs defaultValue={'bets'} className={'md:max-w-[350px]'}>
 				<TabsList className={'w-full bg-transparent justify-between gap-2 grid grid-cols-3'}>
 					<TabsTrigger className={'bg-primary'} variant={'contained'} value={'bets'}>
 						{t('bets')}

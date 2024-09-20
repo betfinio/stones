@@ -21,7 +21,7 @@ const BetSummary = () => {
 
 	const potential = myBet === 0n ? 0 : (bank * 9640n) / 10000n;
 	return (
-		<div className="w-full bg-primaryLight p-4 rounded-lg">
+		<div className="w-full bg-primaryLight p-4 rounded-lg border border-gray-800">
 			<div className="flex justify-between mb-4 bg-primary p-2 rounded-lg">
 				<div className="flex items-center font-semibold text-yellow-400  flex-row gap-2">
 					<BetValue value={bank} />
