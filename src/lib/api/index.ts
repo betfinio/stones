@@ -7,16 +7,15 @@ import type { Options } from 'betfinio_app/lib/types';
 import { type Address, encodeAbiParameters, parseAbiParameters } from 'viem';
 
 export const fetchCurrentRound = async (options: Options): Promise<number> => {
-	return 2877930;
-	// if (!options.config) throw new Error('Config is required');
-	// return Number(
-	// 	await readContract(options.config, {
-	// 		abi: StonesContract.abi,
-	// 		address: STONES,
-	// 		functionName: 'getCurrentRound',
-	// 		args: [],
-	// 	}),
-	// );
+	if (!options.config) throw new Error('Config is required');
+	return Number(
+		await readContract(options.config, {
+			abi: StonesContract.abi,
+			address: STONES,
+			functionName: 'getCurrentRound',
+			args: [],
+		}),
+	);
 };
 export const fetchRoundBank = async (round: number, options: Options): Promise<bigint> => {
 	return (
