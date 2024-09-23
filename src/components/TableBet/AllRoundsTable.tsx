@@ -5,6 +5,7 @@ import RoundCell from '@/src/components/TableBet/columns/RoundCell.tsx';
 import StakingEarningCell from '@/src/components/TableBet/columns/StakingEarningCell.tsx';
 import WinnerCell from '@/src/components/TableBet/columns/WinnerCell.tsx';
 import { useRounds } from '@/src/lib/query';
+import { useNavigate } from '@tanstack/react-router';
 import { createColumnHelper } from '@tanstack/react-table';
 import { DataTable } from 'betfinio_app/DataTable';
 import { useTranslation } from 'react-i18next';
@@ -13,8 +14,8 @@ const columnHelper = createColumnHelper<{ round: number }>();
 
 const AllRoundsTable = () => {
 	const { data: rounds = [] } = useRounds();
-
 	const { t } = useTranslation('', { keyPrefix: 'stones.table.columns' });
+	const navigate = useNavigate();
 
 	const columns = [
 		columnHelper.accessor('round', {
@@ -57,7 +58,11 @@ const AllRoundsTable = () => {
 		}),
 	];
 
-	return <DataTable columns={columns} data={rounds} />;
+	const handleClick = (row: { round: number }) => {
+		navigate({ to: '/stones', search: { round: row.round } });
+	};
+
+	return <DataTable columns={columns} data={rounds} onRowClick={handleClick} />;
 };
 
 export default AllRoundsTable;

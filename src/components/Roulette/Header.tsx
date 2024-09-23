@@ -21,7 +21,7 @@ const Header = () => {
 							<span className="text-xs  font-semibold text-gray-400">#{round}</span>
 						</div>
 						<div className="flex flex-col items-start">
-							<span className=" font-semibold text-yellow-500">WINNING POOL</span>
+							<span className=" font-semibold text-yellow-400">WINNING POOL</span>
 							<span className="text-xs  font-semibold">
 								<BetValue value={bank} withIcon iconClassName={'w-3 h-3'} />
 							</span>
@@ -54,7 +54,7 @@ const Header = () => {
 						</div>
 						<div className="bg-white w-[1px] h-[32px]" />
 						<div className="flex flex-col items-start">
-							<span className=" font-semibold text-yellow-500">Winning Pool</span>
+							<span className=" font-semibold text-yellow-400">Winning Pool</span>
 							<span className="text-xs  font-semibold">
 								<BetValue value={bank} withIcon iconClassName={'w-3 h-3'} />
 							</span>

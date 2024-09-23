@@ -1,14 +1,22 @@
-import { useCurrentRound, useRoundBank, useSideBank } from '@/src/lib/query';
+import ProbabilitiesChart from '@/src/components/BetAmount/ProbabilitiesChart.tsx';
+import BetRanking from '@/src/components/BetRanking/BetRanking.tsx';
+import logger from '@/src/config/logger';
+import { getRoundTimes } from '@/src/lib/api';
+import { useActualRound, useCurrentRound, useRoundBank, useSideBank } from '@/src/lib/query';
 import { usePlaceBet } from '@/src/lib/query/mutations';
 import { useSelectedStone } from '@/src/lib/query/state';
 import { arrayFrom } from '@betfinio/abi';
-import { ResponsivePie } from '@nivo/pie';
+import { useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
 import { BetValue } from 'betfinio_app/BetValue';
 import { Button } from 'betfinio_app/button';
 import { Input } from 'betfinio_app/input';
 import { useBalance } from 'betfinio_app/lib/query/token';
+import { cx } from 'class-variance-authority';
+import { motion } from 'framer-motion';
 import { LoaderIcon } from 'lucide-react';
-import { type ChangeEvent, useEffect, useMemo, useState } from 'react';
+import { DateTime } from 'luxon';
+import { type ChangeEvent, type FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMediaQuery } from 'react-responsive';
 import { useAccount } from 'wagmi';
@@ -32,12 +40,15 @@ const BetAmount = () => {
 	const [betPercentage, setBetPercentage] = useState(0);
 	const { data: selected, setSelectedStone } = useSelectedStone();
 	const { data: round = 0 } = useCurrentRound();
+	const { data: actualRound = 0 } = useActualRound();
 	const { mutate: placeBet, isPending } = usePlaceBet();
 	const { address } = useAccount();
 	const { data: balance = 0n } = useBalance(address);
 	const { data: sideBank = [0n, 0n, 0n, 0n, 0n] } = useSideBank(round);
 	const { data: bank = 0n } = useRoundBank(round);
 	const [amount, setAmount] = useState<string>('10000');
+
+	const [_, end] = getRoundTimes(round);
 
 	const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
 
@@ -46,6 +57,10 @@ const BetAmount = () => {
 	useEffect(() => {
 		setPotentialWin(BigInt(amount) * 5n);
 	}, [amount]);
+
+	useEffect(() => {
+		logger.info('actualRound', actualRound);
+	}, [actualRound]);
 
 	const handleSliderChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setBetPercentage(Math.min(Number(e.target.value), 100));
@@ -105,27 +120,6 @@ const BetAmount = () => {
 		];
 	}, [sideBank, round]);
 
-	const tooltip = ({ datum }: { datum: any }) => {
-		if (isEmpty) return null;
-		return (
-			<div
-				className="flex items-center justify-center space-x-2 p-2 rounded-lg text-white"
-				style={{
-					border: `2px solid ${datum.data.borderColor}`, // Acessando corretamente o borderColor de datum
-					backgroundColor: 'hsl(var(--popover))',
-				}}
-			>
-				<img src={images[`crystal${pie.findIndex((item) => item.id === datum.id) + 1}`]} alt={datum.id} className="h-5" />
-				<div className="flex flex-col items-center justify-center tabular-nums">
-					<span>
-						<strong>{datum.id}</strong>:
-					</span>
-					<span>{datum.value.toFixed(2)}%</span>
-				</div>
-			</div>
-		);
-	};
-
 	return (
 		<div className="w-full">
 			{isMobile ? (
@@ -139,8 +133,8 @@ const BetAmount = () => {
 						</div>
 						<div className="relative mt-2 h-6">
 							<div className="w-full bg-gray-700 h-px rounded-full mt-1 relative">
-								<div className="absolute bg-yellow-500 h-px rounded-full" style={{ width: `${betPercentage}%` }} />
-								<div className="absolute bg-yellow-500 w-2.5 h-2.5 top-[-4px] rounded-full" style={{ left: `calc(${betPercentage}% - 5px)` }} />
+								<div className="absolute bg-yellow-400 h-px rounded-full" style={{ width: `${betPercentage}%` }} />
+								<div className="absolute bg-yellow-400 w-2.5 h-2.5 top-[-4px] rounded-full" style={{ left: `calc(${betPercentage}% - 5px)` }} />
 								<input
 									type="range"
 									min="0"
@@ -152,7 +146,7 @@ const BetAmount = () => {
 							</div>
 							<div className="flex justify-between text-gray-500 text-xs mt-2">
 								<span>0%</span>
-								<span className="text-yellow-500 font-semibold text-sm">{betPercentage.toFixed(2)}%</span>
+								<span className="text-yellow-400 font-semibold text-sm">{betPercentage.toFixed(2)}%</span>
 								<span>100%</span>
 							</div>
 						</div>
@@ -163,7 +157,7 @@ const BetAmount = () => {
 						{pie.map((item, index) => (
 							<div
 								key={index}
-								className={`flex flex-col items-center justify-center h-16 border-2 rounded-lg cursor-pointer hover:scale-105 transition-all ease-in ${selected === item.id ? 'border-yellow-500' : ''}`}
+								className={`flex flex-col items-center justify-center h-16 border-2 rounded-lg cursor-pointer hover:scale-105 transition-all ease-in ${selected === item.id ? 'border-yellow-400' : ''}`}
 								style={{
 									borderColor: item.borderColor,
 									backgroundColor: 'rgba(255, 255, 255, 0.05)',
@@ -195,7 +189,7 @@ const BetAmount = () => {
 							<div
 								key={index}
 								className={`relative flex items-center justify-center border-1 border-[#151A2A]  w-[44px] h-[25px] bg-primaryLight rounded-md cursor-pointer hover:scale-110 transition-all ease-in ${
-									selected === (crystal + 1) ? 'border-2 border-yellow-500' : ''
+									selected === (crystal + 1) ? 'border-2 border-yellow-400' : ''
 								}`}
 								onClick={() => handleCrystalClick(crystal + 1)}
 								onKeyDown={(e) => {
@@ -212,44 +206,19 @@ const BetAmount = () => {
 						))}
 					</div>
 				</div>
+			) : end < Date.now() / 1000 ? (
+				<OldRound round={round} />
 			) : (
-				<div className="flex flex-col md:flex-row justify-center items-center md:items-end space-y-4 md:space-y-0 md:space-x-6 w-full">
-					{/* Crystal List and Pie Chart Section */}
-					<div className="flex flex-col justify-center items-center bg-[#131624] rounded-lg h-[110px]">
-						<div className="flex flex-row h-[110px] items-center justify-center py-3">
-							{/* Crystal List */}
-							<div className="flex flex-col justify-between h-full ml-5">
-								{pie.map((item, index) => (
-									<div key={index} className="flex items-center space-x-2">
-										<img src={images[`crystal${index + 1}`]} alt={'stone'} className="w-2" />
-										<span className="text-white text-sm font-medium tabular-nums">{isEmpty ? 0 : item.value.toFixed(2)}%</span>
-									</div>
-								))}
-							</div>
-
-							{/* Pie Chart with Tooltip */}
-							<div className="flex h-[110px] w-[110px] py-2">
-								<ResponsivePie
-									startAngle={-115}
-									data={pie}
-									margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
-									innerRadius={0.45}
-									padAngle={4}
-									cornerRadius={1}
-									activeOuterRadiusOffset={0}
-									borderWidth={1}
-									borderColor={({ data }) => data.borderColor}
-									enableArcLinkLabels={false}
-									enableArcLabels={false}
-									colors={{ datum: 'data.color' }}
-									tooltip={tooltip} // Corrected tooltip logic
-								/>
-							</div>
-						</div>
-					</div>
+				<motion.div
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					exit={{ opacity: 0 }}
+					className="flex flex-col md:flex-row justify-center items-center md:items-end space-y-4 md:space-y-0 md:space-x-6 w-full"
+				>
+					<ProbabilitiesChart round={round} pie={pie} />
 
 					{/* Bet Amount Section */}
-					<div className="flex flex-col h-[110px] w-full max-w-[200px]">
+					<div className={cx('flex flex-col h-[110px] w-full max-w-[200px]')}>
 						<span className="text-white font-semibold mb-2">Bet amount</span>
 						<div className="flex items-center px-4 space-x-2 border border-gray-500 rounded-lg p-2 w-full h-[40px]">
 							<img src={cash} alt="cash" className="h-[20px]" />
@@ -257,8 +226,8 @@ const BetAmount = () => {
 						</div>
 						<div className="relative mt-2 h-[24px]">
 							<div className="w-full bg-gray-700 h-px rounded-full mt-1 relative">
-								<div className="absolute bg-yellow-500 h-px rounded-full" style={{ width: `${betPercentage}%` }} />
-								<div className="absolute bg-yellow-500 w-2.5 h-2.5 top-[-4px] rounded-full" style={{ left: `calc(${betPercentage}% - 5px)` }} />
+								<div className="absolute bg-yellow-400 h-px rounded-full" style={{ width: `${betPercentage}%` }} />
+								<div className="absolute bg-yellow-400 w-2.5 h-2.5 top-[-4px] rounded-full" style={{ left: `calc(${betPercentage}% - 5px)` }} />
 								<input
 									type="range"
 									min="0"
@@ -270,7 +239,7 @@ const BetAmount = () => {
 							</div>
 							<div className="flex justify-between text-gray-500 text-xs mt-2">
 								<span>0%</span>
-								<span className="text-yellow-500 font-semibold text-sm">{betPercentage.toFixed(2)}%</span>
+								<span className="text-yellow-400 font-semibold text-sm">{betPercentage.toFixed(2)}%</span>
 								<span>100%</span>
 							</div>
 						</div>
@@ -299,7 +268,7 @@ const BetAmount = () => {
 								<div
 									key={index}
 									className={`relative flex items-center justify-center px-2 py-1.5 bg-primaryLight rounded-md cursor-pointer ${
-										selected === item.id ? 'border-2 border-yellow-500' : ''
+										selected === item.id ? 'border-2 border-yellow-400' : ''
 									}`}
 									onClick={() => handleCrystalClick(item.id)}
 									tabIndex={0}
@@ -310,9 +279,30 @@ const BetAmount = () => {
 							))}
 						</div>
 					</div>
-				</div>
+				</motion.div>
 			)}
 		</div>
+	);
+};
+
+const OldRound: FC<{ round: number }> = ({ round }) => {
+	const [_, end] = getRoundTimes(round);
+	const { data: actualRound = 0 } = useActualRound();
+	const navigate = useNavigate();
+	const queryClient = useQueryClient();
+
+	const handleClick = () => {
+		navigate({ to: '/stones', search: { round: actualRound } });
+		queryClient.invalidateQueries({ queryKey: ['stones', 'currentRound'] });
+	};
+	return (
+		<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+			<div className={'w-full border border-yellow-400/50 rounded-lg p-4 flex flex-row items-center justify-between'}>
+				<div>Round ended {DateTime.fromSeconds(end).toFormat('MM/dd T')}</div>
+				<Button onClick={handleClick}>Go to current round</Button>
+			</div>
+			<BetRanking round={round} />
+		</motion.div>
 	);
 };
 

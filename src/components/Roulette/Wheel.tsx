@@ -1,14 +1,15 @@
 import Time from '@/src/components/Roulette/Time';
 import WinnerInfo from '@/src/components/Roulette/WinnerInfo.tsx';
 import logger from '@/src/config/logger';
+import { getRoundTimes } from '@/src/lib/api';
 import { STONES } from '@/src/lib/global.ts';
-import { useCurrentRound, useRoundStatus, useSideBank } from '@/src/lib/query';
+import { useActualRound, useCurrentRound, useRoundStatus, useSideBank } from '@/src/lib/query';
 import { useSelectedStone } from '@/src/lib/query/state.ts';
 import { shootConfetti } from '@/src/lib/utils.ts';
 import { StonesContract, arrayFrom } from '@betfinio/abi';
 import { useQueryClient } from '@tanstack/react-query';
 import { BetValue } from 'betfinio_app/BetValue';
-import { Button } from 'betfinio_app/button';
+import { cx } from 'class-variance-authority';
 import { AnimatePresence, motion, useAnimation } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { useWatchContractEvent } from 'wagmi';
@@ -79,6 +80,7 @@ const Wheel = () => {
 	const queryClient = useQueryClient();
 
 	const { data: currentRound = 0 } = useCurrentRound();
+	const { data: actualRound = 0 } = useActualRound();
 	const { data: selectedStone } = useSelectedStone();
 	const { data: sideBank = [0n, 0n, 0n, 0n, 0n] } = useSideBank(currentRound);
 
@@ -90,13 +92,16 @@ const Wheel = () => {
 	const [showCountdown, setShowCountdown] = useState(true);
 
 	const { data: status = 0 } = useRoundStatus(currentRound);
-
+	const [_, end] = getRoundTimes(currentRound);
 	useEffect(() => {
-		if (status > 0) {
+		if (status > 0 || end < Date.now() / 1000 || actualRound !== currentRound) {
 			setShowWinnerMessage(true);
 			setShowCountdown(false);
+		} else {
+			setShowCountdown(true);
+			setShowWinnerMessage(false);
 		}
-	}, [status]);
+	}, [status, currentRound, end, actualRound]);
 
 	useEffect(() => {
 		const angle = crystals.find((crystal) => crystal.name === selectedStone)?.angle || 0;
@@ -111,8 +116,9 @@ const Wheel = () => {
 		onLogs: async (logs) => {
 			logger.warn('Request detected', logs[0]);
 			const round = Number.parseInt(logs[0].topics[1] || '0x0', 16);
-			// if (round !== currentRound) return; // todo
+			if (round !== currentRound) return;
 			setShowCountdown(false);
+			setShowWinnerMessage(false);
 			startSpin();
 		},
 	});
@@ -125,8 +131,7 @@ const Wheel = () => {
 			logger.warn('Winner detected', logs[0]);
 			const round = Number.parseInt(logs[0].topics[1] || '0x0', 16);
 			const side = Number.parseInt(logs[0].topics[2] || '0x0', 16);
-			console.log(round, side);
-			// if (round !== currentRound) return; //todo
+			if (round !== currentRound) return;
 			const angle = crystals.find((crystal) => crystal.name === side)?.angle || 0;
 			stopSpin(angle).then(async () => {
 				await queryClient.invalidateQueries({ queryKey: ['stones', 'round', round] });
@@ -207,6 +212,7 @@ const Wheel = () => {
 
 	return (
 		<div
+			key={'container'}
 			ref={containerRef}
 			className="relative mx-auto overflow-hidden"
 			style={{
@@ -215,12 +221,6 @@ const Wheel = () => {
 				paddingTop: `${500 * scale}px`,
 			}}
 		>
-			<Button className={'absolute left-0 top-1/2 z-[100]'} onClick={() => startSpin()}>
-				spin
-			</Button>
-			<Button className={'absolute left-0 top-2/3 z-[100]'} onClick={() => stopSpin(crystals[1].angle)}>
-				stop
-			</Button>
 			<div className={'relative w-full mx-auto aspect-square z-[3]'}>
 				<motion.div
 					key="wheel"
@@ -277,7 +277,7 @@ const Wheel = () => {
 												transform: 'translate(-50%, -50%)',
 											}}
 											initial={{ opacity: 0 }}
-											animate={{ opacity: [0, 1, 1] }}
+											animate={{ opacity: 1 }}
 											transition={{
 												duration: 3, // Tempo total da animação
 												ease: 'easeInOut', // Suavidade para a entrada e saída
@@ -353,6 +353,25 @@ const Wheel = () => {
 						/>
 					</motion.div>
 					{showWinnerMessage && <WinnerInfo round={currentRound} scale={scale} />}
+					<div
+						key={'round-over'}
+						className={cx('flex flex-col')}
+						style={{
+							fontSize: `${17 * scale * 2}px`,
+							lineHeight: `${17 * scale * 2}px`,
+						}}
+					>
+						<span>Round is Over!</span>
+						<span
+							style={{
+								fontSize: `${10 * scale * 2}px`,
+								lineHeight: `${14 * scale * 2}px`,
+							}}
+							className={'font-light text-gray-500'}
+						>
+							Waiting for spin, stand by!
+						</span>
+					</div>
 				</AnimatePresence>
 			</div>
 		</div>

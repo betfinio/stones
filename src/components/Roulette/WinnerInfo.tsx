@@ -1,16 +1,13 @@
-import logger from '@/src/config/logger';
-import { useDistributedInRound, useRoundBank, useRoundBetsByPlayer, useRoundStatus, useRoundWinner, useSideBank } from '@/src/lib/query';
+import { useRoundBank, useRoundBetsByPlayer, useRoundStatus, useRoundWinner, useSideBank } from '@/src/lib/query';
 import { ZeroAddress } from '@betfinio/abi';
 import { BetValue } from 'betfinio_app/BetValue';
+import { cx } from 'class-variance-authority';
 import { motion } from 'framer-motion';
 import type { FC } from 'react';
 import { useAccount } from 'wagmi';
 
 const WinnerInfo: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 	const { data: status } = useRoundStatus(round);
-	const { data: distributed } = useDistributedInRound(round);
-	const { data: bank } = useRoundBank(round);
-	logger.log('status', status, distributed, bank);
 
 	const getContent = () => {
 		if (status === 2) {
@@ -21,6 +18,26 @@ const WinnerInfo: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 			// wheel is spinning
 			return <div>Winner is being decided</div>;
 		}
+		return (
+			<div
+				className={cx('flex flex-col')}
+				style={{
+					fontSize: `${17 * scale * 2}px`,
+					lineHeight: `${17 * scale * 2}px`,
+				}}
+			>
+				<span>Round is Over!</span>
+				<span
+					style={{
+						fontSize: `${10 * scale * 2}px`,
+						lineHeight: `${14 * scale * 2}px`,
+					}}
+					className={'font-light text-gray-500'}
+				>
+					Waiting for spin, stand by!
+				</span>
+			</div>
+		);
 	};
 
 	return (
@@ -52,10 +69,10 @@ const WinnerInfo: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 const WinnerNotDistributed: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 	// manually calculate win and bonus amount
 	const { address = ZeroAddress } = useAccount();
-	const { data: winnerSide = 0 } = useRoundWinner(round);
+	const { data: winnerSide = 0, isFetching } = useRoundWinner(round);
 	const { data: bank = 0n } = useRoundBank(round);
 	const { data: sideBank = [0n, 0n, 0n, 0n, 0n] } = useSideBank(round);
-	const { data: bets = [] } = useRoundBetsByPlayer(round, address);
+	const { data: bets = [], isFetching: isBetsFetching } = useRoundBetsByPlayer(round, address);
 	// get only winning bets
 	const winBets = bets.filter((bet) => bet.side === winnerSide);
 
@@ -67,13 +84,17 @@ const WinnerNotDistributed: FC<{ round: number; scale: number }> = ({ round, sca
 	const myBonus = 0n;
 	if (myWin > 0) {
 		return (
-			<div className={'z-[6] flex flex-col items-center text-base lg:text-2xl'}>
-				You won:
+			<motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} className={'z-[6] flex flex-col items-center text-base lg:text-2xl'}>
+				You win:
 				<BetValue prefix={'Win: '} className={'text-yellow-400 scale-110'} value={BigInt(myWin)} withIcon />
-				<BetValue prefix={'Bonus: '} className={'!text-blue-500 scale-[0.9]'} iconClassName={'!text-blue-500'} value={BigInt(myBonus)} withIcon />
-			</div>
+				<div className={'!text-blue-500 scale-[0.9] flex flex-row items-center gap-1'}>
+					+<BetValue prefix={'Bonus: '} iconClassName={'!text-blue-500'} value={BigInt(myBonus)} withIcon />
+				</div>
+			</motion.div>
 		);
 	}
+
+	if (isFetching || isBetsFetching) return null;
 
 	return (
 		<div
@@ -82,7 +103,7 @@ const WinnerNotDistributed: FC<{ round: number; scale: number }> = ({ round, sca
 				fontSize: `${36 * scale}px`,
 			}}
 		>
-			You did not win
+			You didn't win
 		</div>
 	);
 };
