@@ -1,19 +1,19 @@
 query AllRounds($count: Int) {
-    roundStarts(first: $count, orderBy: blockTimestamp, orderDirection: desc) {
-        round
-        blockTimestamp
-        blockNumber
-        transactionHash
-    }
+	roundStarts(first: $count, orderBy: blockTimestamp, orderDirection: desc) {
+		round
+		blockTimestamp
+		blockNumber
+		transactionHash
+	}
 }
 
 query PlayerBets($round: BigInt, $player: Bytes) {
-    betCreateds(where: {round: $round, player: $player}) {
-        player
-        round
-        amount
-        bet
-        side
-        order
-    }
+	betCreateds(where: { round: $round, player: $player }) {
+		player
+		round
+		amount
+		bet
+		side
+		order
+	}
 }
