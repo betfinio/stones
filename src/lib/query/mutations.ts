@@ -1,5 +1,5 @@
 import logger from '@/src/config/logger';
-import { type PlaceBetParams, type SpinParams, placeBet, spin } from '@/src/lib/api';
+import { type DistributeParams, type PlaceBetParams, type SpinParams, distribute, placeBet, spin } from '@/src/lib/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { getTransactionLink } from 'betfinio_app/helpers';
 import { toast } from 'betfinio_app/use-toast';
@@ -53,6 +53,33 @@ export const useSpin = () => {
 			await waitForTransactionReceipt(config.getClient(), { hash: data });
 			logger.success('transaction accepted');
 			update({ variant: 'default', title: 'Requested', action: getTransactionLink(data) });
+			logger.success('finished');
+		},
+		onError: (error) => {
+			logger.error(error);
+		},
+		onMutate: () => {
+			logger.start('placing bet');
+		},
+	});
+};
+
+export const useDistribute = () => {
+	const config = useConfig();
+	return useMutation<WriteContractReturnType, WriteContractReturnType, DistributeParams>({
+		mutationKey: ['stones', 'spin'],
+		mutationFn: (params) => distribute(params, { config }),
+		onSuccess: async (data) => {
+			logger.success('transaction submitted');
+			const { update } = toast({
+				title: 'Distributing',
+				variant: 'loading',
+				duration: 10000,
+			});
+			console.log('data', data);
+			await waitForTransactionReceipt(config.getClient(), { hash: data });
+			logger.success('transaction accepted');
+			update({ variant: 'default', title: 'Distributed', action: getTransactionLink(data) });
 			logger.success('finished');
 		},
 		onError: (error) => {

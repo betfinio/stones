@@ -1,4 +1,5 @@
 import { useDistributedInRound, useRoundBank, useRoundBets, useRoundWinner } from '@/src/lib/query';
+import { useDistribute } from '@/src/lib/query/mutations.ts';
 import { truncateEthAddress } from '@betfinio/abi';
 import { Stones } from '@betfinio/ui/dist/icons/StoneBet';
 import { BetValue } from 'betfinio_app/BetValue';
@@ -9,20 +10,32 @@ import bronzeTrophy from '../../assets/BetHistory/trophy-bronze.svg';
 import goldTrophy from '../../assets/BetHistory/trophy-gold.svg';
 import silverTrophy from '../../assets/BetHistory/trophy-silver.svg';
 import figureImage from '../../assets/BetRanking/duck-winner.png';
-import crystalImage from '../../assets/Roulette/crystal1.svg'; // Substitua pelo caminho correto
-import mockBetRankingData from '../../mocks/mockBetRanking.json';
+import crystalImage from '../../assets/Roulette/crystal1.svg';
 
 const BetRanking: FC<{ round: number }> = ({ round }) => {
-	const { ranking } = mockBetRankingData;
-
 	const { data: bank = 0n } = useRoundBank(round);
 	const { data: bets = [] } = useRoundBets(round);
 	const { data: winner = 0 } = useRoundWinner(round);
 	const { data: distributed = 0n } = useDistributedInRound(round);
 
+	const winBank = (bank * 914n) / 1000n;
+	const bonusBank = (bank * 5n) / 100n;
+
+	const winnerSidePool = bets.filter((bet) => bet.side === winner).reduce((acc, bet) => acc + bet.amount, 0n);
+
+	const { mutate } = useDistribute();
 	const winBets = bets
 		.filter((bet) => bet.side === winner)
-		.sort((a, b) => Number(b.amount) - Number(a.amount))
+		.sort((a, b) => Number(b.order) - Number(a.order))
+		.map((bet) => {
+			const winWithoutBonus = (bet.amount * winBank) / winnerSidePool;
+			console.log('winWithoutBonus', winWithoutBonus);
+			return {
+				...bet,
+				bonus: bet.result ? bet.result - winWithoutBonus : 0n,
+				result: winWithoutBonus,
+			};
+		})
 		.slice(0, 4);
 
 	const trophyImages: string[] = [goldTrophy, silverTrophy, bronzeTrophy];
@@ -35,11 +48,8 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 	};
 
 	const handleDistribute = () => {
-		alert('ok');
+		mutate({ round });
 	};
-
-	const winBank = (bank * 914n) / 1000n;
-	const bonusBank = (bank * 5n) / 100n;
 
 	return (
 		<>
@@ -78,10 +88,10 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 				<div className="w-full flex flex-col space-y-2">
 					{/* Header */}
 					<div className="flex justify-between text-gray-400 text-[12px] px-4 py-2">
-						<div className="w-[25%]">№</div>
-						<div className="w-[43%]">Bet</div>
-						<div className="w-[22%]">Win</div>
-						<div className="w-[22%]">Bonus</div>
+						<div className="w-[20%]">№</div>
+						<div className="w-[30%]">Bet</div>
+						<div className="w-[25%]">Win</div>
+						<div className="w-[25%]">Bonus</div>
 					</div>
 
 					{/* Rows */}
@@ -100,26 +110,26 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 												: 'bg-transparent'
 							} hover:bg-[#282c46] transition-all duration-300`}
 						>
-							<div className="flex items-center w-[25%]">
+							<div className="flex items-center w-[20%]">
 								<span className="mr-2 text-[12px]">#{index + 1}</span>
 								{getTrophyImage(index) && <img src={getTrophyImage(index)} alt="trophy" className="h-4 inline-block mr-2" />}
 							</div>
-							<div className="flex items-center w-[43%] space-x-2">
+							<div className="flex items-center w-[30%] space-x-2">
 								<span className="text-xs">{truncateEthAddress(row.address)}</span>
 							</div>
-							<div className="flex items-center w-[22%] gap-1 text-yellow-400 font-semibold">
+							<div className="flex items-center w-[25%] gap-1 text-yellow-400 font-semibold">
 								<BetValue value={row.result} />
 								<Stones className={'w-4 h-4'} />
 							</div>
-							<div className="flex items-center w-[22%] gap-1 text-blue-400 font-semibold">
-								<BetValue value={row.result} />
+							<div className="flex items-center w-[25%] gap-1 text-blue-400 font-semibold">
+								<BetValue value={row.bonus || 0n} />
 								<Stones className={'w-4 h-4'} />
 							</div>
 						</div>
 					))}
 				</div>
 			</div>
-			{distributed !== bonusBank + winBank && (
+			{bonusBank + winBank - distributed > 10n ** 18n && (
 				<div className={'border border-red-500/30 rounded-lg px-4 p-4 flex justify-between items-center'}>
 					Payout was not distributed
 					<Button onClick={handleDistribute}>Distribute</Button>

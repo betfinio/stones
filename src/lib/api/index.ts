@@ -192,6 +192,20 @@ export const spin = async (params: SpinParams, options: Options) => {
 		args: [params.round],
 	});
 };
+export interface DistributeParams {
+	round: number;
+}
+
+export const distribute = async (params: DistributeParams, options: Options) => {
+	if (!options.config) throw new Error('Config is required');
+
+	return writeContract(options.config, {
+		abi: StonesContract.abi,
+		address: STONES,
+		functionName: 'executeResult',
+		args: [BigInt(params.round), 0n, 100n],
+	});
+};
 
 export const getRoundTimes = (round: number): number[] => {
 	const start = round * 60 * 10;
