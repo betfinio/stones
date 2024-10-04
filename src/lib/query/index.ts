@@ -1,4 +1,5 @@
 import {
+	fetchBetResult,
 	fetchCurrentRound,
 	fetchDistributedInRound,
 	fetchRoundBank,
@@ -9,7 +10,7 @@ import {
 	fetchRoundStones,
 	fetchRoundWinner,
 } from '@/src/lib/api';
-import { fetchRoundBetsByPlayer, fetchRounds } from '@/src/lib/gql';
+import { fetchBetsByPlayer, fetchRoundBetsByPlayer, fetchRounds } from '@/src/lib/gql';
 import type { StoneInfo, StonesBet } from '@/src/lib/types';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
@@ -102,6 +103,13 @@ export const useStonesInfo = (round: number) => {
 	});
 };
 
+export const usePlayerBets = (player: Address) => {
+	return useQuery<StonesBet[]>({
+		queryKey: ['stones', 'player', player, 'bets'],
+		queryFn: () => fetchBetsByPlayer(player),
+	});
+};
+
 export const useRounds = () => {
 	return useQuery({
 		queryKey: ['stones', 'rounds'],
@@ -114,5 +122,13 @@ export const useRoundWinner = (round: number) => {
 	return useQuery({
 		queryKey: ['stones', 'round', round, 'winner'],
 		queryFn: () => fetchRoundWinner(round, config),
+	});
+};
+
+export const useBetResult = (bet: Address) => {
+	const config = useConfig();
+	return useQuery({
+		queryKey: ['stones', 'bet', bet, 'result'],
+		queryFn: () => fetchBetResult(bet, config),
 	});
 };

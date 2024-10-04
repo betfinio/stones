@@ -3,6 +3,7 @@ import { useActualRound, useCurrentRound } from '@/src/lib/query';
 import { arrayFrom } from '@betfinio/abi';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from 'betfinio_app/carousel';
 import { cx } from 'class-variance-authority';
+import { motion } from 'framer-motion';
 import { FaArrowLeftLong, FaArrowRightLong } from 'react-icons/fa6';
 import { useMediaQuery } from 'react-responsive';
 
@@ -23,8 +24,11 @@ export const CardList = () => {
 	}
 
 	return (
-		<div className={cx('relative w-full flex', actualRound !== currentRound && 'h-0')}>
-			<Carousel className={cx('w-full', isMobile && 'mb-8')} opts={{ loop: true, slidesToScroll: 1, dragFree: isDesktop }}>
+		<motion.div className={cx('relative w-full flex mb-8', actualRound !== currentRound && 'h-0 w-0 overflow-hidden')}>
+			<Carousel
+				className={cx('w-full', isMobile && 'mb-8')}
+				opts={{ loop: isMobile || isTablet, slidesToScroll: isMobile ? 2 : isTablet ? 2 : 1, dragFree: isTablet }}
+			>
 				<CarouselContent className="py-6">
 					{arrayFrom(5).map((card) => (
 						<CarouselItem key={card} className={`${itemBasis}`}>
@@ -43,7 +47,7 @@ export const CardList = () => {
 					</>
 				)}
 			</Carousel>
-		</div>
+		</motion.div>
 	);
 };
 

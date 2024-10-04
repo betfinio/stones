@@ -306,7 +306,7 @@ const Wheel = () => {
 											}}
 											className="z-20"
 										>
-											<BetValue value={sideBank[crystal.name - 1] || 0n} className={'text-base md:text-lg'} />
+											<BetValue value={sideBank[crystal.name - 1] || 0n} className={'text-xs md:text-lg'} />
 										</motion.span>
 									</div>
 

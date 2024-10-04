@@ -12,4 +12,5 @@ export interface StonesBet extends BetInterface {
 	side: number;
 	order: number;
 	bonus?: bigint;
+	round: number;
 }

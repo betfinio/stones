@@ -17,7 +17,6 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 	const { data: bets = [] } = useRoundBets(round);
 	const { data: winner = 0 } = useRoundWinner(round);
 	const { data: distributed = 0n } = useDistributedInRound(round);
-
 	const winBank = (bank * 914n) / 1000n;
 	const bonusBank = (bank * 5n) / 100n;
 

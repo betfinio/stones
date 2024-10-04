@@ -2,7 +2,7 @@ import ProbabilitiesChart from '@/src/components/BetAmount/ProbabilitiesChart.ts
 import BetRanking from '@/src/components/BetRanking/BetRanking.tsx';
 import logger from '@/src/config/logger';
 import { getRoundTimes } from '@/src/lib/api';
-import { useActualRound, useCurrentRound, useRoundBank, useSideBank } from '@/src/lib/query';
+import { useActualRound, useCurrentRound, useRoundBank, useRoundStatus, useSideBank } from '@/src/lib/query';
 import { usePlaceBet } from '@/src/lib/query/mutations';
 import { useSelectedStone } from '@/src/lib/query/state';
 import { arrayFrom } from '@betfinio/abi';
@@ -90,14 +90,14 @@ const BetAmount = () => {
 			{
 				id: 1,
 				value: isEmpty ? 20 : (Number(sideBank[0]) * 100) / Number(bank || 1n),
-				color: 'hsl(var(--zircon-bg))',
-				borderColor: 'hsl(var(--zircon-border))',
+				color: 'hsl(var(--topaz-bg))',
+				borderColor: 'hsl(var(--topaz-border))',
 			},
 			{
 				id: 2,
 				value: isEmpty ? 20 : (Number(sideBank[1]) * 100) / Number(bank || 1n),
-				color: 'hsl(var(--topaz-bg))',
-				borderColor: 'hsl(var(--topaz-border))',
+				color: 'hsl(var(--zircon-bg))',
+				borderColor: 'hsl(var(--zircon-border))',
 			},
 			{
 				id: 3,
@@ -123,9 +123,9 @@ const BetAmount = () => {
 	return (
 		<div className="w-full">
 			{isMobile ? (
-				<div className="flex flex-col items-center space-y-4">
+				<div className="flex flex-col items-center space-y-4 px-4">
 					{/* Bet Amount Section */}
-					<div className="w-full">
+					<div className="w-full ">
 						<span className="text-white font-semibold mb-2 block">Bet amount</span>
 						<div className="flex items-center px-4 space-x-2 border border-gray-500 rounded-lg p-2 w-full h-10">
 							<img src={cash} alt="cash" className="h-5" />
@@ -290,6 +290,7 @@ const OldRound: FC<{ round: number }> = ({ round }) => {
 	const { data: actualRound = 0 } = useActualRound();
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
+	const { data: status = 0 } = useRoundStatus(round);
 
 	const handleClick = () => {
 		navigate({ to: '/stones', search: { round: actualRound } });
@@ -301,7 +302,7 @@ const OldRound: FC<{ round: number }> = ({ round }) => {
 				<div>Round ended {DateTime.fromSeconds(end).toFormat('MM/dd T')}</div>
 				<Button onClick={handleClick}>Go to current round</Button>
 			</div>
-			<BetRanking round={round} />
+			{status > 0 && <BetRanking round={round} />}
 		</motion.div>
 	);
 };

@@ -225,3 +225,15 @@ export const fetchRoundWinner = async (round: number, config: Config): Promise<n
 
 	return Number(data);
 };
+
+export const fetchBetResult = async (bet: Address, config: Config): Promise<bigint> => {
+	logger.start('fetching bet result', bet);
+	const data = (await readContract(config, {
+		address: bet,
+		abi: StonesBetContract.abi,
+		functionName: 'getResult',
+		args: [],
+	})) as bigint;
+	logger.success('result', data);
+	return data;
+};

@@ -1,4 +1,5 @@
 import AllRoundsTable from '@/src/components/TableBet/AllRoundsTable.tsx';
+import MyBetsTable from '@/src/components/TableBet/MyBetsTable.tsx';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from 'betfinio_app/tabs';
 import { useTranslation } from 'react-i18next';
 
@@ -13,6 +14,9 @@ const TableBet = () => {
 				</TabsList>
 				<TabsContent value={'rounds'}>
 					<AllRoundsTable />
+				</TabsContent>
+				<TabsContent value={'bets'}>
+					<MyBetsTable />
 				</TabsContent>
 			</Tabs>
 		</div>

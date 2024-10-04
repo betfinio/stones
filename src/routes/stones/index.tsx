@@ -28,7 +28,6 @@ function Index() {
 		if (search.round === 0 && currentRound > 0) {
 			navigate({ to: '/stones', search: { round: currentRound } });
 		} else {
-			console.log('setting round', search.round);
 			queryClient.setQueryData(['stones', 'currentRound'], search.round);
 		}
 	}, [search, currentRound]);
@@ -51,6 +50,9 @@ function Index() {
 				<div key={'table'} className={'col-span-12'}>
 					<TableBet />
 				</div>
+				<a target={'_blank'} rel={'noreferrer '} href="https://chain.link/vrf">
+					<img src="https://chain.link/badge-randomness-black" className={'w-full max-w-[200px]'} alt="randomness secured with chainlink" />
+				</a>
 			</AnimatePresence>
 		</div>
 	);

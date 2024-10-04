@@ -26,7 +26,7 @@ export const usePlaceBet = () => {
 			await waitForTransactionReceipt(config.getClient(), { hash: data });
 			logger.success('transaction accepted');
 			update({ variant: 'default', description: t('success.message'), title: t('success.title'), action: getTransactionLink(data) });
-			await queryClient.invalidateQueries({ queryKey: ['stones'] });
+			queryClient.invalidateQueries({ queryKey: ['stones'] });
 			logger.success('finished');
 		},
 		onError: (error) => {
