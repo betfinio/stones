@@ -11,18 +11,12 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as TestImport } from './routes/test'
 import { Route as PopupImport } from './routes/popup'
 import { Route as FinishedImport } from './routes/finished'
 import { Route as IndexImport } from './routes/index'
 import { Route as StonesIndexImport } from './routes/stones/index'
 
 // Create/Update Routes
-
-const TestRoute = TestImport.update({
-  path: '/test',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const PopupRoute = PopupImport.update({
   path: '/popup',
@@ -69,13 +63,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PopupImport
       parentRoute: typeof rootRoute
     }
-    '/test': {
-      id: '/test'
-      path: '/test'
-      fullPath: '/test'
-      preLoaderRoute: typeof TestImport
-      parentRoute: typeof rootRoute
-    }
     '/stones/': {
       id: '/stones/'
       path: '/stones'
@@ -92,7 +79,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/finished': typeof FinishedRoute
   '/popup': typeof PopupRoute
-  '/test': typeof TestRoute
   '/stones': typeof StonesIndexRoute
 }
 
@@ -100,7 +86,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/finished': typeof FinishedRoute
   '/popup': typeof PopupRoute
-  '/test': typeof TestRoute
   '/stones': typeof StonesIndexRoute
 }
 
@@ -109,16 +94,15 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/finished': typeof FinishedRoute
   '/popup': typeof PopupRoute
-  '/test': typeof TestRoute
   '/stones/': typeof StonesIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/finished' | '/popup' | '/test' | '/stones'
+  fullPaths: '/' | '/finished' | '/popup' | '/stones'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/finished' | '/popup' | '/test' | '/stones'
-  id: '__root__' | '/' | '/finished' | '/popup' | '/test' | '/stones/'
+  to: '/' | '/finished' | '/popup' | '/stones'
+  id: '__root__' | '/' | '/finished' | '/popup' | '/stones/'
   fileRoutesById: FileRoutesById
 }
 
@@ -126,7 +110,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   FinishedRoute: typeof FinishedRoute
   PopupRoute: typeof PopupRoute
-  TestRoute: typeof TestRoute
   StonesIndexRoute: typeof StonesIndexRoute
 }
 
@@ -134,7 +117,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   FinishedRoute: FinishedRoute,
   PopupRoute: PopupRoute,
-  TestRoute: TestRoute,
   StonesIndexRoute: StonesIndexRoute,
 }
 
@@ -153,7 +135,6 @@ export const routeTree = rootRoute
         "/",
         "/finished",
         "/popup",
-        "/test",
         "/stones/"
       ]
     },
@@ -165,9 +146,6 @@ export const routeTree = rootRoute
     },
     "/popup": {
       "filePath": "popup.tsx"
-    },
-    "/test": {
-      "filePath": "test.tsx"
     },
     "/stones/": {
       "filePath": "stones/index.tsx"

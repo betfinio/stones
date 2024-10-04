@@ -1,4 +1,4 @@
-import instance from '@/src/i18n.ts';
+import instance from '@/src/i18n';
 import { createRootRoute } from '@tanstack/react-router';
 import { Root } from 'betfinio_app/root';
 

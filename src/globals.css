@@ -34,6 +34,23 @@ body {
 		--chart-3: 197 37% 24%;
 		--chart-4: 43 74% 66%;
 		--chart-5: 27 87% 67%;
+		--bonus-text: 195, 100%, 45%, 1;
+		--grey-text: 228, 11%, 47%, 1;
+
+		--zircon-bg: 258, 33%, 29%; /* Zircon (background) */
+		--zircon-border: 273, 64%, 71%, 1; /* Zircon (border) */
+
+		--topaz-bg: 291, 11%, 24%; /* Topaz (background) */
+		--topaz-border: 41, 51%, 56%; /* Topaz (border) */
+
+		--citrine-bg: 333, 22%, 25%; /* Citrine (background) */
+		--citrine-border: 25, 96%, 59%; /* Citrine (border) */
+
+		--emerald-bg: 194, 29%, 17%; /* Emerald (background) */
+		--emerald-border: 123, 68%, 34%; /* Emerald (border) */
+
+		--ruby-bg: 304, 33%, 18%; /* Ruby (background) */
+		--ruby-border: 360, 60%, 45%; /* Ruby (border) */
 	}
 
 	.dark {
@@ -80,4 +97,8 @@ input::-webkit-inner-spin-button {
 /* Firefox */
 input[type="number"] {
 	-moz-appearance: textfield;
+}
+
+#pie-box {
+	background-color: "green";
 }

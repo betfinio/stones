@@ -1,0 +1,13 @@
+sources:
+  - name: stones
+    handler:
+      graphql:
+        endpoint: ${PUBLIC_STONES_GRAPH_URL}
+
+codegen:
+  scalars:
+    BigInt: bigint
+    Bytes: string
+
+documents:
+  - ./src/schema.graphql

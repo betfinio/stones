@@ -1,3 +1,8 @@
+import Stone1 from '@/src/assets/Roulette/crystal1.svg';
+import Stone2 from '@/src/assets/Roulette/crystal2.svg';
+import Stone3 from '@/src/assets/Roulette/crystal3.svg';
+import Stone4 from '@/src/assets/Roulette/crystal4.svg';
+import Stone5 from '@/src/assets/Roulette/crystal5.svg';
 import confetti from 'canvas-confetti';
 
 export const shootConfetti = () => {
@@ -21,4 +26,21 @@ export const shootConfetti = () => {
 		colors: ['#FF2A51', '#B100A8', '#FFB300', '#B0D100', '#2462E7'],
 		origin: { x: 0.5, y: 0.4 },
 	});
+};
+
+export const getStoneImage = (stone: number) => {
+	switch (stone) {
+		case 1:
+			return Stone1;
+		case 2:
+			return Stone2;
+		case 3:
+			return Stone3;
+		case 4:
+			return Stone4;
+		case 5:
+			return Stone5;
+		default:
+			return Stone1;
+	}
 };

@@ -1,6 +1,7 @@
 import { ModuleFederationPlugin } from '@module-federation/enhanced/rspack';
 import { defineConfig } from '@rsbuild/core';
 import { pluginReact } from '@rsbuild/plugin-react';
+import { pluginSvgr } from '@rsbuild/plugin-svgr';
 import { TanStackRouterRspack } from '@tanstack/router-plugin/rspack';
 import { dependencies } from './package.json';
 
@@ -26,9 +27,10 @@ export default defineConfig({
 	output: {
 		assetPrefix: getOutput(),
 	},
-	plugins: [pluginReact()],
+	plugins: [pluginReact(), pluginSvgr()],
 	tools: {
 		rspack: {
+			ignoreWarnings: [/Critical dependency: the request of a dependency is an expression/],
 			output: {
 				uniqueName: 'betfinio_stones',
 			},

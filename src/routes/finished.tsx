@@ -1,5 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useTranslation } from 'react-i18next';
 import BetHistory from '../components/BetHistory/BetHistory';
 import BetRanking from '../components/BetRanking/BetRanking';
 import BetSummary from '../components/BetSummary/BetSummary';
