@@ -10,6 +10,8 @@ import enShared from 'betfinio_app/locales/en';
 // @ts-ignore
 import ruShared from 'betfinio_app/locales/ru';
 
+export const defaultLocale = 'en';
+
 const resources = {
 	en: {
 		translation: {
@@ -31,10 +33,23 @@ instance
 	.use(ICU)
 	.init({
 		resources: resources,
-		lng: 'en', // default language
 		fallbackLng: 'en',
 		interpolation: { escapeValue: false },
 		react: { useSuspense: true },
 	});
+
+const changeLanguage = async (locale: string | null) => {
+	const lng = locale ?? defaultLocale;
+	await instance.changeLanguage(lng);
+	localStorage.setItem('i18nextLng', lng);
+};
+
+if (!localStorage.getItem('i18nextLng')) {
+	const locale = navigator.language.split('-')[0];
+	console.log(locale, changeLanguage);
+	changeLanguage(locale);
+} else {
+	changeLanguage(localStorage.getItem('i18nextLng'));
+}
 
 export default instance;
