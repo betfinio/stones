@@ -9,8 +9,7 @@ import ruJSON from './translations/ru.json';
 import enShared from 'betfinio_app/locales/en';
 // @ts-ignore
 import ruShared from 'betfinio_app/locales/ru';
-
-export const defaultLocale = 'en';
+import I18nextBrowserLanguageDetector from 'i18next-browser-languagedetector';
 
 const resources = {
 	en: {
@@ -30,25 +29,18 @@ const resources = {
 const instance: i18n = i18.createInstance();
 instance
 	.use(initReactI18next)
+	.use(I18nextBrowserLanguageDetector)
 	.use(ICU)
 	.init({
 		resources: resources,
+		detection: {
+			order: ['localStorage', 'navigator'],
+			convertDetectedLanguage: (lng) => lng.split('-')[0],
+		},
+		supportedLngs: ['en', 'ru', 'cs'],
 		fallbackLng: 'en',
 		interpolation: { escapeValue: false },
 		react: { useSuspense: true },
 	});
-
-const changeLanguage = async (locale: string | null) => {
-	const lng = locale ?? defaultLocale;
-	await instance.changeLanguage(lng);
-	localStorage.setItem('i18nextLng', lng);
-};
-
-if (!localStorage.getItem('i18nextLng')) {
-	const locale = navigator.language.split('-')[0];
-	changeLanguage(locale);
-} else {
-	changeLanguage(localStorage.getItem('i18nextLng'));
-}
 
 export default instance;
