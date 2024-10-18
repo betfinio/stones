@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
 
 const PlayerItem: FC<{ bet: StonesBet; round: number; className?: string }> = ({ bet, round, className }) => {
-	const { t } = useTranslation('', { keyPrefix: 'stones.history' });
+	const { t } = useTranslation('stones', { keyPrefix: 'history' });
 
 	const { data: bank = 0n } = useRoundBank(round);
 	const share = Number(bet.amount * 100n) / Number(bank);

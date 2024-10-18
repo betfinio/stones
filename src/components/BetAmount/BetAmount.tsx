@@ -36,7 +36,7 @@ const images: { [key: string]: string } = {
 };
 
 const BetAmount = () => {
-	const { t } = useTranslation('', { keyPrefix: 'stones.controls' });
+	const { t } = useTranslation('stones', { keyPrefix: 'controls' });
 	const [betPercentage, setBetPercentage] = useState(0);
 	const { data: selected, setSelectedStone } = useSelectedStone();
 	const { data: round = 0 } = useCurrentRound();

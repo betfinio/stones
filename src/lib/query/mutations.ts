@@ -10,7 +10,7 @@ import { useConfig } from 'wagmi';
 
 export const usePlaceBet = () => {
 	const config = useConfig();
-	const { t } = useTranslation('', { keyPrefix: 'stones.controls' });
+	const { t } = useTranslation('stones', { keyPrefix: 'controls' });
 	const queryClient = useQueryClient();
 	return useMutation<WriteContractReturnType, WriteContractErrorType, PlaceBetParams>({
 		mutationKey: ['stones', 'placeBet'],

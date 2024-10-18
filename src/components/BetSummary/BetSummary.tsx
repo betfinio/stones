@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
 
 const BetSummary = () => {
-	const { t } = useTranslation('', { keyPrefix: 'stones.info' });
+	const { t } = useTranslation('stones', { keyPrefix: 'info' });
 
 	const { data: round = 0 } = useCurrentRound();
 	const { data: bank = 0n } = useRoundBank(round);

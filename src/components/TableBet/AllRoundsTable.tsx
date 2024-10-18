@@ -14,7 +14,7 @@ const columnHelper = createColumnHelper<{ round: number }>();
 
 const AllRoundsTable = () => {
 	const { data: rounds = [] } = useRounds();
-	const { t } = useTranslation('', { keyPrefix: 'stones.table.columns' });
+	const { t } = useTranslation('stones', { keyPrefix: 'table.columns' });
 	const navigate = useNavigate();
 
 	const columns = [
