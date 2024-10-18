@@ -4,9 +4,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from 'betfinio_app/tabs';
 import { useTranslation } from 'react-i18next';
 
 const TableBet = () => {
-	const { t } = useTranslation('', { keyPrefix: 'stones.table' });
+	const { t } = useTranslation('stones', { keyPrefix: 'table' });
 	return (
-		<div>
+		<div className={'w-full'}>
 			<Tabs defaultValue={'rounds'}>
 				<TabsList>
 					<TabsTrigger value={'rounds'}>{t('tabs.rounds')}</TabsTrigger>

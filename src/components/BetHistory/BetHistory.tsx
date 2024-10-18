@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from 'betfinio_app/tabs';
 import { useTranslation } from 'react-i18next';
 
 const BetHistory = () => {
-	const { t } = useTranslation('', { keyPrefix: 'stones.history.tabs' });
+	const { t } = useTranslation('stones', { keyPrefix: 'history.tabs' });
 	const { data: round = 0 } = useCurrentRound();
 	return (
 		<div className="w-full min-h-[300px] lg:h-[650px] p-2 md:p-3 border border-gray-800 rounded-lg bg-primaryLight">

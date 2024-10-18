@@ -19,7 +19,7 @@ const columnHelper = createColumnHelper<StonesBet>();
 const MyBetsTable = () => {
 	const { address = ZeroAddress } = useAccount();
 	const { data: rounds = [] } = usePlayerBets(address);
-	const { t } = useTranslation('', { keyPrefix: 'stones.table.columns' });
+	const { t } = useTranslation('stones', { keyPrefix: 'table.columns' });
 	const navigate = useNavigate();
 
 	const columns: ColumnDef<StonesBet, never>[] = [

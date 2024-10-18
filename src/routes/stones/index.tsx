@@ -32,12 +32,12 @@ function Index() {
 		}
 	}, [search, currentRound]);
 	return (
-		<div className="w-full p-2 md:p-3 lg:p-4 rounded-md text-white h-full  overflow-hidden grid grdi-cols-12 gap-2">
+		<div className="w-full p-2 md:p-3 lg:p-4 rounded-md text-white h-full  overflow-hidden grid grid-cols-12 gap-2">
 			<div className={'col-span-12 lg:col-span-8'}>
 				<Roulette />
 			</div>
 			<AnimatePresence>
-				<div key={'amount'} className={'col-span-12 lg:col-span-8 lg:col-row-2 lg:mb-0 md:mb-10'}>
+				<div key={'amount'} className={'col-span-12 lg:col-span-8 lg:mb-0 md:mb-10'}>
 					<BetAmount />
 				</div>
 				<div key={'cards'} className={'col-span-12 md:col-span-8 overflow-hidden'}>
@@ -47,11 +47,11 @@ function Index() {
 					<BetHistory />
 					<BetSummary />
 				</div>
-				<div key={'table'} className={'col-span-12'}>
+				<div key={'table'} className={'col-span-12 w-full'}>
 					<TableBet />
 				</div>
-				<a target={'_blank'} rel={'noreferrer '} href="https://chain.link/vrf">
-					<img src="https://chain.link/badge-randomness-black" className={'w-full max-w-[200px]'} alt="randomness secured with chainlink" />
+				<a target={'_blank'} rel={'noreferrer '} href="https://chain.link/vrf" className={'w-full max-w-[200px] col-span-12 lg:col-span-4'}>
+					<img src="https://chain.link/badge-randomness-black" alt="randomness secured with chainlink" />
 				</a>
 			</AnimatePresence>
 		</div>
