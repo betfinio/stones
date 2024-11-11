@@ -6,6 +6,7 @@ import { BetValue } from 'betfinio_app/BetValue';
 import { Button } from 'betfinio_app/button';
 import { UserIcon } from 'lucide-react';
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import bronzeTrophy from '../../assets/BetHistory/trophy-bronze.svg';
 import goldTrophy from '../../assets/BetHistory/trophy-gold.svg';
 import silverTrophy from '../../assets/BetHistory/trophy-silver.svg';
@@ -13,6 +14,7 @@ import figureImage from '../../assets/BetRanking/duck-winner.png';
 import crystalImage from '../../assets/Roulette/crystal1.svg';
 
 const BetRanking: FC<{ round: number }> = ({ round }) => {
+	const { t } = useTranslation('stones', { keyPrefix: 'betRanking' });
 	const { data: bank = 0n } = useRoundBank(round);
 	const { data: bets = [] } = useRoundBets(round);
 	const { data: winner = 0 } = useRoundWinner(round);
@@ -60,23 +62,25 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 							<img src={crystalImage} alt="Crystal" className="h-15 w-12" />
 							<div className="flex flex-col items-center">
 								<div className="flex flex-row gap-2 items-center text-yellow-400 text-sm font-semibold">
-									<BetValue value={bank} withIcon /> total bank
+									<BetValue value={bank} withIcon /> {t('totalBank')}
 								</div>
 								<div className="flex items-center text-gray-400 text-[12px] font-semibold">
-									<span className="mr-1">{bets.length} bets</span>
+									<span className="mr-1">
+										{bets.length} {t('bets')}
+									</span>
 									<UserIcon className={'w-4 h-4'} />
 								</div>
 							</div>
 						</div>
 						<div className="flex flex-col items-center justify-center">
-							<div className="flex w-full items-center justify-center text-white text-[24px] font-semibold">WIN!</div>
+							<div className="flex w-full items-center justify-center text-white text-[24px] font-semibold uppercase">{t('win')}!</div>
 							<div className="flex items-center w-full text-yellow-400 font-semibold flex-row gap-1 justify-center">
 								<BetValue value={winBank} />
 								<Stones />
 							</div>
 							<div className="text-blue-500 flex items-center justify-center text-xs mt-1 font-semibold gap-1">
 								<BetValue prefix={'Bonus: '} value={bonusBank} withIcon iconClassName={'!text-blue-500 !w-3 !h-3'} />
-								BONUS
+								<span className={'uppercase'}>{t('bonus')}</span>
 							</div>
 						</div>
 					</div>
@@ -86,11 +90,11 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 				{/* Right Side - Ranking List */}
 				<div className="w-full flex flex-col space-y-2">
 					{/* Header */}
-					<div className="flex justify-between text-gray-400 text-[12px] px-4 py-2">
+					<div className="flex justify-between text-gray-400 text-[12px] px-4 py-2 capitalize">
 						<div className="w-[20%]">№</div>
-						<div className="w-[30%]">Bet</div>
-						<div className="w-[25%]">Win</div>
-						<div className="w-[25%]">Bonus</div>
+						<div className="w-[30%]">{t('bet')}</div>
+						<div className="w-[25%]">{t('win')}</div>
+						<div className="w-[25%]">{t('bonus')}</div>
 					</div>
 
 					{/* Rows */}
@@ -130,8 +134,8 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 			</div>
 			{bonusBank + winBank - distributed > 10n ** 18n && (
 				<div className={'border border-red-500/30 rounded-lg px-4 p-4 flex justify-between items-center'}>
-					Payout was not distributed
-					<Button onClick={handleDistribute}>Distribute</Button>
+					{t('payoutNotDistributed')}
+					<Button onClick={handleDistribute}>{t('distribute')}</Button>
 				</div>
 			)}
 		</>

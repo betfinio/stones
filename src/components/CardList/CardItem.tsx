@@ -5,8 +5,11 @@ import { getStoneImage } from '@/src/lib/utils';
 import { BetValue } from 'betfinio_app/BetValue';
 import { cx } from 'class-variance-authority';
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const CardItem: FC<{ stone: number }> = ({ stone }) => {
+	const { t } = useTranslation('stones', { keyPrefix: 'cards' });
+
 	const { data: round = 0 } = useCurrentRound();
 	const { data: selectedStone, setSelectedStone } = useSelectedStone();
 	const { data: sideBank = [0n, 0n, 0n, 0n, 0n] } = useSideBank(round);
@@ -42,7 +45,7 @@ const CardItem: FC<{ stone: number }> = ({ stone }) => {
 					type="button"
 					className="border-2 border-yellow-400 text-white text-sm px-1 py-2 rounded-lg mt-2 transition-all duration-300 ease-out hover:bg-yellow-400 hover:text-black w-full"
 				>
-					Choose
+					{t('choose')}
 				</button>
 				<div className="flex w-fit items-center mt-4 h-4 mx-auto mb-2 text-sm">
 					<BetValue prefix={'Pool:'} value={sideBank[stone - 1]} withIcon />
@@ -52,14 +55,18 @@ const CardItem: FC<{ stone: number }> = ({ stone }) => {
 				</div>
 				<div className="mt-2 space-y-1 text-sm text-gray-400">
 					<div className="flex items-center justify-center space-x-1 text-nowrap">
-						<img src={bets} alt="bets" className="h-3" />
-						<span className="text-xs opacity-60">{Number(betsCount[stone - 1])} bets</span>
+						<img src={bets} alt={t('bets')} className="h-3" />
+						<span className="text-xs opacity-60">
+							{Number(betsCount[stone - 1])} {t('bets')}
+						</span>
 					</div>
 					<div className="flex w-fit mx-auto items-center justify-center space-x-1 text-nowrap">
 						{sideBank[stone - 1] > 0n ? (
-							<span className="text-xs opacity-60">{(Number(sideBank[stone - 1] * 100n) / Number(bank)).toFixed(2)}% probability</span>
+							<span className="text-xs opacity-60">
+								{(Number(sideBank[stone - 1] * 100n) / Number(bank)).toFixed(2)}% {t('probability')}
+							</span>
 						) : (
-							<span className="text-xs opacity-60">?% probability</span>
+							<span className="text-xs opacity-60">?% {t('probability')}</span>
 						)}
 					</div>
 				</div>

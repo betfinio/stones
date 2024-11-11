@@ -12,6 +12,7 @@ import { BetValue } from 'betfinio_app/BetValue';
 import { cx } from 'class-variance-authority';
 import { AnimatePresence, motion, useAnimation } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useWatchContractEvent } from 'wagmi';
 import arrowdown from '../../assets/Roulette/arrow-down.svg';
 import cash from '../../assets/Roulette/cash.svg';
@@ -210,6 +211,8 @@ const Wheel = () => {
 		};
 	}, []);
 
+	const { t } = useTranslation('stones', { keyPrefix: 'roulette' });
+
 	return (
 		<div
 			key={'container'}
@@ -361,7 +364,7 @@ const Wheel = () => {
 							lineHeight: `${17 * scale * 2}px`,
 						}}
 					>
-						<span>Round is Over!</span>
+						<span>{t('roundIsOver')}</span>
 						<span
 							style={{
 								fontSize: `${10 * scale * 2}px`,
@@ -369,7 +372,7 @@ const Wheel = () => {
 							}}
 							className={'font-light text-gray-500'}
 						>
-							Waiting for spin, stand by!
+							{t('waitingForSpin')}
 						</span>
 					</div>
 				</AnimatePresence>

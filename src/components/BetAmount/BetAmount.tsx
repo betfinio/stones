@@ -126,7 +126,7 @@ const BetAmount = () => {
 				<div className="flex flex-col items-center space-y-4 px-4">
 					{/* Bet Amount Section */}
 					<div className="w-full ">
-						<span className="text-white font-semibold mb-2 block">Bet amount</span>
+						<span className="text-white font-semibold mb-2 block">{t('betAmount')}</span>
 						<div className="flex items-center px-4 space-x-2 border border-gray-500 rounded-lg p-2 w-full h-10">
 							<img src={cash} alt="cash" className="h-5" />
 							<Input className="text-white text-xs border-0 w-full" value={amount} onChange={handleAmountChange} type="number" min={1000} />
@@ -219,7 +219,7 @@ const BetAmount = () => {
 
 					{/* Bet Amount Section */}
 					<div className={cx('flex flex-col h-[110px] w-full max-w-[200px]')}>
-						<span className="text-white font-semibold mb-2">Bet amount</span>
+						<span className="text-white font-semibold mb-2">{t('betAmount')}</span>
 						<div className="flex items-center px-4 space-x-2 border border-gray-500 rounded-lg p-2 w-full h-[40px]">
 							<img src={cash} alt="cash" className="h-[20px]" />
 							<Input className="text-white text-[12px] border-0 w-full" value={amount} onChange={handleAmountChange} type="number" min={1000} />
@@ -296,11 +296,13 @@ const OldRound: FC<{ round: number }> = ({ round }) => {
 		navigate({ to: '/stones', search: { round: actualRound } });
 		queryClient.invalidateQueries({ queryKey: ['stones', 'currentRound'] });
 	};
+	const { t } = useTranslation('stones', { keyPrefix: 'oldRound' });
+
 	return (
 		<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
 			<div className={'w-full border border-yellow-400/50 rounded-lg p-4 flex flex-row items-center justify-between'}>
 				<div>Round ended {DateTime.fromSeconds(end).toFormat('MM/dd T')}</div>
-				<Button onClick={handleClick}>Go to current round</Button>
+				<Button onClick={handleClick}>{t('goToCurrentRound')}</Button>
 			</div>
 			{status > 0 && <BetRanking round={round} />}
 		</motion.div>

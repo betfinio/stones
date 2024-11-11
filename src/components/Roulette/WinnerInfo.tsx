@@ -4,10 +4,13 @@ import { BetValue } from 'betfinio_app/BetValue';
 import { cx } from 'class-variance-authority';
 import { motion } from 'framer-motion';
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
 
 const WinnerInfo: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 	const { data: status } = useRoundStatus(round);
+
+	const { t } = useTranslation('stones', { keyPrefix: 'winner' });
 
 	const getContent = () => {
 		if (status === 2) {
@@ -16,7 +19,7 @@ const WinnerInfo: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 		}
 		if (status === 1) {
 			// wheel is spinning
-			return <div>Winner is being decided</div>;
+			return <div>{t('winnerIsBeingDecided')}</div>;
 		}
 		return (
 			<div
@@ -26,7 +29,7 @@ const WinnerInfo: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 					lineHeight: `${17 * scale * 2}px`,
 				}}
 			>
-				<span>Round is Over!</span>
+				<span>{t('roundIsOver')}!</span>
 				<span
 					style={{
 						fontSize: `${10 * scale * 2}px`,
@@ -34,7 +37,7 @@ const WinnerInfo: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 					}}
 					className={'font-light text-gray-500'}
 				>
-					Waiting for spin, stand by!
+					{t('waitingForSpin')}!
 				</span>
 			</div>
 		);
@@ -68,6 +71,8 @@ const WinnerInfo: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 
 const WinnerNotDistributed: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 	// manually calculate win and bonus amount
+	const { t } = useTranslation('stones', { keyPrefix: 'winner' });
+
 	const { address = ZeroAddress } = useAccount();
 	const { data: winnerSide = 0, isFetching } = useRoundWinner(round);
 	const { data: bank = 0n } = useRoundBank(round);
@@ -85,7 +90,7 @@ const WinnerNotDistributed: FC<{ round: number; scale: number }> = ({ round, sca
 	if (myWin > 0) {
 		return (
 			<motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} className={'z-[6] flex flex-col items-center text-base lg:text-2xl'}>
-				You win:
+				{t('win')}:
 				<BetValue prefix={'Win: '} className={'text-yellow-400 scale-110'} value={BigInt(myWin)} withIcon />
 				<div className={'!text-blue-500 scale-[0.9] flex flex-row items-center gap-1'}>
 					+<BetValue prefix={'Bonus: '} iconClassName={'!text-blue-500'} value={BigInt(myBonus)} withIcon />
@@ -103,7 +108,7 @@ const WinnerNotDistributed: FC<{ round: number; scale: number }> = ({ round, sca
 				fontSize: `${36 * scale}px`,
 			}}
 		>
-			You didn't win
+			{t('lose')}
 		</div>
 	);
 };

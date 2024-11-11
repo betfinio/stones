@@ -3,8 +3,10 @@ import { useSpin } from '@/src/lib/query/mutations.ts';
 import { getStoneImage } from '@/src/lib/utils.ts';
 import { LoaderIcon } from 'lucide-react';
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const WinnerCell: FC<{ round: number }> = ({ round }) => {
+	const { t } = useTranslation('stones', { keyPrefix: 'status' });
 	const { data: winner = 0 } = useRoundWinner(round);
 	const { data: status = 0 } = useRoundStatus(round);
 	const { mutate: spin } = useSpin();
@@ -20,7 +22,7 @@ const WinnerCell: FC<{ round: number }> = ({ round }) => {
 			) : status === 1 ? (
 				<LoaderIcon className={'animate-spin'} />
 			) : (
-				'Waiting'
+				t('waiting')
 			)}
 		</div>
 	);

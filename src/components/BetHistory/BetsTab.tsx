@@ -2,10 +2,12 @@ import BetItem from '@/src/components/BetHistory/BetItem';
 import { useRoundBets } from '@/src/lib/query';
 import { motion } from 'framer-motion';
 import type { CSSProperties, FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMediaQuery } from 'react-responsive';
 import { FixedSizeList as List } from 'react-window';
 
 const BetsTab: FC<{ round: number }> = ({ round }) => {
+	const { t } = useTranslation('stones', { keyPrefix: 'history.tabs' });
 	const { data: bets = [] } = useRoundBets(round);
 	const Row = ({ index, style }: { index: number; style: CSSProperties }) => {
 		const player = bets[index];
@@ -25,7 +27,7 @@ const BetsTab: FC<{ round: number }> = ({ round }) => {
 			</List>
 		</motion.div>
 	) : (
-		<div className={'items-center flex justify-center text-gray-500'}>No bets yet</div>
+		<div className={'items-center flex justify-center text-gray-500'}>{t('noData')}</div>
 	);
 };
 
