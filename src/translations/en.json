@@ -1,7 +1,27 @@
 {
 	"title": "Template",
-
+	"header": {
+		"roundId": "Round ID",
+		"winningPool": "Winning Pool",
+		"bonusPool": "Bonus Pool",
+		"howToPlay": "How to play",
+		"report": "Report"
+	},
+	"roulette": {
+		"roundIsOver": "Round is Over!",
+		"waitingForSpin": "Waiting for spin, stand by!",
+		"animation": "Roulette Animation",
+		"timeLeft": "Wheel spins in"
+	},
+	"winner": {
+		"winnerIsBeingDecided": "Winner is being decided",
+		"roundIsOver": "Round is Over",
+		"waitingForSpin": "Waiting for spin, stand by",
+		"lose": "You didn't win",
+		"win": "You win"
+	},
 	"controls": {
+		"betAmount": "Bet amount",
 		"placeBet": "Place a bet to win",
 		"pending": {
 			"title": "Placing a bet",
@@ -12,6 +32,9 @@
 			"message": "Your bet has been placed successfully"
 		}
 	},
+	"oldRound": {
+		"goToCurrentRound": "Go to current round"
+	},
 	"info": {
 		"yourBet": "Your BET",
 		"potentialWin": "Potential win"
@@ -20,9 +43,19 @@
 		"tabs": {
 			"bets": "Bets",
 			"players": "Players",
-			"bonus": "Bonuses"
+			"bonus": "Bonuses",
+			"noData": "No bets yet"
 		},
 		"betCount": "{count, plural, =0 {No bets} =1 {# bet} other {# bets}}"
+	},
+	"betRanking": {
+		"totalBank": "total bank",
+		"bets": "bets",
+		"bet": "bet",
+		"win": "win",
+		"bonus": "bonus",
+		"distibute": "Distribute",
+		"payoutNotDistributed": "Payout was not distributed"
 	},
 	"table": {
 		"tabs": {
@@ -41,5 +74,13 @@
 			"winner": "Winner",
 			"staking": "Staking Earnings"
 		}
+	},
+	"cards": {
+		"bets": "bets",
+		"choose": "choose",
+		"probability": "probability"
+	},
+	"status": {
+		"waiting": "Waiting"
 	}
 }

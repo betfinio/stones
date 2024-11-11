@@ -7,7 +7,6 @@ import { BetValue } from 'betfinio_app/BetValue';
 import { useCustomUsername, useUsername } from 'betfinio_app/lib/query/username';
 import { cx } from 'class-variance-authority';
 import type { FC } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
 
 const BetItem: FC<{ bet: StonesBet; round: number; className?: string }> = ({ bet, round, className }) => {

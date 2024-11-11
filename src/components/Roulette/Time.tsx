@@ -2,6 +2,7 @@ import { getRoundTimes } from '@/src/lib/api';
 import { cx } from 'class-variance-authority';
 import { motion } from 'framer-motion';
 import { type FC, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Time: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 	const [_, end] = getRoundTimes(round);
@@ -25,6 +26,8 @@ const Time: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 		return () => clearInterval(interval);
 	}, [round]);
 
+	const { t } = useTranslation('stones', { keyPrefix: 'roulette' });
+
 	return (
 		<motion.div
 			key="countdown"
@@ -47,7 +50,7 @@ const Time: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 					opacity: 0.4,
 				}}
 			>
-				Stop game in:
+				{t('timeLeft')}:
 			</span>
 			<span
 				className={cx((!loaded || remaining === '00:00') && 'hidden')}

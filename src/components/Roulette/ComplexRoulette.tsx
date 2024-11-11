@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 const ComplexRoulette = () => {
 	const sections = 10;
@@ -76,6 +77,8 @@ const ComplexRoulette = () => {
 		};
 	};
 
+	const { t } = useTranslation('stones', { keyPrefix: 'roulette' });
+
 	return (
 		<motion.svg
 			initial={{ opacity: 0, rotate: 360 }}
@@ -90,7 +93,7 @@ const ComplexRoulette = () => {
 			viewBox={`0 0 ${radius * 2.2} ${radius * 2.2}`}
 			className="w-full h-full"
 		>
-			<title className="hidden">Roulette Animation</title>
+			<title className="hidden">{t('animation')}</title>
 			<defs>
 				<radialGradient id="grad1" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
 					<stop offset="0%" style={{ stopColor: '#1C223A', stopOpacity: 1 }} />
