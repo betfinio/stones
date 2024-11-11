@@ -45,7 +45,6 @@ const CardItem: FC<{ stone: number }> = ({ stone }) => {
 					type="button"
 					className="border-2 border-yellow-400 text-white text-sm px-1 py-2 rounded-lg mt-2 transition-all duration-300 ease-out hover:bg-yellow-400 hover:text-black w-full"
 				>
-					{/*Choose*/}
 					{t('choose')}
 				</button>
 				<div className="flex w-fit items-center mt-4 h-4 mx-auto mb-2 text-sm">

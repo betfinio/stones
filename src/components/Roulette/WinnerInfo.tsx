@@ -19,7 +19,7 @@ const WinnerInfo: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 		}
 		if (status === 1) {
 			// wheel is spinning
-			return <div>{'winnerIsBeingDecided'}</div>;
+			return <div>{t('winnerIsBeingDecided')}</div>;
 		}
 		return (
 			<div

@@ -126,8 +126,7 @@ const BetAmount = () => {
 				<div className="flex flex-col items-center space-y-4 px-4">
 					{/* Bet Amount Section */}
 					<div className="w-full ">
-						{/*Bet amount*/}
-						<span className="text-white font-semibold mb-2 block">{'betAmount'}</span>
+						<span className="text-white font-semibold mb-2 block">{t('betAmount')}</span>
 						<div className="flex items-center px-4 space-x-2 border border-gray-500 rounded-lg p-2 w-full h-10">
 							<img src={cash} alt="cash" className="h-5" />
 							<Input className="text-white text-xs border-0 w-full" value={amount} onChange={handleAmountChange} type="number" min={1000} />
