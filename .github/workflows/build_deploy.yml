@@ -1,0 +1,55 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - prod/*
+      - dev
+
+jobs:
+  build:
+    name: build
+    environment: ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Fetch variables
+        uses: aws-actions/aws-secretsmanager-get-secrets@v2
+        with:
+          secret-ids: |
+            ,${{ secrets.AWS_ENVIRONMENT }}
+            ,${{ github.ref_name }}
+          parse-json-secrets: true
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          registry-url: "https://npm.pkg.github.com"
+          scope: '@betfinio'
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install
+        env:
+          BUN_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build
+        env:
+          PUBLIC_OUTPUT_URL: https://s3.${{secrets.AWS_REGION}}.amazonaws.com/${{secrets.AWS_BUCKET}}
+        run: bun run build --env-mode ${{ secrets.AWS_ENVIRONMENT }}
+      - name: Deploy
+        run: |
+          aws s3 cp ./dist s3://${{secrets.AWS_BUCKET}} --cache-control 'public, max-age=31104000' --recursive
+      - name: Release
+        if: ${{github.ref_name == 'dev'}}
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr create -B prod/io -H dev --title 'Release to prod/io' --body 'Created by Github Action'
+          gh pr create -B prod/gg -H dev --title 'Release to prod/gg' --body 'Created by Github Action'
+          gh pr create -B prod/games -H dev --title 'Release to prod/games' --body 'Created by Github Action'
