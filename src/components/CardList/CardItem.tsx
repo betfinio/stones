@@ -35,17 +35,20 @@ const CardItem: FC<{ stone: number }> = ({ stone }) => {
 			{/* The card content below the crystal */}
 			<div
 				className={cx(
-					'relative z-10 mt-8 flex flex-col items-center text-center bg-primaryLight rounded-xl p-4 pt-16 w-36 ',
-					selectedStone === stone && 'border border-yellow-400/20 ',
+					'relative z-10 mt-8 flex flex-col border border-transparent items-center text-center bg-primaryLight rounded-xl p-4 pt-16 w-36 duration-300',
+					selectedStone === stone && '!border-yellow-400',
 				)}
 			>
 				<span className="block text-md font-normal tabular-nums">{displayMultiplier}</span>
 				<button
 					onClick={handleClick}
 					type="button"
-					className="border-2 border-yellow-400 text-white text-sm px-1 py-2 rounded-lg mt-2 transition-all duration-300 ease-out hover:bg-yellow-400 hover:text-black w-full"
+					className={cx(
+						'border-2 border-yellow-400 text-white text-sm capitalize px-1 py-2 rounded-lg mt-2 transition-all duration-300 ease-out hover:bg-yellow-400 hover:text-black w-full',
+						selectedStone === stone && '!bg-yellow-400 !text-black',
+					)}
 				>
-					{t('choose')}
+					{selectedStone === stone ? t('selected') : t('select')}
 				</button>
 				<div className="flex w-fit items-center mt-4 h-4 mx-auto mb-2 text-sm">
 					<BetValue prefix={'Pool:'} value={sideBank[stone - 1]} withIcon />

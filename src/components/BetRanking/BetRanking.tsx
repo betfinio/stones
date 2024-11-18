@@ -1,6 +1,7 @@
 import { useDistributedInRound, useRoundBank, useRoundBets, useRoundWinner } from '@/src/lib/query';
 import { useDistribute } from '@/src/lib/query/mutations.ts';
 import { truncateEthAddress } from '@betfinio/abi';
+import { Bet } from '@betfinio/ui';
 import { Stones } from '@betfinio/ui/dist/icons/StoneBet';
 import { BetValue } from 'betfinio_app/BetValue';
 import { Button } from 'betfinio_app/button';
@@ -76,7 +77,7 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 							<div className="flex w-full items-center justify-center text-white text-[24px] font-semibold uppercase">{t('win')}!</div>
 							<div className="flex items-center w-full text-yellow-400 font-semibold flex-row gap-1 justify-center">
 								<BetValue value={winBank} />
-								<Stones />
+								<Bet className={'text-yellow-400 w-4 h-4'} />
 							</div>
 							<div className="text-blue-500 flex items-center justify-center text-xs mt-1 font-semibold gap-1">
 								<BetValue prefix={'Bonus: '} value={bonusBank} withIcon iconClassName={'!text-blue-500 !w-3 !h-3'} />
@@ -122,11 +123,11 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 							</div>
 							<div className="flex items-center w-[25%] gap-1 text-yellow-400 font-semibold">
 								<BetValue value={row.result} />
-								<Stones className={'w-4 h-4'} />
+								<Bet className={'text-yellow-400 w-4 h-4'} />
 							</div>
 							<div className="flex items-center w-[25%] gap-1 text-blue-400 font-semibold">
 								<BetValue value={row.bonus || 0n} />
-								<Stones className={'w-4 h-4'} />
+								<Bet className={'text-yellow-400 w-4 h-4'} />
 							</div>
 						</div>
 					))}

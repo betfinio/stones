@@ -1,7 +1,6 @@
 import { useCurrentRound, useRoundBank, useRoundBets } from '@/src/lib/query';
 import { ZeroAddress } from '@betfinio/abi';
-import { MoneyHand } from '@betfinio/ui';
-import { Stones } from '@betfinio/ui/dist/icons/StoneBet';
+import { Bet, MoneyHand } from '@betfinio/ui';
 import { BetValue } from 'betfinio_app/BetValue';
 import { UserIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -25,7 +24,7 @@ const BetSummary = () => {
 			<div className="flex justify-between mb-4 bg-primary p-2 rounded-lg">
 				<div className="flex items-center font-semibold text-yellow-400  flex-row gap-2">
 					<BetValue value={bank} />
-					<Stones />
+					<Bet className={'text-yellow-400 w-4 h-4'} />
 				</div>
 				<div className="flex items-center font-semibold text-green-400 flex-row gap-2">
 					{bets.length}
