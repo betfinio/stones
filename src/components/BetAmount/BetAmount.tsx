@@ -5,13 +5,15 @@ import { getRoundTimes } from '@/src/lib/api';
 import { useActualRound, useCurrentRound, useRoundBank, useRoundStatus, useSideBank } from '@/src/lib/query';
 import { usePlaceBet } from '@/src/lib/query/mutations';
 import { useSelectedStone } from '@/src/lib/query/state';
-import { arrayFrom } from '@betfinio/abi';
+import { arrayFrom, valueToNumber } from '@betfinio/abi';
+import { Bet } from '@betfinio/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { BetValue } from 'betfinio_app/BetValue';
 import { Button } from 'betfinio_app/button';
 import { Input } from 'betfinio_app/input';
 import { useBalance } from 'betfinio_app/lib/query/token';
+import { Slider } from 'betfinio_app/slider';
 import { cx } from 'class-variance-authority';
 import { motion } from 'framer-motion';
 import { LoaderIcon } from 'lucide-react';
@@ -62,13 +64,9 @@ const BetAmount = () => {
 		logger.info('actualRound', actualRound);
 	}, [actualRound]);
 
-	const handleSliderChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setBetPercentage(Math.min(Number(e.target.value), 100));
-		if (e.target.value === '0') {
-			setAmount('1000');
-			return;
-		}
-		setAmount(((balance * BigInt(e.target.value)) / 100n / 10n ** 18n).toString());
+	const handleSliderChange = (value: number) => {
+		setBetPercentage(Number(((value / valueToNumber(balance)) * 100).toFixed(2)));
+		setAmount(value.toFixed(0));
 	};
 
 	const handleAmountChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -128,22 +126,20 @@ const BetAmount = () => {
 					<div className="w-full ">
 						<span className="text-white font-semibold mb-2 block">{t('betAmount')}</span>
 						<div className="flex items-center px-4 space-x-2 border border-gray-500 rounded-lg p-2 w-full h-10">
-							<img src={cash} alt="cash" className="h-5" />
+							<Bet className={'w-5 h-5 text-yellow-400'} />
 							<Input className="text-white text-xs border-0 w-full" value={amount} onChange={handleAmountChange} type="number" min={1000} />
 						</div>
-						<div className="relative mt-2 h-6">
-							<div className="w-full bg-gray-700 h-px rounded-full mt-1 relative">
-								<div className="absolute bg-yellow-400 h-px rounded-full" style={{ width: `${betPercentage}%` }} />
-								<div className="absolute bg-yellow-400 w-2.5 h-2.5 top-[-4px] rounded-full" style={{ left: `calc(${betPercentage}% - 5px)` }} />
-								<input
-									type="range"
-									min="0"
-									max="100"
-									value={betPercentage}
-									onChange={handleSliderChange}
-									className="absolute w-full h-px opacity-0 cursor-pointer"
-								/>
-							</div>
+						<div className="relative mt-4 h-6">
+							<Slider
+								min={1000}
+								max={valueToNumber(balance) - 1}
+								value={[amount]}
+								defaultValue={[10000]}
+								onValueChange={(value: number[]) => {
+									handleSliderChange(value[0]);
+								}}
+							/>
+
 							<div className="flex justify-between text-gray-500 text-xs mt-2">
 								<span>0%</span>
 								<span className="text-yellow-400 font-semibold text-sm">{betPercentage.toFixed(2)}%</span>
@@ -221,22 +217,19 @@ const BetAmount = () => {
 					<div className={cx('flex flex-col h-[110px] w-full max-w-[200px]')}>
 						<span className="text-white font-semibold mb-2">{t('betAmount')}</span>
 						<div className="flex items-center px-4 space-x-2 border border-gray-500 rounded-lg p-2 w-full h-[40px]">
-							<img src={cash} alt="cash" className="h-[20px]" />
+							<Bet className={'w-5 h-5 text-yellow-400'} />
 							<Input className="text-white text-[12px] border-0 w-full" value={amount} onChange={handleAmountChange} type="number" min={1000} />
 						</div>
 						<div className="relative mt-2 h-[24px]">
-							<div className="w-full bg-gray-700 h-px rounded-full mt-1 relative">
-								<div className="absolute bg-yellow-400 h-px rounded-full" style={{ width: `${betPercentage}%` }} />
-								<div className="absolute bg-yellow-400 w-2.5 h-2.5 top-[-4px] rounded-full" style={{ left: `calc(${betPercentage}% - 5px)` }} />
-								<input
-									type="range"
-									min="0"
-									max="100"
-									value={betPercentage}
-									onChange={handleSliderChange}
-									className="absolute w-full h-px opacity-0 cursor-pointer"
-								/>
-							</div>
+							<Slider
+								min={1000}
+								max={valueToNumber(balance) - 1}
+								value={[amount]}
+								defaultValue={[10000]}
+								onValueChange={(value: number[]) => {
+									handleSliderChange(value[0]);
+								}}
+							/>
 							<div className="flex justify-between text-gray-500 text-xs mt-2">
 								<span>0%</span>
 								<span className="text-yellow-400 font-semibold text-sm">{betPercentage.toFixed(2)}%</span>

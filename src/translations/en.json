@@ -77,7 +77,8 @@
 	},
 	"cards": {
 		"bets": "bets",
-		"choose": "choose",
+		"select": "select",
+		"selected": "selected",
 		"probability": "probability"
 	},
 	"status": {

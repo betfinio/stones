@@ -23,6 +23,9 @@ export default defineConfig({
 	html: {
 		title: 'BetFin Stones',
 		favicon: './src/assets/favicon.svg',
+		meta: {
+			viewport: 'width=device-width, initial-scale=1, maximum-scale=1'
+		}
 	},
 	output: {
 		assetPrefix: getOutput(),

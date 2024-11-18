@@ -7,6 +7,7 @@ import { useActualRound, useCurrentRound, useRoundStatus, useSideBank } from '@/
 import { useSelectedStone } from '@/src/lib/query/state.ts';
 import { shootConfetti } from '@/src/lib/utils.ts';
 import { StonesContract, arrayFrom } from '@betfinio/abi';
+import { Bet } from '@betfinio/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { BetValue } from 'betfinio_app/BetValue';
 import { cx } from 'class-variance-authority';
@@ -82,7 +83,7 @@ const Wheel = () => {
 
 	const { data: currentRound = 0 } = useCurrentRound();
 	const { data: actualRound = 0 } = useActualRound();
-	const { data: selectedStone } = useSelectedStone();
+	const { data: selectedStone, setSelectedStone } = useSelectedStone();
 	const { data: sideBank = [0n, 0n, 0n, 0n, 0n] } = useSideBank(currentRound);
 
 	const [scale, setScale] = useState(1);
@@ -267,9 +268,10 @@ const Wheel = () => {
 									style={{
 										transform: `rotate(${-crystal.angle}deg)`,
 									}}
+									onClick={() => setSelectedStone(crystal.name)}
 									className="relative flex flex-col items-center justify-center space-y-[16%]"
 								>
-									<div className="text-xs text-white transform -scale-y-100 -scale-x-100 flex items-center space-x-[3%]">
+									<div className="text-xs text-white transform -scale-y-100 -scale-x-100 flex items-center gap-1 space-x-[3%]">
 										<motion.div
 											className="absolute rounded-full bg-[#7366FF] opacity-[0.85] blur-xl"
 											style={{
@@ -287,18 +289,7 @@ const Wheel = () => {
 												times: [0, 0.5, 1], // Define os momentos das transições
 											}}
 										/>
-										<motion.img
-											src={cash}
-											alt={`cash-${crystal.name}`}
-											initial={{ opacity: 0 }}
-											animate={{ opacity: [0, 1, 1] }}
-											transition={{
-												duration: 3, // Tempo total da animação
-												ease: 'easeInOut', // Suavidade para a entrada e saída
-												times: [0, 0.5, 1], // Define os momentos das transições
-											}}
-											className="z-20 aspect-square md:w-4 md:h-4 h-3 w-3"
-										/>
+										<Bet className="z-20 aspect-square md:w-4 md:h-4 h-3 w-3 text-yellow-400" />
 										<motion.span
 											initial={{ opacity: 0 }}
 											animate={{ opacity: [0, 1, 1] }}

@@ -31,11 +31,12 @@ const Time: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 	return (
 		<motion.div
 			key="countdown"
-			className="absolute flex flex-col text-center w-full text-white"
+			className="absolute flex flex-col text-center w-fit text-white left-1/2"
 			style={{
 				top: `-${420 * scale}px`,
 				fontSize: `${20 * scale}px`,
 				zIndex: 4,
+				x: '-50%',
 			}}
 			initial={{ opacity: 0, scale: 0.5 }}
 			animate={{ opacity: 1, scale: 1.2 }}
