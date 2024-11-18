@@ -14,3 +14,7 @@ export interface StonesBet extends BetInterface {
 	bonus?: bigint;
 	round: number;
 }
+
+export type StonesAuthor = StonesBet & {
+	betsNumber: number;
+};
