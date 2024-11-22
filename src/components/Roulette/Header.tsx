@@ -10,7 +10,9 @@ const Header = () => {
 	const { data: bank = 0n } = useRoundBank(round);
 	const { t } = useTranslation('stones', { keyPrefix: 'header' });
 
-	const handleReport = useCallback(() => {}, []);
+	const handleReport = useCallback(() => {
+		window.Tawk_API.maximize();
+	}, []);
 	return (
 		<div className="flex w-full justify-between items-center bg-primaryLight text-white p-4 rounded-lg border border-gray-800 h-[80px]">
 			<div className="flex items-center justify-between gap-4">
@@ -34,10 +36,15 @@ const Header = () => {
 				</div>
 			</div>
 			<div className="flex items-center space-x-6">
-				<div className="flex flex-col items-center cursor-pointer hover:text-yellow-400">
+				<a
+					href={'https://betfin.gitbook.io/betfin-public/games-guide/stones'}
+					target={'_blank'}
+					rel="noreferrer"
+					className="flex flex-col items-center cursor-pointer hover:text-yellow-400"
+				>
 					<CircleAlert className={'w-6 h-6'} />
 					<span className="hidden lg:block text-xs">{t('howToPlay')}</span>
-				</div>
+				</a>
 				<div className="flex flex-col items-center cursor-pointer hover:text-yellow-400" onClick={handleReport}>
 					<TriangleAlert className={'w-6 h-6'} />
 					<span className="hidden lg:block text-xs">{t('report')}</span>
