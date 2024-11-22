@@ -1,13 +1,16 @@
 import { useDistributedInRound, useRoundBank, useRoundBets, useRoundWinner } from '@/src/lib/query';
 import { useDistribute } from '@/src/lib/query/mutations.ts';
-import { truncateEthAddress } from '@betfinio/abi';
+import type { StonesBet } from '@/src/lib/types.ts';
+import { ZeroAddress, truncateEthAddress } from '@betfinio/abi';
 import { Bet } from '@betfinio/ui';
-import { Stones } from '@betfinio/ui/dist/icons/StoneBet';
 import { BetValue } from 'betfinio_app/BetValue';
 import { Button } from 'betfinio_app/button';
+import { cx } from 'class-variance-authority';
 import { UserIcon } from 'lucide-react';
 import type { FC } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAccount } from 'wagmi';
 import bronzeTrophy from '../../assets/BetHistory/trophy-bronze.svg';
 import goldTrophy from '../../assets/BetHistory/trophy-gold.svg';
 import silverTrophy from '../../assets/BetHistory/trophy-silver.svg';
@@ -22,11 +25,12 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 	const { data: distributed = 0n } = useDistributedInRound(round);
 	const winBank = (bank * 914n) / 1000n;
 	const bonusBank = (bank * 5n) / 100n;
+	const { address = ZeroAddress } = useAccount();
 
 	const winnerSidePool = bets.filter((bet) => bet.side === winner).reduce((acc, bet) => acc + bet.amount, 0n);
 
 	const { mutate } = useDistribute();
-	const winBets = bets
+	const winBets: StonesBet[] = bets
 		.filter((bet) => bet.side === winner)
 		.sort((a, b) => Number(b.order) - Number(a.order))
 		.map((bet) => {
@@ -53,28 +57,39 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 		mutate({ round });
 	};
 
+	const userWon = useMemo(() => {
+		return winBets.find((bet) => bet.player === address);
+	}, [winBets]);
+
 	return (
 		<>
 			<div className="flex flex-col md:flex-row w-full space-x-2 items-center justify-around my-8 px-2 gap-8">
 				{/* Left Side */}
-				<div className="flex w-full max-w-[380px] h-full items-center justify-around rounded-xl border-2 border-yellow-400">
-					<div className="flex flex-col justify-center items-center space-y-2">
-						<div className="flex flex-col w-full items-center space-y-2">
-							<img src={crystalImage} alt="Crystal" className="h-15 w-12" />
-							<div className="flex flex-col items-center">
-								<div className="flex flex-row gap-2 items-center text-yellow-400 text-sm font-semibold">
-									<BetValue value={bank} withIcon /> {t('totalBank')}
-								</div>
-								<div className="flex items-center text-gray-400 text-[12px] font-semibold">
-									<span className="mr-1">
-										{bets.length} {t('bets')}
-									</span>
-									<UserIcon className={'w-4 h-4'} />
+				<div className={cx('flex w-full max-w-[380px] h-full items-center justify-around rounded-xl border-2 border-yellow-400')}>
+					<div className="flex flex-col justify-center items-center space-y-2 h-[223px] py-4">
+						{userWon ? (
+							<div className="flex flex-col w-full items-center space-y-2">
+								<img src={crystalImage} alt="Crystal" className="h-15 w-12" />
+								<div className="flex flex-col items-center">
+									<div className="flex flex-row gap-2 items-center text-yellow-400 text-sm font-semibold">
+										<BetValue value={bank} withIcon /> {t('totalBank')}
+									</div>
+									<div className="flex items-center text-gray-400 text-[12px] font-semibold">
+										<span className="mr-1">
+											{bets.length} {t('bets')}
+										</span>
+										<UserIcon className={'w-4 h-4'} />
+									</div>
 								</div>
 							</div>
-						</div>
+						) : (
+							<div className={'grow flex items-center'}>{t('roundOver')}</div>
+						)}
+
 						<div className="flex flex-col items-center justify-center">
-							<div className="flex w-full items-center justify-center text-white text-[24px] font-semibold uppercase">{t('win')}!</div>
+							<div className="flex w-full items-center justify-center text-white font-semibold ">
+								{userWon ? <span className={'text-2xl uppercase'}>{t('win')}</span> : <span>{t('couldWin')}</span>}
+							</div>
 							<div className="flex items-center w-full text-yellow-400 font-semibold flex-row gap-1 justify-center">
 								<BetValue value={winBank} />
 								<Bet className={'text-yellow-400 w-4 h-4'} />
