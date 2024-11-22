@@ -10,26 +10,26 @@ import { useMediaQuery } from 'react-responsive';
 export const CardList = () => {
 	const { data: actualRound = 0 } = useActualRound();
 	const { data: currentRound = 0 } = useCurrentRound();
-	const isDesktop = useMediaQuery({ minWidth: 1024 });
-	const isTablet = useMediaQuery({ minWidth: 750, maxWidth: 1023 });
-	const isMobile = useMediaQuery({ maxWidth: 749 });
+	const isXl = useMediaQuery({ minWidth: 1440 });
+	const isDesktop = useMediaQuery({ minWidth: 1220 });
+	const isTablet = useMediaQuery({ minWidth: 769 });
+	const isMobile = useMediaQuery({ maxWidth: 768 });
 
 	let itemBasis: string;
-	if (isDesktop) {
-		itemBasis = 'basis-1/5'; // 5 slides on desktop
+	if (isXl) {
+		itemBasis = 'basis-1/5 pl-2'; // 5 slides on desktop
+	} else if (isDesktop) {
+		itemBasis = 'basis-1/4'; // 5 slides on desktop
 	} else if (isTablet) {
 		itemBasis = 'basis-1/3'; // 3 slides on tablet
 	} else if (isMobile) {
-		itemBasis = 'basis-1/2'; // 2 slides on mobile
+		itemBasis = 'basis-1/3 pl-2'; // 2 slides on mobile
 	}
 
 	return (
-		<motion.div className={cx('relative w-full flex mb-8', actualRound !== currentRound && 'h-0 w-0 overflow-hidden')}>
-			<Carousel
-				className={cx('w-full', isMobile && 'mb-8')}
-				opts={{ loop: isMobile || isTablet, slidesToScroll: isMobile ? 2 : isTablet ? 2 : 1, dragFree: isTablet }}
-			>
-				<CarouselContent className="py-6">
+		<motion.div className={cx('relative w-full hidden md:flex mb-8', actualRound !== currentRound && 'h-0 w-0 overflow-hidden')}>
+			<Carousel className={cx('w-full', isMobile && 'mb-8')}>
+				<CarouselContent className="py-6 ml-0.5">
 					{arrayFrom(5).map((card) => (
 						<CarouselItem key={card} className={`${itemBasis}`}>
 							<CardItem stone={card + 1} />
