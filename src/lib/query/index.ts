@@ -6,6 +6,7 @@ import {
 	fetchRoundBets,
 	fetchRoundSideBank,
 	fetchRoundSideBetsCount,
+	fetchRoundSideBonusShares,
 	fetchRoundStatus,
 	fetchRoundStones,
 	fetchRoundWinner,
@@ -73,6 +74,13 @@ export const useSideBank = (round: number) => {
 		queryFn: () => fetchRoundSideBank(round, { config }),
 	});
 };
+export const useSideBonusShares = (round: number) => {
+	const config = useConfig();
+	return useQuery<bigint[]>({
+		queryKey: ['stones', 'round', round, 'sideBonusShares'],
+		queryFn: () => fetchRoundSideBonusShares(round, { config }),
+	});
+};
 export const useSideBetsCount = (round: number) => {
 	const config = useConfig();
 	return useQuery<bigint[]>({
@@ -130,5 +138,12 @@ export const useBetResult = (bet: Address) => {
 	return useQuery({
 		queryKey: ['stones', 'bet', bet, 'result'],
 		queryFn: () => fetchBetResult(bet, config),
+	});
+};
+
+export const useBetAmount = () => {
+	return useQuery({
+		queryKey: ['betAmount'],
+		staleTime: Number.POSITIVE_INFINITY,
 	});
 };

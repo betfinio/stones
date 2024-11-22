@@ -76,7 +76,7 @@ const WinnerNotDistributed: FC<{ round: number; scale: number }> = ({ round, sca
 	const { address = ZeroAddress } = useAccount();
 	const { data: winnerSide = 0, isFetching } = useRoundWinner(round);
 	const { data: bank = 0n } = useRoundBank(round);
-	const { data: sideBank = [0n, 0n, 0n, 0n, 0n] } = useSideBank(round);
+	const { data: sideBank = [1n, 1n, 1n, 1n, 1n] } = useSideBank(round);
 	const { data: bets = [], isFetching: isBetsFetching } = useRoundBetsByPlayer(round, address);
 	// get only winning bets
 	const winBets = bets.filter((bet) => bet.side === winnerSide);
@@ -89,7 +89,12 @@ const WinnerNotDistributed: FC<{ round: number; scale: number }> = ({ round, sca
 	const myBonus = 0n;
 	if (myWin > 0) {
 		return (
-			<motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} className={'z-[6] flex flex-col items-center text-base lg:text-2xl'}>
+			<motion.div
+				initial={{ scale: 0, y: -7 }}
+				animate={{ scale: 1 }}
+				exit={{ scale: 0 }}
+				className={'z-[6] flex flex-col items-center text-sm sm:text-base lg:text-2xl'}
+			>
 				{t('win')}:
 				<BetValue prefix={'Win: '} className={'text-yellow-400 scale-110'} value={BigInt(myWin)} withIcon />
 				<div className={'!text-blue-500 scale-[0.9] flex flex-row items-center gap-1'}>
