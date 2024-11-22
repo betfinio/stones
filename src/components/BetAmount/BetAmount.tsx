@@ -1,9 +1,10 @@
+import { MobileStoneSelect } from '@/src/components/BetAmount/MobileStoneSelect.tsx';
 import ProbabilitiesChart from '@/src/components/BetAmount/ProbabilitiesChart.tsx';
 import BetRanking from '@/src/components/BetRanking/BetRanking.tsx';
 import logger from '@/src/config/logger';
 import { getRoundTimes } from '@/src/lib/api';
-import { useActualRound, useCurrentRound, useRoundBank, useRoundStatus, useSideBank } from '@/src/lib/query';
-import { usePlaceBet } from '@/src/lib/query/mutations';
+import { useActualRound, useBetAmount, useCurrentRound, useRoundBank, useRoundStatus, useSideBank, useSideBonusShares } from '@/src/lib/query';
+import { usePlaceBet, useSetBetAmount } from '@/src/lib/query/mutations';
 import { useSelectedStone } from '@/src/lib/query/state';
 import { arrayFrom, valueToNumber } from '@betfinio/abi';
 import { Bet } from '@betfinio/ui';
@@ -20,9 +21,9 @@ import { LoaderIcon } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { type ChangeEvent, type FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { NumericFormat } from 'react-number-format';
 import { useMediaQuery } from 'react-responsive';
 import { useAccount } from 'wagmi';
-import cash from '../../assets/Roulette/cash.svg';
 import crystal1 from '../../assets/Roulette/crystal1.svg';
 import crystal2 from '../../assets/Roulette/crystal2.svg';
 import crystal3 from '../../assets/Roulette/crystal3.svg';
@@ -47,18 +48,27 @@ const BetAmount = () => {
 	const { address } = useAccount();
 	const { data: balance = 0n } = useBalance(address);
 	const { data: sideBank = [0n, 0n, 0n, 0n, 0n] } = useSideBank(round);
+	const { data: bonusShares = [0n, 0n, 0n, 0n, 0n] } = useSideBonusShares(round);
 	const { data: bank = 0n } = useRoundBank(round);
-	const [amount, setAmount] = useState<string>('10000');
+	const { data: amount = '10000' } = useBetAmount();
+	const { mutate: setAmount } = useSetBetAmount();
 
 	const [_, end] = getRoundTimes(round);
 
 	const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
 
-	const [potentialWin, setPotentialWin] = useState<bigint>(0n);
+	const potentialWin = useMemo(() => {
+		return ((Number(amount) + valueToNumber(bank)) * 91_4) / 100_0;
+	}, [amount, bank]);
 
-	useEffect(() => {
-		setPotentialWin(BigInt(amount) * 5n);
-	}, [amount]);
+	const stoneBank = Number(amount) + valueToNumber(sideBank[selected - 1]) || 1;
+	const potentialBonus = useMemo(() => {
+		const stoneShares = valueToNumber(bonusShares[selected - 1]);
+
+		const totalShares = stoneShares + stoneBank;
+		const myShare = Number(amount);
+		return ((((valueToNumber(bank) + Number(amount)) / 100) * 5) / totalShares) * myShare;
+	}, [bonusShares[selected - 1], bank, selected, amount, stoneBank]);
 
 	useEffect(() => {
 		logger.info('actualRound', actualRound);
@@ -69,9 +79,9 @@ const BetAmount = () => {
 		setAmount(value.toFixed(0));
 	};
 
-	const handleAmountChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setAmount(e.target.value);
-		setBetPercentage(Math.min(Number((BigInt(e.target.value) * 100n * 10n ** 18n) / balance), 100));
+	const handleAmountChange = (value: string) => {
+		setAmount(value);
+		setBetPercentage(Math.min(Number((BigInt(value) * 100n * 10n ** 18n) / balance), 100));
 	};
 
 	const handleCrystalClick = (crystal: number) => {
@@ -121,87 +131,89 @@ const BetAmount = () => {
 	return (
 		<div className="w-full">
 			{isMobile ? (
-				<div className="flex flex-col items-center space-y-4 px-4">
-					{/* Bet Amount Section */}
-					<div className="w-full ">
-						<span className="text-white font-semibold mb-2 block">{t('betAmount')}</span>
-						<div className="flex items-center px-4 space-x-2 border border-gray-500 rounded-lg p-2 w-full h-10">
-							<Bet className={'w-5 h-5 text-yellow-400'} />
-							<Input className="text-white text-xs border-0 w-full" value={amount} onChange={handleAmountChange} type="number" min={1000} />
-						</div>
-						<div className="relative mt-4 h-6">
-							<Slider
-								min={1000}
-								max={valueToNumber(balance) - 1}
-								value={[amount]}
-								defaultValue={[10000]}
-								onValueChange={(value: number[]) => {
-									handleSliderChange(value[0]);
+				end < Date.now() / 1000 ? (
+					<OldRound round={round} />
+				) : (
+					<div className="flex flex-col items-center space-y-4 px-4">
+						{/* Bet Amount Section */}
+						{/* Crystal List below Bet Amount Section */}
+						<MobileStoneSelect pie={pie} />
+
+						<div className="w-full ">
+							<span className="text-white font-semibold mb-2 block">{t('betAmount')}</span>
+							<NumericFormat
+								className={cx(
+									'text-center bg-primary py-3 font-semibold text-sm text-white disabled:cursor-not-allowed duration-300 px-4 border border-gray-500 rounded-lg p-2 w-full h-10',
+									valueToNumber(balance) < Number(amount) && 'text-red-400',
+								)}
+								thousandSeparator={','}
+								min={1}
+								allowNegative={false}
+								maxLength={15}
+								disabled={isPending}
+								placeholder={valueToNumber(balance) < Number(amount) ? t('placeholder.balance') : t('placeholder.Amount')}
+								value={amount}
+								onValueChange={(values) => {
+									const { value } = values;
+									handleAmountChange(value);
 								}}
 							/>
+							<div className="relative mt-4 h-6">
+								<Slider
+									min={1000}
+									max={valueToNumber(balance) - 1}
+									value={[amount]}
+									defaultValue={[10000]}
+									onValueChange={(value: number[]) => {
+										handleSliderChange(value[0]);
+									}}
+								/>
 
-							<div className="flex justify-between text-gray-500 text-xs mt-2">
-								<span>0%</span>
-								<span className="text-yellow-400 font-semibold text-sm">{betPercentage.toFixed(2)}%</span>
-								<span>100%</span>
+								<div className="flex justify-between text-gray-500 text-xs mt-2">
+									<span>0%</span>
+									<span className="text-yellow-400 font-semibold text-sm">{Math.round(betPercentage)}%</span>
+									<span>100%</span>
+								</div>
 							</div>
 						</div>
-					</div>
 
-					{/* Crystal List below Bet Amount Section */}
-					<div className="grid grid-cols-5 gap-3 w-full py-6">
-						{pie.map((item, index) => (
-							<div
-								key={index}
-								className={`flex flex-col items-center justify-center h-16 border-2 rounded-lg cursor-pointer hover:scale-105 transition-all ease-in ${selected === item.id ? 'border-yellow-400' : ''}`}
-								style={{
-									borderColor: item.borderColor,
-									backgroundColor: 'rgba(255, 255, 255, 0.05)',
-								}}
-								onClick={() => handleCrystalClick(item.id)}
-							>
-								<img src={images[`crystal${index + 1}`]} alt={'stone'} className="h-7 mb-1" />
-								<span className="text-white text-sm font-medium tabular-nums">{isEmpty ? 0 : item.value.toFixed(2)}%</span>
-							</div>
-						))}
-					</div>
-
-					{/* Button Section */}
-					<div className="w-full">
-						<Button className={'hover:scale-105 duration-200 transition-all flex gap-1 w-full'} type="button" disabled={isPending} onClick={handleSpin}>
-							{isPending ? (
-								<LoaderIcon className={'animate-spin'} />
-							) : (
-								<>
-									{t('placeBet')} <BetValue value={Number(potentialWin)} withIcon iconClassName={'border border-gray-800 rounded-full'} />
-								</>
-							)}
-						</Button>
-					</div>
-
-					{/* Mini Crystal List below the Button */}
-					<div className="flex space-x-2 mt-4 h-10 w-full justify-between items-start">
-						{arrayFrom(5).map((crystal, index) => (
-							<div
-								key={index}
-								className={`relative flex items-center justify-center border-1 border-[#151A2A]  w-[44px] h-[25px] bg-primaryLight rounded-md cursor-pointer hover:scale-110 transition-all ease-in ${
-									selected === (crystal + 1) ? 'border-2 border-yellow-400' : ''
-								}`}
-								onClick={() => handleCrystalClick(crystal + 1)}
-								onKeyDown={(e) => {
-									if (e.key === 'Enter' || e.key === ' ') {
-										handleCrystalClick(crystal + 1);
-									}
-								}}
-							>
-								<img src={images[`crystal${crystal + 1}`]} alt={`crystal-${index}`} className="h-[15px] z-20" />
-								{index === 0 && (
-									<div className="absolute top-[2px] w-[20px] h-[20px] rounded-full bg-blue-500 opacity-70 blur-sm z-10 hover:scale-110 transition-all ease-linear" />
+						{/* Button Section */}
+						<div className="w-full">
+							<Button className={'hover:scale-105 duration-200 transition-all flex gap-1 w-full'} type="button" disabled={isPending} onClick={handleSpin}>
+								{isPending ? (
+									<LoaderIcon className={'animate-spin'} />
+								) : (
+									<>
+										{t('placeBet')} <BetValue value={Number(potentialWin + potentialBonus)} withIcon iconClassName={'border border-gray-800 rounded-full'} />
+									</>
 								)}
-							</div>
-						))}
+							</Button>
+						</div>
+
+						{/* Mini Crystal List below the Button */}
+						<div className="flex space-x-2 mt-4 h-10 w-full justify-between items-start">
+							{arrayFrom(5).map((crystal, index) => (
+								<div
+									key={index}
+									className={`relative flex items-center justify-center border-1 border-[#151A2A]  w-[44px] h-[25px] bg-primaryLight rounded-md cursor-pointer hover:scale-110 transition-all ease-in ${
+										selected === (crystal + 1) ? 'border-2 border-yellow-400' : ''
+									}`}
+									onClick={() => handleCrystalClick(crystal + 1)}
+									onKeyDown={(e) => {
+										if (e.key === 'Enter' || e.key === ' ') {
+											handleCrystalClick(crystal + 1);
+										}
+									}}
+								>
+									<img src={images[`crystal${crystal + 1}`]} alt={`crystal-${index}`} className="h-[15px] z-20" />
+									{index === 0 && (
+										<div className="absolute top-[2px] w-[20px] h-[20px] rounded-full bg-blue-500 opacity-70 blur-sm z-10 hover:scale-110 transition-all ease-linear" />
+									)}
+								</div>
+							))}
+						</div>
 					</div>
-				</div>
+				)
 			) : end < Date.now() / 1000 ? (
 				<OldRound round={round} />
 			) : (
@@ -216,9 +228,24 @@ const BetAmount = () => {
 					{/* Bet Amount Section */}
 					<div className={cx('flex flex-col h-[110px] w-full max-w-[200px]')}>
 						<span className="text-white font-semibold mb-2">{t('betAmount')}</span>
-						<div className="flex items-center px-4 space-x-2 border border-gray-500 rounded-lg p-2 w-full h-[40px]">
-							<Bet className={'w-5 h-5 text-yellow-400'} />
-							<Input className="text-white text-[12px] border-0 w-full" value={amount} onChange={handleAmountChange} type="number" min={1000} />
+						<div>
+							<NumericFormat
+								className={cx(
+									'text-center bg-primary py-3 font-semibold text-sm text-white disabled:cursor-not-allowed duration-300 px-4 border border-gray-500 rounded-lg p-2 w-full h-[40px]',
+									valueToNumber(balance) < Number(amount) && 'text-red-400',
+								)}
+								thousandSeparator={','}
+								min={1}
+								allowNegative={false}
+								maxLength={15}
+								disabled={isPending}
+								placeholder={valueToNumber(balance) < Number(amount) ? t('placeholder.balance') : t('placeholder.Amount')}
+								value={amount}
+								onValueChange={(values) => {
+									const { value } = values;
+									handleAmountChange(value);
+								}}
+							/>
 						</div>
 						<div className="relative mt-2 h-[24px]">
 							<Slider
@@ -232,7 +259,7 @@ const BetAmount = () => {
 							/>
 							<div className="flex justify-between text-gray-500 text-xs mt-2">
 								<span>0%</span>
-								<span className="text-yellow-400 font-semibold text-sm">{betPercentage.toFixed(2)}%</span>
+								<span className="text-yellow-400 font-semibold text-sm">{Math.round(betPercentage)}%</span>
 								<span>100%</span>
 							</div>
 						</div>
@@ -250,7 +277,7 @@ const BetAmount = () => {
 								<LoaderIcon className={'animate-spin'} />
 							) : (
 								<>
-									{t('placeBet')} <BetValue value={Number(potentialWin)} withIcon iconClassName={'border border-gray-800 rounded-full'} />
+									{t('placeBet')} <BetValue value={Number(potentialWin + potentialBonus)} withIcon iconClassName={'border border-gray-800 rounded-full'} />
 								</>
 							)}
 						</Button>
