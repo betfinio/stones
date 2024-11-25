@@ -3,7 +3,7 @@ import WinnerInfo from '@/src/components/Roulette/WinnerInfo.tsx';
 import logger from '@/src/config/logger';
 import { getRoundTimes } from '@/src/lib/api';
 import { STONES } from '@/src/lib/global.ts';
-import { useActualRound, useCurrentRound, useObserveBet, useRoundBets, useRoundBank, useRoundStatus, useSideBank } from '@/src/lib/query';
+import { useActualRound, useCurrentRound, useObserveBet, useRoundBank, useRoundBets, useRoundStatus, useSideBank } from '@/src/lib/query';
 import { useSelectedStone } from '@/src/lib/query/state.ts';
 import { getStoneImage, shootConfetti } from '@/src/lib/utils.ts';
 import { StonesContract, ZeroAddress, arrayFrom } from '@betfinio/abi';
