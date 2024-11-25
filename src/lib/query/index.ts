@@ -132,3 +132,17 @@ export const useBetResult = (bet: Address) => {
 		queryFn: () => fetchBetResult(bet, config),
 	});
 };
+
+export const useObserveBet = (round: number) => {
+	const queryClient = useQueryClient();
+	const resetObservedBet = () => {
+		queryClient.setQueryData(['stones', 'round', round, 'newBet'], { stone: null, strength: 0 });
+	};
+
+	const query = useQuery<{ stone: number | null; strength: number }>({
+		queryKey: ['stones', 'round', round, 'newBet'],
+		initialData: { stone: null, strength: 0 },
+	});
+
+	return { query, resetObservedBet };
+};

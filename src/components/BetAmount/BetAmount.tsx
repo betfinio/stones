@@ -22,7 +22,6 @@ import { type ChangeEvent, type FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMediaQuery } from 'react-responsive';
 import { useAccount } from 'wagmi';
-import cash from '../../assets/Roulette/cash.svg';
 import crystal1 from '../../assets/Roulette/crystal1.svg';
 import crystal2 from '../../assets/Roulette/crystal2.svg';
 import crystal3 from '../../assets/Roulette/crystal3.svg';

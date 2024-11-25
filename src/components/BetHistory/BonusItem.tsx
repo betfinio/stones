@@ -6,9 +6,9 @@ import { Fox } from '@betfinio/ui';
 import { BetValue } from 'betfinio_app/BetValue';
 import { useCustomUsername, useUsername } from 'betfinio_app/lib/query/username';
 import { cx } from 'class-variance-authority';
+import { motion } from 'framer-motion';
 import type { FC } from 'react';
 import { useAccount } from 'wagmi';
-import {motion} from "framer-motion";
 
 const BonusItem: FC<{ bet: StonesBet; round: number; className?: string }> = ({ bet, round, className }) => {
 	const { data: bank = 0n } = useRoundBank(round);
@@ -20,11 +20,12 @@ const BonusItem: FC<{ bet: StonesBet; round: number; className?: string }> = ({ 
 		<motion.div
 			key={bet.player}
 			layout
-			initial={{scale: 0}}
-			animate={{scale: 1}}
-			transition={{type: 'spring', stiffness: 500, damping: 30}}
-			exit={{opacity: 0, y: 10}}
-			className={cx('rounded-lg flex bg-primary justify-between', className)}>
+			initial={{ scale: 0 }}
+			animate={{ scale: 1 }}
+			transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+			exit={{ opacity: 0, y: 10 }}
+			className={cx('rounded-lg flex bg-primary justify-between', className)}
+		>
 			<div className={'py-3 px-2 flex justify-between items-center grow gap-2'}>
 				<div className={'flex items-start gap-[10px]'}>
 					<Fox className={'w-5 h-5'} />

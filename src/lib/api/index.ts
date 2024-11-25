@@ -2,6 +2,7 @@ import logger from '@/src/config/logger';
 import { PARTNER, STONES } from '@/src/lib/global';
 import type { StoneInfo, StonesBet } from '@/src/lib/types';
 import { PartnerContract, StonesBetContract, StonesContract, arrayFrom } from '@betfinio/abi';
+import type { QueryClient } from '@tanstack/react-query';
 import { type Config, multicall, readContract, writeContract } from '@wagmi/core';
 import type { Options } from 'betfinio_app/lib/types';
 import { type Address, encodeAbiParameters, parseAbiParameters } from 'viem';
@@ -236,4 +237,8 @@ export const fetchBetResult = async (bet: Address, config: Config): Promise<bigi
 	})) as bigint;
 	logger.success('result', data);
 	return data;
+};
+
+export const animateNewBet = (stone: number, strength: number, queryClient: QueryClient, round: number) => {
+	queryClient.setQueryData(['stones', 'round', round, 'newBet'], { stone, strength: 0 });
 };

@@ -4,11 +4,18 @@ import BetSummary from '@/src/components/BetSummary/BetSummary.tsx';
 import CardList from '@/src/components/CardList/CardList.tsx';
 import Roulette from '@/src/components/Roulette/Roulette';
 import TableBet from '@/src/components/TableBet/TableBet.tsx';
+import logger from '@/src/config/logger.ts';
+import { animateNewBet } from '@/src/lib/api';
+import { STONES } from '@/src/lib/global.ts';
 import { useCurrentRound } from '@/src/lib/query';
+import { StonesBetContract, StonesContract } from '@betfinio/abi';
 import { useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { readContract } from '@wagmi/core';
 import { AnimatePresence } from 'framer-motion';
 import { useEffect } from 'react';
+import type { Address } from 'viem';
+import { useConfig, useWatchContractEvent } from 'wagmi';
 
 export const Route = createFileRoute('/stones/')({
 	component: () => <Index />,
@@ -31,6 +38,26 @@ function Index() {
 			queryClient.setQueryData(['stones', 'currentRound'], search.round);
 		}
 	}, [search, currentRound]);
+	const config = useConfig();
+
+	useWatchContractEvent({
+		abi: StonesContract.abi,
+		address: STONES,
+		eventName: 'BetCreated',
+		strict: true,
+		onLogs: async (logs) => {
+			logger.warn('Request detected', logs[0]);
+			const round = Number(logs[0]?.args?.round);
+			const bet = logs[0]?.args?.bet as Address;
+			if (round !== currentRound) return;
+			const side = (await readContract(config, {
+				address: bet,
+				abi: StonesBetContract.abi,
+				functionName: 'getSide',
+			})) as bigint;
+			animateNewBet(Number(side), 0, queryClient, round);
+		},
+	});
 	return (
 		<div className="w-full p-2 md:p-3 lg:p-4 rounded-md text-white h-full  overflow-hidden grid grid-cols-12 gap-2">
 			<div className={'col-span-12 lg:col-span-8'}>
