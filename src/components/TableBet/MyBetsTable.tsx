@@ -26,7 +26,7 @@ const MyBetsTable = () => {
 		columnHelper.accessor('round', {
 			header: t('round'),
 			meta: {
-				className: 'h-[50px] w-[100px]',
+				className: 'w-[100px]',
 			},
 			cell: (props) => <RoundCell round={props.getValue()} />,
 		}),

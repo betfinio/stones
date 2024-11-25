@@ -3,7 +3,7 @@ import WinnerInfo from '@/src/components/Roulette/WinnerInfo.tsx';
 import logger from '@/src/config/logger';
 import { getRoundTimes } from '@/src/lib/api';
 import { STONES } from '@/src/lib/global.ts';
-import { useActualRound, useCurrentRound, useObserveBet, useRoundBets, useRoundStatus, useSideBank } from '@/src/lib/query';
+import { useActualRound, useCurrentRound, useObserveBet, useRoundBets, useRoundBank, useRoundStatus, useSideBank } from '@/src/lib/query';
 import { useSelectedStone } from '@/src/lib/query/state.ts';
 import { getStoneImage, shootConfetti } from '@/src/lib/utils.ts';
 import { StonesContract, ZeroAddress, arrayFrom } from '@betfinio/abi';
@@ -86,6 +86,7 @@ const Wheel = () => {
 	const { data: actualRound = 0 } = useActualRound();
 	const { data: selectedStone, setSelectedStone } = useSelectedStone();
 	const { data: sideBank = [0n, 0n, 0n, 0n, 0n] } = useSideBank(currentRound);
+	const { data: bank = 0n } = useRoundBank(currentRound);
 	const { data: bets = [] } = useRoundBets(currentRound);
 
 	const [scale, setScale] = useState(1);
@@ -233,7 +234,7 @@ const Wheel = () => {
 			<div className={'relative w-full mx-auto aspect-square z-[3]'}>
 				<motion.div
 					key="wheel"
-					className="relative mx-auto -top-[100%] cursor-pointer"
+					className="relative mx-auto -translate-y-full cursor-pointer"
 					style={{
 						width: '100%',
 						height: '100%',
@@ -276,7 +277,7 @@ const Wheel = () => {
 									onClick={() => setSelectedStone(crystal.name)}
 									className="relative flex flex-col items-center justify-center space-y-[16%]"
 								>
-									<div className="text-xs text-white transform -scale-y-100 -scale-x-100 flex items-center gap-1 space-x-[3%]">
+									<div className="text-xs text-white transform -scale-y-100 -scale-x-100 space-x-[3%]">
 										<motion.div
 											className="absolute rounded-full bg-[#7366FF] opacity-[0.85] blur-xl"
 											style={{
@@ -294,19 +295,25 @@ const Wheel = () => {
 												times: [0, 0.5, 1], // Define os momentos das transições
 											}}
 										/>
-										<Bet className="z-20 aspect-square md:w-4 md:h-4 h-3 w-3 text-yellow-400" />
-										<motion.span
-											initial={{ opacity: 0 }}
-											animate={{ opacity: [0, 1, 1] }}
-											transition={{
-												duration: 3, // Tempo total da animação
-												ease: 'easeInOut', // Suavidade para a entrada e saída
-												times: [0, 0.5, 1], // Define os momentos das transições
-											}}
-											className="z-20"
-										>
-											<BetValue value={sideBank[crystal.name - 1] || 0n} className={'text-xs md:text-lg'} />
-										</motion.span>
+										<div className={'flex items-center gap-1 justify-center'}>
+											<Bet className="z-20 aspect-square md:w-4 md:h-4 h-3 w-3 text-yellow-400" />
+											<motion.span
+												initial={{ opacity: 0 }}
+												animate={{ opacity: [0, 1, 1] }}
+												transition={{
+													duration: 3, // Tempo total da animação
+													ease: 'easeInOut', // Suavidade para a entrada e saída
+													times: [0, 0.5, 1], // Define os momentos das transições
+												}}
+												className="z-20"
+											>
+												<BetValue value={sideBank[crystal.name - 1] || 0n} className={'text-xs md:text-lg'} />
+											</motion.span>
+										</div>
+
+										<div>
+											<span className="text-xs opacity-60">{(Number((sideBank[crystal.name - 1] ?? 0n) * 100n) / Number(bank) || 0).toFixed(2)}%</span>
+										</div>
 									</div>
 
 									<motion.div

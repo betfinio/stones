@@ -22,7 +22,11 @@
 	},
 	"controls": {
 		"betAmount": "Bet amount",
-		"placeBet": "Place a bet to win",
+		"placeholder": {
+			"balance": "Please top-up balance",
+			"Amount": "Amount"
+		},
+		"placeBet": "Bet and win",
 		"pending": {
 			"title": "Placing a bet",
 			"message": "Please wait while your bet is being placed"
@@ -53,8 +57,10 @@
 		"bets": "bets",
 		"bet": "bet",
 		"win": "win",
+		"couldWin": "You could win",
+		"roundOver": "Round is over",
 		"bonus": "bonus",
-		"distibute": "Distribute",
+		"distribute": "Distribute",
 		"payoutNotDistributed": "Payout was not distributed"
 	},
 	"table": {
@@ -79,7 +85,10 @@
 		"bets": "bets",
 		"select": "select",
 		"selected": "selected",
-		"probability": "probability"
+		"probability": "probability",
+		"betFirst": "Bet first for bigger bonus!",
+		"win": "Win",
+		"bonus": "Bonus"
 	},
 	"status": {
 		"waiting": "Waiting"

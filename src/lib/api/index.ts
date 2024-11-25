@@ -43,6 +43,21 @@ export const fetchRoundSideBank = async (round: number, options: Options): Promi
 	logger.success('side bank', data.length);
 	return data.map((item) => item.result as bigint);
 };
+
+export const fetchRoundSideBonusShares = async (round: number, options: Options): Promise<bigint[]> => {
+	if (!options.config) throw new Error('Config is required');
+	logger.start('fetching round side bonus shares', round);
+	const data = await multicall(options.config, {
+		contracts: arrayFrom(5).map((_, i) => ({
+			address: STONES,
+			abi: StonesContract.abi,
+			functionName: 'roundBonusSharesBySide',
+			args: [BigInt(round), BigInt(i + 1)],
+		})),
+	});
+	logger.success('side bonus shares', data.length);
+	return data.map((item) => item.result as bigint);
+};
 export const fetchRoundSideBetsCount = async (round: number, options: Options): Promise<bigint[]> => {
 	if (!options.config) throw new Error('Config is required');
 	logger.start('fetching round side bank', round);

@@ -2,7 +2,7 @@
 	"title": "Template",
 
 	"controls": {
-		"placeBet": "Place a bet to win",
+		"placeBet": "Bet and win",
 		"pending": {
 			"title": "Placing a bet",
 			"message": "Please wait while your bet is being placed"
