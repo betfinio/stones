@@ -94,7 +94,7 @@ export const useDistribute = () => {
 export const useSetBetAmount = () => {
 	const queryClient = useQueryClient();
 
-	return useMutation<string, any, string>({
+	return useMutation<number, any, number>({
 		mutationKey: ['spin'],
 		mutationFn: (newValue) => {
 			queryClient.setQueryData(['betAmount'], newValue);
