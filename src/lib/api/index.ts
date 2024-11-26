@@ -2,6 +2,7 @@ import logger from '@/src/config/logger';
 import { PARTNER, STONES } from '@/src/lib/global';
 import type { StoneInfo, StonesBet } from '@/src/lib/types';
 import { PartnerContract, StonesBetContract, StonesContract, arrayFrom } from '@betfinio/abi';
+import type { QueryClient } from '@tanstack/react-query';
 import { type Config, multicall, readContract, writeContract } from '@wagmi/core';
 import type { Options } from 'betfinio_app/lib/types';
 import { type Address, encodeAbiParameters, parseAbiParameters } from 'viem';
@@ -71,10 +72,10 @@ export const fetchRoundSideBetsCount = async (round: number, options: Options): 
 	logger.success('side bank', data.length);
 	return data.map((item) => item.result as bigint);
 };
-export const fetchRoundBets = async (round: number, options: Options): Promise<StonesBet[]> => {
-	if (!options.config) throw new Error('Config is required');
+export const fetchRoundBets = async (round: number, config: Config): Promise<StonesBet[]> => {
+	if (!config) throw new Error('Config is required');
 	logger.start('fetching round bets count', round);
-	const betsCount = await readContract(options.config, {
+	const betsCount = await readContract(config, {
 		address: STONES,
 		abi: StonesContract.abi,
 		functionName: 'getRoundBetsCount',
@@ -82,7 +83,7 @@ export const fetchRoundBets = async (round: number, options: Options): Promise<S
 	});
 	logger.success('betsCount', betsCount);
 	logger.start('fetching bets');
-	const betsData = await multicall(options.config, {
+	const betsData = await multicall(config, {
 		contracts: arrayFrom(Number(betsCount)).map((_, i) => ({
 			address: STONES,
 			abi: StonesContract.abi,
@@ -93,17 +94,17 @@ export const fetchRoundBets = async (round: number, options: Options): Promise<S
 
 	logger.success('bets', betsData.length);
 	const bets = betsData.map((bet) => bet.result as Address);
-	return await Promise.all(bets.map((bet) => fetchBetInfo(bet, options)));
+	return await Promise.all(bets.map((bet) => fetchBetInfo(bet, config)));
 };
 
-export const fetchBetInfo = async (bet: Address, options: Options): Promise<StonesBet> => {
-	if (!options.config) throw new Error('Config is required');
-	const info = (await readContract(options.config, {
+export const fetchBetInfo = async (bet: Address, config: Config): Promise<StonesBet> => {
+	if (!config) throw new Error('Config is required');
+	const info = (await readContract(config, {
 		address: bet,
 		abi: StonesBetContract.abi,
 		functionName: 'getBetInfo',
 	})) as [Address, Address, bigint, bigint, bigint, bigint];
-	const side = (await readContract(options.config, {
+	const side = (await readContract(config, {
 		address: bet,
 		abi: StonesBetContract.abi,
 		functionName: 'getSide',
@@ -251,4 +252,8 @@ export const fetchBetResult = async (bet: Address, config: Config): Promise<bigi
 	})) as bigint;
 	logger.success('result', data);
 	return data;
+};
+
+export const animateNewBet = (stone: number, strength: number, queryClient: QueryClient, round: number) => {
+	queryClient.setQueryData(['stones', 'round', round, 'newBet'], { stone, strength: 0 });
 };

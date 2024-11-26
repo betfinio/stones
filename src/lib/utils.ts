@@ -3,6 +3,7 @@ import Stone2 from '@/src/assets/Roulette/crystal2.svg';
 import Stone3 from '@/src/assets/Roulette/crystal3.svg';
 import Stone4 from '@/src/assets/Roulette/crystal4.svg';
 import Stone5 from '@/src/assets/Roulette/crystal5.svg';
+import type { StonesAuthor, StonesBet } from '@/src/lib/types.ts';
 import confetti from 'canvas-confetti';
 
 export const shootConfetti = () => {
@@ -43,4 +44,17 @@ export const getStoneImage = (stone: number) => {
 		default:
 			return Stone1;
 	}
+};
+
+export const mapBetsToAuthors = (bets: StonesBet[]): StonesAuthor[] => {
+	return [...bets].reduce((acc: StonesAuthor[], val) => {
+		const author = acc.findIndex((bet) => bet.player === val.player);
+		if (author === -1) {
+			acc.push({ ...val, betsNumber: 1 });
+			return acc;
+		}
+		acc[author].amount += val.amount;
+		acc[author].betsNumber += 1;
+		return acc;
+	}, []);
 };

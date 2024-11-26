@@ -5,6 +5,7 @@ import CardList from '@/src/components/CardList/CardList.tsx';
 import Roulette from '@/src/components/Roulette/Roulette';
 import TableBet from '@/src/components/TableBet/TableBet.tsx';
 import logger from '@/src/config/logger.ts';
+import { animateNewBet, fetchBetInfo } from '@/src/lib/api';
 import { STONES } from '@/src/lib/global.ts';
 import { useCurrentRound } from '@/src/lib/query';
 import { StonesContract } from '@betfinio/abi';
@@ -13,7 +14,8 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { TooltipProvider } from 'betfinio_app/tooltip';
 import { AnimatePresence } from 'framer-motion';
 import { useEffect } from 'react';
-import { useWatchContractEvent } from 'wagmi';
+import type { Address } from 'viem';
+import { useConfig, useWatchContractEvent } from 'wagmi';
 
 export const Route = createFileRoute('/stones/')({
 	component: () => <Index />,
@@ -36,20 +38,26 @@ function Index() {
 			queryClient.setQueryData(['stones', 'currentRound'], search.round);
 		}
 	}, [search, currentRound]);
+	const config = useConfig();
 
 	useWatchContractEvent({
 		abi: StonesContract.abi,
 		address: STONES,
 		eventName: 'BetCreated',
+		strict: true,
 		onLogs: async (logs) => {
+			logger.warn('Request detected', logs[0]);
 			// @ts-ignore
-			const round = logs[0]?.args?.round;
-			if (Number(round) === currentRound) {
-				queryClient.invalidateQueries({ queryKey: ['stones'] });
-			}
+			const round = Number(logs[0]?.args?.round);
+			// @ts-ignore
+			const bet = logs[0]?.args?.bet as Address;
+
+			if (round !== currentRound) return;
+			const betInfo = await fetchBetInfo(bet, config);
+			animateNewBet(Number(betInfo.side), 0, queryClient, round);
+			queryClient.invalidateQueries({ queryKey: ['stones'] });
 		},
 	});
-
 	return (
 		<TooltipProvider>
 			<div className="w-full p-2 md:p-3 lg:p-4 rounded-md text-white h-full  overflow-hidden grid grid-cols-12 gap-2">

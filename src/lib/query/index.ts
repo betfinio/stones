@@ -93,7 +93,7 @@ export const useRoundBets = (round: number) => {
 	const config = useConfig();
 	return useQuery<StonesBet[]>({
 		queryKey: ['stones', 'round', round, 'bets'],
-		queryFn: () => fetchRoundBets(round, { config }),
+		queryFn: () => fetchRoundBets(round, config),
 	});
 };
 export const useRoundBetsByPlayer = (round: number, player: Address) => {
@@ -146,4 +146,18 @@ export const useBetAmount = () => {
 		queryKey: ['betAmount'],
 		staleTime: Number.POSITIVE_INFINITY,
 	});
+};
+
+export const useObserveBet = (round: number) => {
+	const queryClient = useQueryClient();
+	const resetObservedBet = () => {
+		queryClient.setQueryData(['stones', 'round', round, 'newBet'], { stone: null, strength: 0 });
+	};
+
+	const query = useQuery<{ stone: number | null; strength: number }>({
+		queryKey: ['stones', 'round', round, 'newBet'],
+		initialData: { stone: null, strength: 0 },
+	});
+
+	return { query, resetObservedBet };
 };

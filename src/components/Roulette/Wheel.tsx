@@ -1,12 +1,13 @@
+import { EffectsLayer } from '@/src/components/Roulette/EffectsLayer.tsx';
 import Time from '@/src/components/Roulette/Time';
 import WinnerInfo from '@/src/components/Roulette/WinnerInfo.tsx';
 import logger from '@/src/config/logger';
 import { getRoundTimes } from '@/src/lib/api';
 import { STONES } from '@/src/lib/global.ts';
-import { useActualRound, useCurrentRound, useRoundBank, useRoundStatus, useSideBank } from '@/src/lib/query';
+import { useActualRound, useCurrentRound, useRoundBank, useRoundBets, useRoundStatus, useSideBank } from '@/src/lib/query';
 import { useSelectedStone } from '@/src/lib/query/state.ts';
 import { shootConfetti } from '@/src/lib/utils.ts';
-import { StonesContract, arrayFrom } from '@betfinio/abi';
+import { StonesContract, ZeroAddress, arrayFrom } from '@betfinio/abi';
 import { Bet } from '@betfinio/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { BetValue } from 'betfinio_app/BetValue';
@@ -14,9 +15,8 @@ import { cx } from 'class-variance-authority';
 import { AnimatePresence, motion, useAnimation } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useWatchContractEvent } from 'wagmi';
+import { useAccount, useWatchContractEvent } from 'wagmi';
 import arrowdown from '../../assets/Roulette/arrow-down.svg';
-import cash from '../../assets/Roulette/cash.svg';
 import neonImage from '../../assets/Roulette/neon-glow.png';
 import ComplexRoulette from './ComplexRoulette';
 import CrystalAnimation1 from './Crystals/CrystalAnimation1';
@@ -81,11 +81,13 @@ const Wheel = () => {
 
 	const queryClient = useQueryClient();
 
+	const { address = ZeroAddress } = useAccount();
 	const { data: currentRound = 0 } = useCurrentRound();
 	const { data: actualRound = 0 } = useActualRound();
 	const { data: selectedStone, setSelectedStone } = useSelectedStone();
 	const { data: sideBank = [0n, 0n, 0n, 0n, 0n] } = useSideBank(currentRound);
 	const { data: bank = 0n } = useRoundBank(currentRound);
+	const { data: bets = [] } = useRoundBets(currentRound);
 
 	const [scale, setScale] = useState(1);
 
@@ -137,9 +139,11 @@ const Wheel = () => {
 			if (round !== currentRound) return;
 			const angle = crystals.find((crystal) => crystal.name === side)?.angle || 0;
 			stopSpin(angle).then(async () => {
+				if (bets.find((bet) => bet.side === side && bet.player === address)) {
+					shootConfetti();
+				}
 				await queryClient.invalidateQueries({ queryKey: ['stones', 'round', round] });
 				setShowWinnerMessage(true);
-				shootConfetti();
 			});
 		},
 	});
@@ -226,6 +230,7 @@ const Wheel = () => {
 				paddingTop: `${500 * scale}px`,
 			}}
 		>
+			<EffectsLayer round={currentRound} />
 			<div className={'relative w-full mx-auto aspect-square z-[3]'}>
 				<motion.div
 					key="wheel"
