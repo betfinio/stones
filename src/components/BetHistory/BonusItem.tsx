@@ -3,7 +3,6 @@ import { useRoundBank } from '@/src/lib/query';
 import type { StonesBetWithBonus } from '@/src/lib/types';
 import { getStoneImage } from '@/src/lib/utils.ts';
 import { truncateEthAddress } from '@betfinio/abi';
-import { Fox } from '@betfinio/ui';
 import { BetValue } from 'betfinio_app/BetValue';
 import { useCustomUsername, useUsername } from 'betfinio_app/lib/query/username';
 import { cx } from 'class-variance-authority';
@@ -44,8 +43,8 @@ const BonusItem: FC<{ bet: StonesBetWithBonus; round: number; className?: string
 						</a>
 					</div>
 				</div>
-				<div className={'flex flex-col items-end text-xs gap-2'}>
-					<BetValue precision={2} value={bet.potentialBonus} withIcon />
+				<div className={'flex flex-col items-end text-xs gap-2 text-blue-400'}>
+					<BetValue precision={2} value={bet.potentialBonus} iconClassName={'!text-blue-400'} withIcon />
 				</div>
 			</div>
 		</motion.div>
