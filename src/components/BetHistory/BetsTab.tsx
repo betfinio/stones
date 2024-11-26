@@ -1,6 +1,6 @@
 import BetItem from '@/src/components/BetHistory/BetItem';
 import { useRoundBets } from '@/src/lib/query';
-import type {CSSProperties, FC} from 'react';
+import type { CSSProperties, FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMediaQuery } from 'react-responsive';
 import { List } from 'react-virtualized';
@@ -9,7 +9,7 @@ const BetsTab: FC<{ round: number }> = ({ round }) => {
 	const { t } = useTranslation('stones', { keyPrefix: 'history.tabs' });
 	const { data: bets = [] } = useRoundBets(round);
 
-	const renderRow = ({ index, style }: {index: number, style: CSSProperties}) => {
+	const renderRow = ({ index, style }: { index: number; style: CSSProperties }) => {
 		const bet = bets[index];
 		return (
 			<div key={bet.address} style={style}>
