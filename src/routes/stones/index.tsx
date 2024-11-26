@@ -42,6 +42,7 @@ function Index() {
 		address: STONES,
 		eventName: 'BetCreated',
 		onLogs: async (logs) => {
+			// @ts-ignore
 			const round = logs[0]?.args?.round;
 			if (Number(round) === currentRound) {
 				queryClient.invalidateQueries({ queryKey: ['stones'] });

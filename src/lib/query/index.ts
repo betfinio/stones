@@ -119,7 +119,7 @@ export const usePlayerBets = (player: Address) => {
 };
 
 export const useRounds = () => {
-	return useQuery({
+	return useQuery<{ round: number }[]>({
 		queryKey: ['stones', 'rounds'],
 		queryFn: () => fetchRounds(),
 	});
@@ -127,7 +127,7 @@ export const useRounds = () => {
 
 export const useRoundWinner = (round: number) => {
 	const config = useConfig();
-	return useQuery({
+	return useQuery<number>({
 		queryKey: ['stones', 'round', round, 'winner'],
 		queryFn: () => fetchRoundWinner(round, config),
 	});
@@ -135,14 +135,14 @@ export const useRoundWinner = (round: number) => {
 
 export const useBetResult = (bet: Address) => {
 	const config = useConfig();
-	return useQuery({
+	return useQuery<bigint>({
 		queryKey: ['stones', 'bet', bet, 'result'],
 		queryFn: () => fetchBetResult(bet, config),
 	});
 };
 
 export const useBetAmount = () => {
-	return useQuery({
+	return useQuery<number>({
 		queryKey: ['betAmount'],
 		staleTime: Number.POSITIVE_INFINITY,
 	});

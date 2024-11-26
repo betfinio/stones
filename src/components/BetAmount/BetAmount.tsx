@@ -140,7 +140,7 @@ const BetAmount = () => {
 					<div className="flex flex-col items-center space-y-4 px-4">
 						{/* Bet Amount Section */}
 						{/* Crystal List below Bet Amount Section */}
-						<MobileStoneSelect pie={pie} />
+						<MobileStoneSelect />
 
 						<div className={cx('w-full', balance <= 0n && 'pointer-events-none grayscale')}>
 							<span className="text-white font-semibold mb-2 block">{t('betAmount')}</span>
