@@ -1,22 +1,22 @@
+import { EffectsLayer } from '@/src/components/Roulette/EffectsLayer.tsx';
 import Time from '@/src/components/Roulette/Time';
 import WinnerInfo from '@/src/components/Roulette/WinnerInfo.tsx';
 import logger from '@/src/config/logger';
 import { getRoundTimes } from '@/src/lib/api';
 import { STONES } from '@/src/lib/global.ts';
-import { useActualRound, useCurrentRound, useObserveBet, useRoundBank, useRoundBets, useRoundStatus, useSideBank } from '@/src/lib/query';
+import { useActualRound, useCurrentRound, useRoundBank, useRoundBets, useRoundStatus, useSideBank } from '@/src/lib/query';
 import { useSelectedStone } from '@/src/lib/query/state.ts';
-import { getStoneImage, shootConfetti } from '@/src/lib/utils.ts';
+import { shootConfetti } from '@/src/lib/utils.ts';
 import { StonesContract, ZeroAddress, arrayFrom } from '@betfinio/abi';
 import { Bet } from '@betfinio/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { BetValue } from 'betfinio_app/BetValue';
 import { cx } from 'class-variance-authority';
 import { AnimatePresence, motion, useAnimation } from 'framer-motion';
-import { type FC, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount, useWatchContractEvent } from 'wagmi';
 import arrowdown from '../../assets/Roulette/arrow-down.svg';
-import cash from '../../assets/Roulette/cash.svg';
 import neonImage from '../../assets/Roulette/neon-glow.png';
 import ComplexRoulette from './ComplexRoulette';
 import CrystalAnimation1 from './Crystals/CrystalAnimation1';
@@ -385,137 +385,3 @@ const Wheel = () => {
 };
 
 export default Wheel;
-
-const EffectsLayer: FC<{ round: number }> = ({ round }) => {
-	const {
-		query: { data: observedBetData },
-		resetObservedBet,
-	} = useObserveBet(round);
-	const [firstStones, setFirstStones] = useState<Array<{ x: number; y: number }>>([]);
-	const [secondStones, setSecondStones] = useState<Array<{ x: number; y: number }>>([]);
-	const [thirdStones, setThirdStones] = useState<Array<{ x: number; y: number }>>([]);
-	const [fourthStones, setFourthStones] = useState<Array<{ x: number; y: number }>>([]);
-	const [fifthStones, setFifthStones] = useState<Array<{ x: number; y: number }>>([]);
-
-	const ref = useRef<HTMLDivElement | null>(null);
-
-	const generateParticles = () => {
-		const { width, height } = ref.current?.getBoundingClientRect() ?? { width: 300, height: 300 };
-
-		const arr = Array.from(new Array(30));
-		return arr.map(() => ({
-			x: Math.floor(Math.random() * (width + 40)) - 20,
-			y: Math.floor(Math.random() * (height + 40)) - 20,
-		}));
-	};
-
-	useEffect(() => {
-		if (!observedBetData.stone) return;
-
-		switch (observedBetData.stone) {
-			case 1:
-				setFirstStones(generateParticles());
-				setTimeout(() => {
-					setFirstStones([]);
-				}, 4000);
-				break;
-			case 2:
-				setSecondStones(generateParticles());
-				setTimeout(() => {
-					setSecondStones([]);
-				}, 4000);
-				break;
-			case 3:
-				setThirdStones(generateParticles());
-				setTimeout(() => {
-					setThirdStones([]);
-				}, 4000);
-				break;
-			case 4:
-				setFourthStones(generateParticles());
-				setTimeout(() => {
-					setFourthStones([]);
-				}, 4000);
-				break;
-			case 5:
-				setFifthStones(generateParticles());
-				setTimeout(() => {
-					setFifthStones([]);
-				}, 4000);
-				break;
-			default:
-				break;
-		}
-
-		setTimeout(() => {
-			resetObservedBet();
-		}, 4000);
-	}, [observedBetData.stone]);
-
-	return (
-		<div ref={ref} className={'absolute top-0 right-0 left-0 bottom-0 duration-300 overflow-hidden'}>
-			<AnimatePresence>
-				{firstStones?.map((particle, i) => (
-					<motion.div
-						key={i}
-						initial={{ opacity: 0, y: 300 }}
-						animate={{ opacity: 1, y: -500 }}
-						transition={{ duration: Math.random() * 2.3 + 1, delay: i * 0.01 }}
-						className="w-5 h-5 absolute"
-						style={{ left: particle.x, top: particle.y }}
-					>
-						<img src={getStoneImage(1)} alt="stone1" />
-					</motion.div>
-				))}
-				{secondStones?.map((particle, i) => (
-					<motion.div
-						key={i}
-						initial={{ opacity: 0, y: 300 }}
-						animate={{ opacity: 1, y: -500 }}
-						transition={{ duration: Math.random() * 2.3 + 1, delay: i * 0.01 }}
-						className="w-5 h-5 absolute"
-						style={{ left: particle.x, top: particle.y }}
-					>
-						<img src={getStoneImage(2)} alt="stone1" />
-					</motion.div>
-				))}
-				{thirdStones?.map((particle, i) => (
-					<motion.div
-						key={i}
-						initial={{ opacity: 0, y: 300 }}
-						animate={{ opacity: 1, y: -500 }}
-						transition={{ duration: Math.random() * 2.3 + 1, delay: i * 0.01 }}
-						className="w-5 h-5 absolute"
-						style={{ left: particle.x, top: particle.y }}
-					>
-						<img src={getStoneImage(3)} alt="stone1" />
-					</motion.div>
-				))}
-				{fourthStones?.map((particle, i) => (
-					<motion.div
-						key={i}
-						initial={{ opacity: 0, y: 300 }}
-						animate={{ opacity: 1, y: -500 }}
-						transition={{ duration: Math.random() * 2.3 + 1, delay: i * 0.01 }}
-						className="w-5 h-5 absolute"
-						style={{ left: particle.x, top: particle.y }}
-					>
-						<img src={getStoneImage(4)} alt="stone1" />
-					</motion.div>
-				))}
-				{fifthStones?.map((particle, i) => (
-					<motion.div
-						key={i}
-						initial={{ opacity: 0, y: 300 }}
-						animate={{ opacity: 1, y: -500 }}
-						transition={{ duration: Math.random() * 2.3 + 1, delay: i * 0.01 }}
-						className="w-5 h-5 absolute"
-						style={{ left: particle.x, top: particle.y }}
-					>
-						<img src={getStoneImage(5)} alt="stone1" />
-					</motion.div>
-				))}
-			</AnimatePresence>
-		</div>
-	);
-};
