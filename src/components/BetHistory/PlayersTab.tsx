@@ -1,7 +1,7 @@
 import PlayerItem from '@/src/components/BetHistory/PlayerItem';
 import { useRoundBets } from '@/src/lib/query';
 import { mapBetsToAuthors } from '@/src/lib/utils.ts';
-import type { FC } from 'react';
+import type {CSSProperties, FC} from 'react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMediaQuery } from 'react-responsive';
@@ -15,7 +15,7 @@ const PlayersTab: FC<{ round: number }> = ({ round }) => {
 		return mapBetsToAuthors([...bets]).sort((a, b) => Number(b.amount - a.amount));
 	}, [bets]);
 
-	const renderRow = ({ index, style }) => {
+	const renderRow = ({ index, style }: {index: number, style: CSSProperties}) => {
 		const player = players[index];
 		return (
 			<div key={player.player} style={style}>
@@ -23,7 +23,6 @@ const PlayersTab: FC<{ round: number }> = ({ round }) => {
 			</div>
 		);
 	};
-	console.log(bets, players);
 
 	const isMobile = useMediaQuery({ maxWidth: 749 });
 	return bets.length > 0 ? (

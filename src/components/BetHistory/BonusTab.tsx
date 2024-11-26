@@ -1,9 +1,10 @@
 import BonusItem from '@/src/components/BetHistory/BonusItem';
 import { useRoundBank, useRoundBets } from '@/src/lib/query';
-import type { FC } from 'react';
+import type {CSSProperties, FC} from 'react';
 import { useMemo } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { List } from 'react-virtualized';
+import type {StonesBet} from "@/src/lib/types.ts";
 
 const BonusTab: FC<{ round: number }> = ({ round }) => {
 	const { data: bets = [] } = useRoundBets(round);
@@ -14,7 +15,7 @@ const BonusTab: FC<{ round: number }> = ({ round }) => {
 		const PERCENTAGE_BASE = 100n;
 		const bonusBank = (totalRoundBank * BONUS_PERCENTAGE) / PERCENTAGE_BASE;
 
-		const betsBySide = bets.reduce((acc, bet) => {
+		const betsBySide = bets.reduce((acc: Record<number, StonesBet[]>, bet) => {
 			if (!acc[bet.side]) acc[bet.side] = [];
 			acc[bet.side].push(bet);
 			return acc;
@@ -53,7 +54,7 @@ const BonusTab: FC<{ round: number }> = ({ round }) => {
 		return betsWithCalculatedBonuses;
 	}, [bets, totalRoundBank]);
 
-	const renderRow = ({ index, style }) => {
+	const renderRow = ({ index, style }: {index: number, style: CSSProperties}) => {
 		const player = betsWithBonuses[index];
 		return (
 			<div key={player.address} style={style}>
