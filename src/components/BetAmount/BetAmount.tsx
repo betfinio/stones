@@ -22,6 +22,7 @@ import { DateTime } from 'luxon';
 import { type ChangeEvent, type FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
+import type { NumberFormatValues } from 'react-number-format/types';
 import { useMediaQuery } from 'react-responsive';
 import { useAccount } from 'wagmi';
 import crystal1 from '../../assets/Roulette/crystal1.svg';
@@ -50,9 +51,8 @@ const BetAmount = () => {
 	const { data: sideBank = [0n, 0n, 0n, 0n, 0n] } = useSideBank(round);
 	const { data: bonusShares = [0n, 0n, 0n, 0n, 0n] } = useSideBonusShares(round);
 	const { data: bank = 0n } = useRoundBank(round);
-	const { data: amount = '10000' } = useBetAmount();
+	const { data: amount = 10000 } = useBetAmount();
 	const { mutate: setAmount } = useSetBetAmount();
-
 	const [_, end] = getRoundTimes(round);
 
 	const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
@@ -74,14 +74,16 @@ const BetAmount = () => {
 		logger.info('actualRound', actualRound);
 	}, [actualRound]);
 
-	const handleSliderChange = (value: number) => {
+	const handleSliderChange = (values: number[]) => {
+		const value = values[0];
 		setBetPercentage(Number(((value / valueToNumber(balance)) * 100).toFixed(2)));
-		setAmount(value.toFixed(0));
+		setAmount(Math.floor(value));
 	};
 
-	const handleAmountChange = (value: string) => {
-		setAmount(value);
-		setBetPercentage(Math.min(Number((BigInt(value) * 100n * 10n ** 18n) / balance), 100));
+	const handleAmountChange = (valueObj: NumberFormatValues) => {
+		const { floatValue = 0 } = valueObj;
+		setAmount(floatValue);
+		setBetPercentage(Math.min(Number((BigInt(floatValue) * 100n * 10n ** 18n) / balance), 100));
 	};
 
 	const handleCrystalClick = (crystal: number) => {
@@ -127,6 +129,7 @@ const BetAmount = () => {
 			},
 		];
 	}, [sideBank, round]);
+	console.log(balance);
 
 	return (
 		<div className="w-full">
@@ -137,9 +140,9 @@ const BetAmount = () => {
 					<div className="flex flex-col items-center space-y-4 px-4">
 						{/* Bet Amount Section */}
 						{/* Crystal List below Bet Amount Section */}
-						<MobileStoneSelect pie={pie} />
+						<MobileStoneSelect />
 
-						<div className="w-full ">
+						<div className={cx('w-full', balance <= 0n && 'pointer-events-none grayscale')}>
 							<span className="text-white font-semibold mb-2 block">{t('betAmount')}</span>
 							<NumericFormat
 								className={cx(
@@ -153,21 +156,10 @@ const BetAmount = () => {
 								disabled={isPending}
 								placeholder={valueToNumber(balance) < Number(amount) ? t('placeholder.balance') : t('placeholder.Amount')}
 								value={amount}
-								onValueChange={(values) => {
-									const { value } = values;
-									handleAmountChange(value);
-								}}
+								onValueChange={handleAmountChange}
 							/>
 							<div className="relative mt-4 h-6">
-								<Slider
-									min={1000}
-									max={valueToNumber(balance) - 1}
-									value={[amount]}
-									defaultValue={[10000]}
-									onValueChange={(value: number[]) => {
-										handleSliderChange(value[0]);
-									}}
-								/>
+								<Slider min={1000} max={valueToNumber(balance) - 1} value={[amount]} defaultValue={[10000]} onValueChange={handleSliderChange} />
 
 								<div className="flex justify-between text-gray-500 text-xs mt-2">
 									<span>0%</span>
@@ -226,7 +218,7 @@ const BetAmount = () => {
 					<ProbabilitiesChart round={round} pie={pie} />
 
 					{/* Bet Amount Section */}
-					<div className={cx('flex flex-col h-[110px] w-full max-w-[200px]')}>
+					<div className={cx('flex flex-col h-[110px] w-full max-w-[200px]', balance <= 0n && 'pointer-events-none grayscale')}>
 						<span className="text-white font-semibold mb-2">{t('betAmount')}</span>
 						<div>
 							<NumericFormat
@@ -238,25 +230,14 @@ const BetAmount = () => {
 								min={1}
 								allowNegative={false}
 								maxLength={15}
-								disabled={isPending}
+								disabled={isPending || balance <= 0n}
 								placeholder={valueToNumber(balance) < Number(amount) ? t('placeholder.balance') : t('placeholder.Amount')}
 								value={amount}
-								onValueChange={(values) => {
-									const { value } = values;
-									handleAmountChange(value);
-								}}
+								onValueChange={handleAmountChange}
 							/>
 						</div>
 						<div className="relative mt-2 h-[24px]">
-							<Slider
-								min={1000}
-								max={valueToNumber(balance) - 1}
-								value={[amount]}
-								defaultValue={[10000]}
-								onValueChange={(value: number[]) => {
-									handleSliderChange(value[0]);
-								}}
-							/>
+							<Slider min={1000} max={valueToNumber(balance) - 1} value={[amount]} defaultValue={[10000]} onValueChange={handleSliderChange} />
 							<div className="flex justify-between text-gray-500 text-xs mt-2">
 								<span>0%</span>
 								<span className="text-yellow-400 font-semibold text-sm">{Math.round(betPercentage)}%</span>
@@ -270,7 +251,7 @@ const BetAmount = () => {
 						<Button
 							className={'hover:scale-105 duration-200 transition-all flex gap-1 w-full max-w-[320px] '}
 							type="button"
-							disabled={isPending}
+							disabled={isPending || balance <= 0n}
 							onClick={handleSpin}
 						>
 							{isPending ? (

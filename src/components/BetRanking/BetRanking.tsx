@@ -63,7 +63,7 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 
 	return (
 		<>
-			<div className="flex flex-col md:flex-row w-full space-x-2 items-center justify-around my-8 px-2 gap-8">
+			<div className="flex flex-col md:flex-row w-full space-x-2 items-center justify-around my-8 px-2 gap-8 lg:gap-2 xl:gap-8">
 				{/* Left Side */}
 				<div className={cx('flex w-full max-w-[380px] h-full items-center justify-around rounded-xl border-2 border-yellow-400')}>
 					<div className="flex flex-col justify-center items-center space-y-2 h-[223px] py-4">
@@ -110,7 +110,7 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 						<div className="w-[20%]">№</div>
 						<div className="w-[30%]">{t('bet')}</div>
 						<div className="w-[25%]">{t('win')}</div>
-						<div className="w-[25%]">{t('bonus')}</div>
+						<div className="w-[25%] pl-2">{t('bonus')}</div>
 					</div>
 
 					{/* Rows */}
@@ -130,19 +130,19 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 							} hover:bg-[#282c46] transition-all duration-300`}
 						>
 							<div className="flex items-center w-[20%]">
-								<span className="mr-2 text-[12px]">#{index + 1}</span>
+								<span className="mr-2 text-xs">#{index + 1}</span>
 								{getTrophyImage(index) && <img src={getTrophyImage(index)} alt="trophy" className="h-4 inline-block mr-2" />}
 							</div>
 							<div className="flex items-center w-[30%] space-x-2">
 								<span className="text-xs">{truncateEthAddress(row.address)}</span>
 							</div>
-							<div className="flex items-center w-[25%] gap-1 text-yellow-400 font-semibold">
-								<BetValue value={row.result} />
-								<Bet className={'text-yellow-400 w-4 h-4'} />
+							<div className="flex items-center w-[25%] gap-1 text-yellow-400 font-semibold text-xs">
+								<BetValue value={row.result || 0n} />
+								<Bet className={'text-yellow-400 w-3 h-3'} />
 							</div>
-							<div className="flex items-center w-[25%] gap-1 text-blue-400 font-semibold">
+							<div className="flex items-center w-[25%] gap-1 text-blue-400 font-semibold text-xs pl-2">
 								<BetValue value={row.bonus || 0n} />
-								<Bet className={'text-yellow-400 w-4 h-4'} />
+								<Bet className={'text-yellow-400 w-3 h-3'} />
 							</div>
 						</div>
 					))}
