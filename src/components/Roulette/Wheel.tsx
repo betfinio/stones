@@ -270,7 +270,7 @@ const Wheel = () => {
 										transform: `rotate(${-crystal.angle}deg)`,
 									}}
 									onClick={() => setSelectedStone(crystal.name)}
-									className="relative flex flex-col items-center justify-center space-y-[16%]"
+									className="relative flex flex-col items-center justify-center space-y-2"
 								>
 									<div className="text-xs text-white transform -scale-y-100 -scale-x-100 space-x-[3%]">
 										<motion.div

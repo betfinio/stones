@@ -1,5 +1,6 @@
 import { useCurrentRound, useRoundBank } from '@/src/lib/query';
 import { BetValue } from 'betfinio_app/BetValue';
+import { useChatbot } from 'betfinio_app/chatbot';
 import { Separator } from 'betfinio_app/separator';
 import { CircleAlert, TriangleAlert } from 'lucide-react';
 import { useCallback } from 'react';
@@ -9,9 +10,10 @@ const Header = () => {
 	const { data: round = 0 } = useCurrentRound();
 	const { data: bank = 0n } = useRoundBank(round);
 	const { t } = useTranslation('stones', { keyPrefix: 'header' });
+	const { maximize } = useChatbot();
 
 	const handleReport = useCallback(() => {
-		window.Tawk_API.maximize();
+		maximize();
 	}, []);
 	return (
 		<div className="flex w-full justify-between items-center bg-primaryLight text-white p-4 rounded-lg border border-gray-800 h-[80px]">

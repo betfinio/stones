@@ -46,7 +46,7 @@ const CardItem: FC<{ stone: number }> = ({ stone }) => {
 	const { data: sideBank = [0n, 0n, 0n, 0n, 0n] } = useSideBank(round);
 	const { data: bonusShares = [0n, 0n, 0n, 0n, 0n] } = useSideBonusShares(round);
 	const { data: bank = 0n } = useRoundBank(round);
-	const { data: amount = '10000' } = useBetAmount();
+	const { data: amount = 10000 } = useBetAmount();
 
 	const stoneBank = Number(amount) + valueToNumber(sideBank[stone - 1]) || 1;
 	const myBonus = useMemo(() => {
@@ -96,9 +96,9 @@ const CardItem: FC<{ stone: number }> = ({ stone }) => {
 				<Tooltip>
 					<div className={cx('absolute right-1.5 top-1.5 z-20', { hidden: sideBank[stone - 1] })}>
 						<TooltipTrigger>
-							<CircleAlert className={'w-5 h-5'} />
+							<CircleAlert className={'w-5 h-5 text-gray-400'} />
 						</TooltipTrigger>
-						<TooltipContent className={'font-semibold'}>{t('betFirst')}</TooltipContent>
+						<TooltipContent>{t('betFirst')}</TooltipContent>
 					</div>
 				</Tooltip>
 				{/* Container giving the appearance of the crystal "floating" outside */}
