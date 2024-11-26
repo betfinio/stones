@@ -1,10 +1,10 @@
 import { useCurrentRound, useRoundBank } from '@/src/lib/query';
 import { BetValue } from 'betfinio_app/BetValue';
+import { useChatbot } from 'betfinio_app/chatbot';
 import { Separator } from 'betfinio_app/separator';
 import { CircleAlert, TriangleAlert } from 'lucide-react';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import {useChatbot} from "betfinio_app/chatbot";
 
 const Header = () => {
 	const { data: round = 0 } = useCurrentRound();
