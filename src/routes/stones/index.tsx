@@ -5,13 +5,12 @@ import CardList from '@/src/components/CardList/CardList.tsx';
 import Roulette from '@/src/components/Roulette/Roulette';
 import TableBet from '@/src/components/TableBet/TableBet.tsx';
 import logger from '@/src/config/logger.ts';
-import { animateNewBet } from '@/src/lib/api';
+import { animateNewBet, fetchBetInfo } from '@/src/lib/api';
 import { STONES } from '@/src/lib/global.ts';
 import { useCurrentRound } from '@/src/lib/query';
-import { StonesBetContract, StonesContract } from '@betfinio/abi';
+import { StonesContract } from '@betfinio/abi';
 import { useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { readContract } from '@wagmi/core';
 import { TooltipProvider } from 'betfinio_app/tooltip';
 import { AnimatePresence } from 'framer-motion';
 import { useEffect } from 'react';
@@ -48,15 +47,14 @@ function Index() {
 		strict: true,
 		onLogs: async (logs) => {
 			logger.warn('Request detected', logs[0]);
+			// @ts-ignore
 			const round = Number(logs[0]?.args?.round);
+			// @ts-ignore
 			const bet = logs[0]?.args?.bet as Address;
+
 			if (round !== currentRound) return;
-			const side = (await readContract(config, {
-				address: bet,
-				abi: StonesBetContract.abi,
-				functionName: 'getSide',
-			})) as bigint;
-			animateNewBet(Number(side), 0, queryClient, round);
+			const betInfo = await fetchBetInfo(bet, config);
+			animateNewBet(Number(betInfo.side), 0, queryClient, round);
 			queryClient.invalidateQueries({ queryKey: ['stones'] });
 		},
 	});
