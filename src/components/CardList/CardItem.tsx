@@ -74,7 +74,10 @@ const CardItem: FC<{ stone: number }> = ({ stone }) => {
 	return (
 		<>
 			<div
-				className={`mt-5 py-3 px-1 flex flex-col md:hidden items-center justify-center border-2 rounded-lg cursor-pointer transition-all ease-in ${selectedStone === stone ? 'border-yellow-400 scale-105' : ''}`}
+				className={cx('mt-5 py-3 px-1 flex flex-col text-xs md:hidden items-center justify-center border-2 rounded-lg cursor-pointer transition-all ease-in', {
+					'border-yellow-400 scale-110': selectedStone === stone,
+					'opacity-70': selectedStone !== stone,
+				})}
 				style={{
 					borderColor: colors[stone - 1].borderColor,
 					backgroundColor: 'rgba(255, 255, 255, 0.05)',
@@ -83,9 +86,8 @@ const CardItem: FC<{ stone: number }> = ({ stone }) => {
 			>
 				<img src={getStoneImage(stone) as string} alt={'stone'} className="h-7 mb-1" />
 				<span className="block text-md font-normal tabular-nums">{displayMultiplier}</span>
-				<div className="text-blue-500 text-sm font-medium whitespace-nowrap flex flex-wrap items-center justify-center gap-1">
-					Bonus:
-					<BetValue prefix={'Bonus:'} value={myBonus} withIcon className={'!text-blue-500'} iconClassName={'!text-blue-500'} />
+				<div className="text-blue-500 text-xs font-medium whitespace-nowrap flex flex-row flex-nowrap items-center justify-center">
+					+<BetValue prefix={'Bonus:'} value={myBonus} className={'!text-blue-500'} />
 				</div>
 			</div>
 
@@ -129,7 +131,7 @@ const CardItem: FC<{ stone: number }> = ({ stone }) => {
 						{t('win')}:
 						<BetValue prefix={'Win:'} value={potentialWin} withIcon />
 					</div>
-					<div className="text-blue-500 text-sm font-medium whitespace-nowrap flex items-center gap-1">
+					<div className="text-blue-500 text-xs md:text-sm font-medium whitespace-nowrap flex items-center gap-1">
 						{t('bonus')}:
 						<BetValue prefix={'Bonus:'} value={myBonus} withIcon className={'!text-blue-500'} iconClassName={'!text-blue-500'} />
 					</div>
