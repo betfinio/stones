@@ -224,8 +224,8 @@ export const distribute = async (params: DistributeParams, options: Options) => 
 };
 
 export const getRoundTimes = (round: number): number[] => {
-	const start = round * 60 * 10;
-	const end = start + 60 * 10;
+	const start = round * 60 * 5;
+	const end = start + 60 * 5;
 	return [start, end];
 };
 

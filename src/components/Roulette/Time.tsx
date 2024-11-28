@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 const Time: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 	const [_, end] = getRoundTimes(round);
-	const [remaining, setRemaining] = useState('10:00');
+	const [remaining, setRemaining] = useState('05:00');
 	const [loaded, setLoaded] = useState(false);
 	useEffect(() => {
 		if (round === 0) return;
