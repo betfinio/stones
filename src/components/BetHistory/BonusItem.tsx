@@ -34,7 +34,7 @@ const BonusItem: FC<{ bet: StonesBetWithBonus; round: number; className?: string
 							href={`${ETHSCAN}/address/${bet.player}`}
 							target={'_blank'}
 							className={cx(
-								'font-semibold text-sm !text-tertiary-foreground hover:underline',
+								'font-semibold text-sm text-tertiary-foreground hover:underline',
 								bet.player.toLowerCase() === address?.toLowerCase() && '!text-secondary-foreground',
 							)}
 							rel="noreferrer"

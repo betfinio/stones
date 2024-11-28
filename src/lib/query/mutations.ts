@@ -17,7 +17,7 @@ export const usePlaceBet = () => {
 		mutationFn: (params) => placeBet(params, { config }),
 		onSuccess: async (data) => {
 			logger.success('transaction submitted');
-			const { update } = toast({
+			const { update, id } = toast({
 				title: t('pending.title'),
 				description: t('pending.message'),
 				variant: 'loading',
@@ -25,7 +25,7 @@ export const usePlaceBet = () => {
 			});
 			await waitForTransactionReceipt(config.getClient(), { hash: data });
 			logger.success('transaction accepted');
-			update({ variant: 'default', description: t('success.message'), title: t('success.title'), action: getTransactionLink(data) });
+			update({ variant: 'default', description: t('success.message'), title: t('success.title'), action: getTransactionLink(data), id });
 			queryClient.invalidateQueries({ queryKey: ['stones'] });
 			logger.success('finished');
 		},
@@ -45,14 +45,14 @@ export const useSpin = () => {
 		mutationFn: (params) => spin(params, { config }),
 		onSuccess: async (data) => {
 			logger.success('transaction submitted');
-			const { update } = toast({
+			const { update, id } = toast({
 				title: 'Spinning',
 				variant: 'loading',
 				duration: 10000,
 			});
 			await waitForTransactionReceipt(config.getClient(), { hash: data });
 			logger.success('transaction accepted');
-			update({ variant: 'default', title: 'Requested', action: getTransactionLink(data) });
+			update({ variant: 'default', title: 'Requested', action: getTransactionLink(data), id });
 			logger.success('finished');
 		},
 		onError: (error) => {
@@ -71,7 +71,7 @@ export const useDistribute = () => {
 		mutationFn: (params) => distribute(params, { config }),
 		onSuccess: async (data) => {
 			logger.success('transaction submitted');
-			const { update } = toast({
+			const { update, id } = toast({
 				title: 'Distributing',
 				variant: 'loading',
 				duration: 10000,
@@ -79,7 +79,7 @@ export const useDistribute = () => {
 			console.log('data', data);
 			await waitForTransactionReceipt(config.getClient(), { hash: data });
 			logger.success('transaction accepted');
-			update({ variant: 'default', title: 'Distributed', action: getTransactionLink(data) });
+			update({ variant: 'default', title: 'Distributed', action: getTransactionLink(data), id });
 			logger.success('finished');
 		},
 		onError: (error) => {

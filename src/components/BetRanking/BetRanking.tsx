@@ -1,4 +1,5 @@
-import { useDistributedInRound, useRoundBank, useRoundBets, useRoundWinner } from '@/src/lib/query';
+import { ETHSCAN } from '@/src/lib/global.ts';
+import { useDistributedInRound, useRoundBank, useRoundBets, useRoundWinner, useSideBank, useSideBonusShares } from '@/src/lib/query';
 import { useDistribute } from '@/src/lib/query/mutations.ts';
 import type { StonesBet } from '@/src/lib/types.ts';
 import { ZeroAddress, truncateEthAddress } from '@betfinio/abi';
@@ -20,29 +21,34 @@ import crystalImage from '../../assets/Roulette/crystal1.svg';
 const BetRanking: FC<{ round: number }> = ({ round }) => {
 	const { t } = useTranslation('stones', { keyPrefix: 'betRanking' });
 	const { data: bank = 0n } = useRoundBank(round);
-	const { data: bets = [] } = useRoundBets(round);
+	const { data: bets = [], isLoading: areBetsLoading } = useRoundBets(round);
 	const { data: winner = 0 } = useRoundWinner(round);
 	const { data: distributed = 0n } = useDistributedInRound(round);
+	const { data: sideBank = [0n, 0n, 0n, 0n, 0n] } = useSideBank(round);
+	const { data: sideBonusShares = [0n, 0n, 0n, 0n, 0n] } = useSideBonusShares(round);
 	const winBank = (bank * 914n) / 1000n;
 	const bonusBank = (bank * 5n) / 100n;
 	const { address = ZeroAddress } = useAccount();
-
-	const winnerSidePool = bets.filter((bet) => bet.side === winner).reduce((acc, bet) => acc + bet.amount, 0n);
-
+	const winnerSideBank = sideBank[winner - 1];
+	const winnerSideBonusShares = sideBonusShares[winner - 1];
 	const { mutate } = useDistribute();
-	const winBets: StonesBet[] = bets
-		.filter((bet) => bet.side === winner)
-		.sort((a, b) => Number(b.order) - Number(a.order))
-		.map((bet) => {
-			const winWithoutBonus = (bet.amount * winBank) / winnerSidePool;
-			console.log('winWithoutBonus', winWithoutBonus);
-			return {
-				...bet,
-				bonus: bet.result ? bet.result - winWithoutBonus : 0n,
-				result: winWithoutBonus,
-			};
-		})
-		.slice(0, 4);
+	const winBets: StonesBet[] = useMemo(() => {
+		return bets
+			.filter((bet) => bet.side === winner)
+			.sort((a, b) => Number(b.order) - Number(a.order))
+			.map((bet, index, arr) => {
+				const betAmount = bet.amount;
+				const winnings = (betAmount * winBank) / (winnerSideBank || 1n);
+				const bonusShare = betAmount * BigInt(arr.length - index);
+				const bonus = winnerSideBonusShares > 0n ? (bonusShare * bonusBank) / winnerSideBonusShares : 0n;
+				return {
+					...bet,
+					bonus,
+					result: winnings,
+				};
+			})
+			.slice(0, 3);
+	}, [bets, winnerSideBank, winnerSideBonusShares]);
 
 	const trophyImages: string[] = [goldTrophy, silverTrophy, bronzeTrophy];
 
@@ -60,6 +66,7 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 	const userWon = useMemo(() => {
 		return winBets.find((bet) => bet.player === address);
 	}, [winBets]);
+	console.log(winBets);
 
 	return (
 		<>
@@ -104,48 +111,51 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 				</div>
 
 				{/* Right Side - Ranking List */}
-				<div className="w-full flex flex-col space-y-2">
-					{/* Header */}
-					<div className="flex justify-between text-tertiary-foreground text-[12px] px-4 py-2 capitalize">
-						<div className="w-[20%]">№</div>
-						<div className="w-[30%]">{t('bet')}</div>
-						<div className="w-[25%]">{t('win')}</div>
-						<div className="w-[25%] pl-2">{t('bonus')}</div>
-					</div>
-
-					{/* Rows */}
-					{winBets.map((row, index) => (
-						<div
-							key={index}
-							className={`flex items-center h-10 px-4 rounded-lg relative overflow-hidden ${
-								index === 0
-									? 'bg-gradient-to-r from-primary/50 via-primaryLight to-transparent shadow-[inset_0_0_0_1px_rgba(255,223,0,0.6),inset_0_0_0_1px_rgba(0,0,0,0.4)]'
-									: index === 1
-										? 'bg-gradient-to-r from-tertiary-foreground/20 via-primaryLight to-transparent shadow-[inset_0_0_0_1px_rgba(192,192,192,0.6),inset_0_0_0_1px_rgba(0,0,0,0.4)]'
-										: index === 2
-											? 'bg-gradient-to-r from-orange-600/50 via-primaryLight to-transparent shadow-[inset_0_0_0_1px_rgba(205,127,50,0.6),inset_0_0_0_1px_rgba(0,0,0,0.4)]'
-											: index % 2 === 0
-												? 'bg-card'
-												: 'bg-transparent'
-							} transition-all duration-300`}
-						>
-							<div className="flex items-center w-[20%]">
-								<span className="mr-2 text-xs">#{index + 1}</span>
-								{getTrophyImage(index) && <img src={getTrophyImage(index)} alt="trophy" className="h-4 inline-block mr-2" />}
-							</div>
-							<div className="flex items-center w-[30%] space-x-2">
-								<span className="text-xs">{truncateEthAddress(row.address)}</span>
-							</div>
-							<div className="flex items-center w-[25%] gap-1 text-secondary-foreground font-semibold text-xs">
-								<BetValue value={row.result || 0n} />
-								<Bet className={'text-secondary-foreground w-3 h-3'} />
-							</div>
-							<div className="flex items-center w-[25%] gap-1 text-bonus font-semibold text-xs pl-2">
-								<BetValue value={row.bonus || 0n} />
-								<Bet className={'text-secondary-foreground w-3 h-3'} />
-							</div>
+				<div className={cx('w-full flex flex-col gap-2', { 'aimate-pulse blur-sm': areBetsLoading })}>
+					<div className={'flex justify-center '}>{t('topBets', { count: winBets.length })}</div>
+					<div className="w-full flex flex-col space-y-2">
+						{/* Header */}
+						<div className="flex justify-between text-tertiary-foreground text-[12px] px-4 py-2 capitalize">
+							<div className="w-[20%]">№</div>
+							<div className="w-[30%]">{t('bet')}</div>
+							<div className="w-[25%]">{t('win')}</div>
+							<div className="w-[25%] pl-2">{t('bonus')}</div>
 						</div>
-					))}
+
+						{/* Rows */}
+						{winBets.map((row, index) => (
+							<div
+								key={index}
+								className={`flex items-center h-10 px-4 rounded-lg relative overflow-hidden ${
+									index === 0
+										? 'bg-gradient-to-r from-primary/50 via-primaryLight to-transparent shadow-[inset_0_0_0_1px_rgba(255,223,0,0.6),inset_0_0_0_1px_rgba(0,0,0,0.4)]'
+										: index === 1
+											? 'bg-gradient-to-r from-tertiary-foreground/20 via-primaryLight to-transparent shadow-[inset_0_0_0_1px_rgba(192,192,192,0.6),inset_0_0_0_1px_rgba(0,0,0,0.4)]'
+											: index === 2
+												? 'bg-gradient-to-r from-orange-600/50 via-primaryLight to-transparent shadow-[inset_0_0_0_1px_rgba(205,127,50,0.6),inset_0_0_0_1px_rgba(0,0,0,0.4)]'
+												: index % 2 === 0
+													? 'bg-card'
+													: 'bg-transparent'
+								} transition-all duration-300`}
+							>
+								<div className="flex items-center w-[20%]">
+									<span className="mr-2 text-xs">#{index + 1}</span>
+									{getTrophyImage(index) && <img src={getTrophyImage(index)} alt="trophy" className="h-4 inline-block mr-2" />}
+								</div>
+								<div className="flex items-center w-[30%] space-x-2">
+									<a target={'_blank'} rel={'noreferrer'} href={`${ETHSCAN}/address/${row.address}`} className="text-xs hover:text-bonus">
+										{truncateEthAddress(row.address)}
+									</a>
+								</div>
+								<div className="flex items-center w-[25%] gap-1 text-secondary-foreground font-semibold text-xs">
+									<BetValue value={row.result || 0n} withIcon={true} iconClassName={'w-3 h-3'} />
+								</div>
+								<div className="flex items-center w-[25%] gap-1 text-bonus font-semibold text-xs pl-2">
+									<BetValue value={row.bonus || 0n} withIcon={true} iconClassName={'w-3 h-3'} />
+								</div>
+							</div>
+						))}
+					</div>
 				</div>
 			</div>
 			{bonusBank + winBank - distributed > 10n ** 18n && (

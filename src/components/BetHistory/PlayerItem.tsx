@@ -21,7 +21,6 @@ const PlayerItem: FC<{ bet: StonesBet; round: number; className?: string }> = ({
 	const betsNumber = bets.filter((b) => b.player === bet.player).length;
 	const { data: username } = useUsername(bet.player);
 	const { data: customUsername } = useCustomUsername(address, bet.player);
-
 	return (
 		<motion.div
 			key={bet.player}
@@ -40,7 +39,7 @@ const PlayerItem: FC<{ bet: StonesBet; round: number; className?: string }> = ({
 							href={`${ETHSCAN}/address/${bet.player}`}
 							target={'_blank'}
 							className={cx(
-								'font-semibold text-sm !text-tertiary-foreground hover:underline',
+								'font-semibold text-sm text-tertiary-foreground hover:underline',
 								bet.player.toLowerCase() === address?.toLowerCase() && '!text-secondary-foreground',
 							)}
 							rel="noreferrer"
