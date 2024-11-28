@@ -31,7 +31,7 @@ const Time: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 	return (
 		<motion.div
 			key="countdown"
-			className="absolute flex flex-col text-center w-fit text-white left-1/2"
+			className="absolute flex flex-col text-center w-fit text-foreground left-1/2"
 			style={{
 				top: `-${420 * scale}px`,
 				fontSize: `${20 * scale}px`,

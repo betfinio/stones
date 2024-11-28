@@ -1,8 +1,8 @@
 import logger from '@/src/config/logger';
 import { type DistributeParams, type PlaceBetParams, type SpinParams, distribute, fetchRoundBank, placeBet, spin } from '@/src/lib/api';
+import { toast } from '@betfinio/components/hooks';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getTransactionLink } from 'betfinio_app/helpers';
-import { toast } from 'betfinio_app/use-toast';
 import { useTranslation } from 'react-i18next';
 import type { WriteContractErrorType, WriteContractReturnType } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
@@ -97,7 +97,7 @@ export const useSetBetAmount = () => {
 	return useMutation<unknown, number, number>({
 		mutationKey: ['spin'],
 		mutationFn: async (newValue) => {
-			queryClient.setQueryData(['betAmount'], newValue)
+			queryClient.setQueryData(['betAmount'], newValue);
 		},
 	});
 };

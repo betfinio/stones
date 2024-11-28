@@ -1,6 +1,6 @@
 import AllRoundsTable from '@/src/components/TableBet/AllRoundsTable.tsx';
 import MyBetsTable from '@/src/components/TableBet/MyBetsTable.tsx';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from 'betfinio_app/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@betfinio/components/ui';
 import { useTranslation } from 'react-i18next';
 
 const TableBet = () => {

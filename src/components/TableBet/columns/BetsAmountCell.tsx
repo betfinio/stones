@@ -1,5 +1,5 @@
 import { useRoundBank } from '@/src/lib/query';
-import { BetValue } from 'betfinio_app/BetValue';
+import { BetValue } from '@betfinio/components/shared';
 import type { FC } from 'react';
 
 const BetsAmountCell: FC<{ round: number }> = ({ round }) => {

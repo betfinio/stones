@@ -5,9 +5,9 @@ import RoundCell from '@/src/components/TableBet/columns/RoundCell.tsx';
 import StakingEarningCell from '@/src/components/TableBet/columns/StakingEarningCell.tsx';
 import WinnerCell from '@/src/components/TableBet/columns/WinnerCell.tsx';
 import { useRounds } from '@/src/lib/query';
+import { DataTable } from '@betfinio/components/shared';
 import { useNavigate } from '@tanstack/react-router';
 import { createColumnHelper } from '@tanstack/react-table';
-import { DataTable } from 'betfinio_app/DataTable';
 import { useTranslation } from 'react-i18next';
 
 const columnHelper = createColumnHelper<{ round: number }>();
