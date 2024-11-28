@@ -66,7 +66,6 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 	const userWon = useMemo(() => {
 		return winBets.find((bet) => bet.player === address);
 	}, [winBets]);
-	console.log(winBets);
 
 	return (
 		<>
