@@ -126,7 +126,6 @@ const BetAmount = () => {
 			},
 		];
 	}, [sideBank, round]);
-	console.log(balance);
 
 	return (
 		<div className="w-full">
