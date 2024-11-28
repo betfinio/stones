@@ -29,7 +29,7 @@ export const useCurrentRound = () => {
 export const useActualRound = () => {
 	const queryClient = useQueryClient();
 	const getRound = () => {
-		return Math.floor(Date.now() / 1000 / 60 / 10);
+		return Math.floor(Date.now() / 1000 / 60 / 5);
 	};
 	useEffect(() => {
 		const interval = setInterval(() => {
