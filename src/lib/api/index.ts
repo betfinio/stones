@@ -3,7 +3,7 @@ import { PARTNER, STONES } from '@/src/lib/global';
 import type { StoneInfo, StonesBet } from '@/src/lib/types';
 import { PartnerContract, StonesBetContract, StonesContract, arrayFrom } from '@betfinio/abi';
 import type { QueryClient } from '@tanstack/react-query';
-import { type Config, multicall, readContract, writeContract } from '@wagmi/core';
+import { type Config, multicall, readContract, simulateContract, writeContract } from '@wagmi/core';
 import type { Options } from 'betfinio_app/lib/types';
 import { type Address, encodeAbiParameters, parseAbiParameters } from 'viem';
 
@@ -200,7 +200,12 @@ export interface SpinParams {
 
 export const spin = async (params: SpinParams, options: Options) => {
 	if (!options.config) throw new Error('Config is required');
-
+	await simulateContract(options.config, {
+		address: STONES,
+		abi: StonesContract.abi,
+		functionName: 'roll',
+		args: [params.round],
+	});
 	return writeContract(options.config, {
 		address: STONES,
 		abi: StonesContract.abi,
