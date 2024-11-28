@@ -35,7 +35,7 @@ const BetItem: FC<{ bet: StonesBet; round: number; className?: string }> = ({ be
 							href={`${ETHSCAN}/address/${bet.player}`}
 							target={'_blank'}
 							className={cx(
-								'font-semibold text-sm !text-tertiary-foreground hover:underline',
+								'font-semibold text-sm text-tertiary-foreground hover:underline',
 								bet.player.toLowerCase() === address?.toLowerCase() && '!text-secondary-foreground',
 							)}
 							rel="noreferrer"

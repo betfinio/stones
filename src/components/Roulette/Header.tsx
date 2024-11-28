@@ -2,7 +2,7 @@ import { useCurrentRound, useRoundBank } from '@/src/lib/query';
 import { BetValue } from '@betfinio/components/shared';
 import { Separator } from '@betfinio/components/ui';
 import { useChatbot } from 'betfinio_app/chatbot';
-import { CircleAlert, TriangleAlert } from 'lucide-react';
+import { CircleHelp, TriangleAlert } from 'lucide-react';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -44,7 +44,7 @@ const Header = () => {
 					rel="noreferrer"
 					className="flex flex-col items-center cursor-pointer hover:text-secondary-foreground"
 				>
-					<CircleAlert className={'w-6 h-6'} />
+					<CircleHelp className={'w-6 h-6'} />
 					<span className="hidden lg:block text-xs">{t('howToPlay')}</span>
 				</a>
 				<div className="flex flex-col items-center cursor-pointer hover:text-secondary-foreground" onClick={handleReport}>

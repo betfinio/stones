@@ -61,7 +61,8 @@
 		"roundOver": "Round is over",
 		"bonus": "bonus",
 		"distribute": "Distribute",
-		"payoutNotDistributed": "Payout was not distributed"
+		"payoutNotDistributed": "Payout was not distributed",
+		"topBets": "Top {count, plural, =1 {# bet} other {# bets}}"
 	},
 	"table": {
 		"tabs": {
