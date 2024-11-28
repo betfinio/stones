@@ -23,7 +23,7 @@ const ProbabilitiesChart: FC<{ round: number; pie: any[] }> = ({ round, pie }) =
 		if (isEmpty) return null;
 		return (
 			<div
-				className="flex items-center justify-center space-x-2 p-2 rounded-lg text-white"
+				className="flex items-center justify-center space-x-2 p-2 rounded-lg text-foreground"
 				style={{
 					border: `2px solid ${datum.data.borderColor}`, // Acessando corretamente o borderColor de datum
 					backgroundColor: 'hsl(var(--popover))',
@@ -44,7 +44,7 @@ const ProbabilitiesChart: FC<{ round: number; pie: any[] }> = ({ round, pie }) =
 			initial={{ opacity: 0 }}
 			animate={{ opacity: 1 }}
 			exit={{ opacity: 1 }}
-			className="flex flex-col justify-center items-center bg-[#131624] rounded-lg h-[110px]"
+			className="flex flex-col justify-center items-center bg-card rounded-lg h-[110px]"
 		>
 			<div className="flex flex-row h-[110px] items-center justify-center py-3">
 				{/* Crystal List */}
@@ -52,7 +52,7 @@ const ProbabilitiesChart: FC<{ round: number; pie: any[] }> = ({ round, pie }) =
 					{pie.map((item, index) => (
 						<div key={index} className="flex items-center space-x-2">
 							<img src={images[`crystal${index + 1}`]} alt={'stone'} className="w-2" />
-							<span className="text-white text-sm font-medium tabular-nums">{isEmpty ? 0 : item.value.toFixed(2)}%</span>
+							<span className="text-foreground text-sm font-medium tabular-nums">{isEmpty ? 0 : item.value.toFixed(2)}%</span>
 						</div>
 					))}
 				</div>

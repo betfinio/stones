@@ -16,7 +16,7 @@ const WinnerCell: FC<{ round: number }> = ({ round }) => {
 	};
 
 	return (
-		<div className={'text-gray-400'} onClick={handleRequestCalculate}>
+		<div className={'text-tertiary-foreground'} onClick={handleRequestCalculate}>
 			{status === 2 ? (
 				<img src={getStoneImage(winner)} alt={'winner'} className={'w-5 h-5'} />
 			) : status === 1 ? (

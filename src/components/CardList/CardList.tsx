@@ -1,7 +1,7 @@
 import CardItem from '@/src/components/CardList/CardItem.tsx';
 import { useActualRound, useCurrentRound } from '@/src/lib/query';
 import { arrayFrom } from '@betfinio/abi';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from 'betfinio_app/carousel';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@betfinio/components/ui';
 import { cx } from 'class-variance-authority';
 import { motion } from 'framer-motion';
 import { FaArrowLeftLong, FaArrowRightLong } from 'react-icons/fa6';
@@ -39,10 +39,10 @@ export const CardList = () => {
 				{isMobile && (
 					<>
 						<CarouselPrevious className="absolute top-[108%] left-0 flex justify-center items-center  opacity-50 hover:opacity-100 cursor-pointer z-20 rounded-md">
-							<FaArrowLeftLong className="w-6 h-6 text-yellow-400" />
+							<FaArrowLeftLong className="w-6 h-6 text-secondary-foreground" />
 						</CarouselPrevious>
 						<CarouselNext className="absolute top-[108%] right-0 flex justify-center items-center opacity-50 hover:opacity-100 cursor-pointer z-20 rounded-md">
-							<FaArrowRightLong className="w-6 h-6 text-yellow-400" />
+							<FaArrowRightLong className="w-6 h-6 text-secondary-foreground" />
 						</CarouselNext>
 					</>
 				)}

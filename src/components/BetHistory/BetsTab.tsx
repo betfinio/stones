@@ -34,7 +34,7 @@ const BetsTab: FC<{ round: number }> = ({ round }) => {
 			/>
 		</div>
 	) : (
-		<div className={'items-center flex justify-center text-gray-500'}>{t('noData')}</div>
+		<div className={'items-center flex justify-center text-tertiary-foreground'}>{t('noData')}</div>
 	);
 };
 

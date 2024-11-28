@@ -26,7 +26,6 @@ export const fetchRoundBetsByPlayer = async (round: number, player: Address): Pr
 	const data: ExecutionResult<PlayerBetsByRoundQuery> = await execute(PlayerBetsByRoundDocument, { round, player });
 	logger.success('round bets by player', data.data?.betCreateds.length);
 	if (!data.data) return [];
-	console.log(data);
 	return populateStonesBet(data.data);
 };
 

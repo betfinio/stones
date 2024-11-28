@@ -1,6 +1,6 @@
 import { useRoundBank, useRoundBetsByPlayer, useRoundStatus, useRoundWinner, useSideBank } from '@/src/lib/query';
 import { ZeroAddress } from '@betfinio/abi';
-import { BetValue } from 'betfinio_app/BetValue';
+import { BetValue } from '@betfinio/components/shared';
 import { cx } from 'class-variance-authority';
 import { motion } from 'framer-motion';
 import type { FC } from 'react';
@@ -35,7 +35,7 @@ const WinnerInfo: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 						fontSize: `${10 * scale * 2}px`,
 						lineHeight: `${14 * scale * 2}px`,
 					}}
-					className={'font-light text-gray-500'}
+					className={'font-light text-tertiary-foreground'}
 				>
 					{t('waitingForSpin')}!
 				</span>
@@ -46,7 +46,7 @@ const WinnerInfo: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 	return (
 		<motion.div
 			key="winnerMessage"
-			className="absolute w-full flex flex-col items-center justify-center text-center text-white"
+			className="absolute w-full flex flex-col items-center justify-center text-center text-foreground"
 			initial={{ opacity: 0, scale: 0.5 }}
 			animate={{ opacity: 1, scale: 1.2 }}
 			exit={{ opacity: 0, scale: 0.8 }}
@@ -58,7 +58,7 @@ const WinnerInfo: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 			}}
 		>
 			<div
-				className="absolute rounded-full opacity-30 blur-2xl bg-red-500"
+				className="absolute rounded-full opacity-30 blur-2xl bg-destructive"
 				style={{
 					width: `${300 * scale}px`,
 					height: `${300 * scale}px`,
@@ -96,9 +96,9 @@ const WinnerNotDistributed: FC<{ round: number; scale: number }> = ({ round, sca
 				className={'z-[6] flex flex-col items-center text-sm sm:text-base lg:text-2xl'}
 			>
 				{t('win')}:
-				<BetValue prefix={'Win: '} className={'text-yellow-400 scale-110'} value={BigInt(myWin)} withIcon />
-				<div className={'!text-blue-500 scale-[0.9] flex flex-row items-center gap-1'}>
-					+<BetValue prefix={'Bonus: '} iconClassName={'!text-blue-500'} value={BigInt(myBonus)} withIcon />
+				<BetValue prefix={'Win: '} className={'text-secondary-foreground scale-110'} value={BigInt(myWin)} withIcon />
+				<div className={'!text-bonus scale-[0.9] flex flex-row items-center gap-1'}>
+					+<BetValue prefix={'Bonus: '} iconClassName={'!text-bonus'} value={BigInt(myBonus)} withIcon />
 				</div>
 			</motion.div>
 		);

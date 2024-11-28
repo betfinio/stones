@@ -36,7 +36,7 @@ Currently available components:
 ### Custom Components
 
 ```tsx
-import {BetValue} from "betfinio_app/BetValue";
+import {BetValue} from "@betfinio/components/shared";
 ```
 
 Component for displaying bet value with a BET logo and tooltip.

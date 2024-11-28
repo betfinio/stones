@@ -9,9 +9,9 @@ import { animateNewBet, fetchBetInfo } from '@/src/lib/api';
 import { STONES } from '@/src/lib/global.ts';
 import { useCurrentRound } from '@/src/lib/query';
 import { StonesContract } from '@betfinio/abi';
+import { TooltipProvider } from '@betfinio/components/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { TooltipProvider } from 'betfinio_app/tooltip';
 import { AnimatePresence } from 'framer-motion';
 import { useEffect } from 'react';
 import type { Address } from 'viem';
@@ -60,7 +60,7 @@ function Index() {
 	});
 	return (
 		<TooltipProvider>
-			<div className="w-full p-2 md:p-3 lg:p-4 rounded-md text-white h-full  overflow-hidden grid grid-cols-12 gap-2">
+			<div className="w-full p-2 md:p-3 lg:p-4 rounded-md text-foreground h-full  overflow-hidden grid grid-cols-12 gap-2">
 				<div className={'col-span-12 lg:col-span-8'}>
 					<Roulette />
 				</div>

@@ -10,7 +10,6 @@ import { List } from 'react-virtualized';
 const PlayersTab: FC<{ round: number }> = ({ round }) => {
 	const { t } = useTranslation('stones', { keyPrefix: 'history.tabs' });
 	const { data: bets = [] } = useRoundBets(round);
-
 	const players = useMemo(() => {
 		return mapBetsToAuthors([...bets]).sort((a, b) => Number(b.amount - a.amount));
 	}, [bets]);
@@ -39,7 +38,7 @@ const PlayersTab: FC<{ round: number }> = ({ round }) => {
 			/>
 		</div>
 	) : (
-		<div className={'items-center flex justify-center text-gray-500'}>{t('noData')}</div>
+		<div className={'items-center flex justify-center text-tertiary-foreground'}>{t('noData')}</div>
 	);
 };
 

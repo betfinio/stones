@@ -7,19 +7,16 @@ import { useActualRound, useBetAmount, useCurrentRound, useRoundBank, useRoundSt
 import { usePlaceBet, useSetBetAmount } from '@/src/lib/query/mutations';
 import { useSelectedStone } from '@/src/lib/query/state';
 import { arrayFrom, valueToNumber } from '@betfinio/abi';
-import { Bet } from '@betfinio/ui';
+import { BetValue } from '@betfinio/components/shared';
+import { Button, Slider } from '@betfinio/components/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
-import { BetValue } from 'betfinio_app/BetValue';
-import { Button } from 'betfinio_app/button';
-import { Input } from 'betfinio_app/input';
 import { useBalance } from 'betfinio_app/lib/query/token';
-import { Slider } from 'betfinio_app/slider';
 import { cx } from 'class-variance-authority';
 import { motion } from 'framer-motion';
 import { LoaderIcon } from 'lucide-react';
 import { DateTime } from 'luxon';
-import { type ChangeEvent, type FC, useEffect, useMemo, useState } from 'react';
+import { type FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import type { NumberFormatValues } from 'react-number-format/types';
@@ -129,7 +126,6 @@ const BetAmount = () => {
 			},
 		];
 	}, [sideBank, round]);
-	console.log(balance);
 
 	return (
 		<div className="w-full">
@@ -143,11 +139,11 @@ const BetAmount = () => {
 						<MobileStoneSelect />
 
 						<div className={cx('w-full', balance <= 0n && 'pointer-events-none grayscale')}>
-							<span className="text-white font-semibold mb-2 block">{t('betAmount')}</span>
+							<span className="text-foreground font-semibold mb-2 block">{t('betAmount')}</span>
 							<NumericFormat
 								className={cx(
-									'text-center bg-primary py-3 font-semibold text-sm text-white disabled:cursor-not-allowed duration-300 px-4 border border-gray-500 rounded-lg p-2 w-full h-10',
-									valueToNumber(balance) < Number(amount) && 'text-red-400',
+									'text-center bg-background py-3 font-semibold text-sm text-foreground disabled:cursor-not-allowed duration-300 px-4 border border-border rounded-lg p-2 w-full h-10',
+									valueToNumber(balance) < Number(amount) && 'text-destructive',
 								)}
 								thousandSeparator={','}
 								min={1}
@@ -161,9 +157,9 @@ const BetAmount = () => {
 							<div className="relative mt-4 h-6">
 								<Slider min={1000} max={valueToNumber(balance) - 1} value={[amount]} defaultValue={[10000]} onValueChange={handleSliderChange} />
 
-								<div className="flex justify-between text-gray-500 text-xs mt-2">
+								<div className="flex justify-between text-tertiary-foreground text-xs mt-2">
 									<span>0%</span>
-									<span className="text-yellow-400 font-semibold text-sm">{Math.round(betPercentage)}%</span>
+									<span className="text-secondary-foreground font-semibold text-sm">{Math.round(betPercentage)}%</span>
 									<span>100%</span>
 								</div>
 							</div>
@@ -176,7 +172,7 @@ const BetAmount = () => {
 									<LoaderIcon className={'animate-spin'} />
 								) : (
 									<>
-										{t('placeBet')} <BetValue value={Number(potentialWin + potentialBonus)} withIcon iconClassName={'border border-gray-800 rounded-full'} />
+										{t('placeBet')} <BetValue value={Number(potentialWin + potentialBonus)} withIcon iconClassName={'border border-border rounded-full'} />
 									</>
 								)}
 							</Button>
@@ -187,8 +183,8 @@ const BetAmount = () => {
 							{arrayFrom(5).map((crystal, index) => (
 								<div
 									key={index}
-									className={`relative flex items-center justify-center border-1 border-[#151A2A]  w-[44px] h-[25px] bg-primaryLight rounded-md cursor-pointer hover:scale-110 transition-all ease-in ${
-										selected === (crystal + 1) ? 'border-2 border-yellow-400' : ''
+									className={`relative flex items-center justify-center border-1 border-border w-[44px] h-[25px] bg-card rounded-md cursor-pointer hover:scale-110 transition-all ease-in ${
+										selected === (crystal + 1) ? 'border-2 border-border' : ''
 									}`}
 									onClick={() => handleCrystalClick(crystal + 1)}
 									onKeyDown={(e) => {
@@ -199,7 +195,7 @@ const BetAmount = () => {
 								>
 									<img src={images[`crystal${crystal + 1}`]} alt={`crystal-${index}`} className="h-[15px] z-20" />
 									{index === 0 && (
-										<div className="absolute top-[2px] w-[20px] h-[20px] rounded-full bg-blue-500 opacity-70 blur-sm z-10 hover:scale-110 transition-all ease-linear" />
+										<div className="absolute top-[2px] w-[20px] h-[20px] rounded-full bg-bonus opacity-70 blur-sm z-10 hover:scale-110 transition-all ease-linear" />
 									)}
 								</div>
 							))}
@@ -219,12 +215,12 @@ const BetAmount = () => {
 
 					{/* Bet Amount Section */}
 					<div className={cx('flex flex-col h-[110px] w-full max-w-[200px]', balance <= 0n && 'pointer-events-none grayscale')}>
-						<span className="text-white font-semibold mb-2">{t('betAmount')}</span>
+						<span className="text-foreground font-semibold mb-2">{t('betAmount')}</span>
 						<div>
 							<NumericFormat
 								className={cx(
-									'text-center bg-primary py-3 font-semibold text-sm text-white disabled:cursor-not-allowed duration-300 px-4 border border-gray-500 rounded-lg p-2 w-full h-[40px]',
-									valueToNumber(balance) < Number(amount) && 'text-red-400',
+									'text-center bg-background py-3 font-semibold text-sm text-foreground disabled:cursor-not-allowed duration-300 px-4 border border-border rounded-lg p-2 w-full h-[40px]',
+									valueToNumber(balance) < Number(amount) && 'text-destructive',
 								)}
 								thousandSeparator={','}
 								min={1}
@@ -238,9 +234,9 @@ const BetAmount = () => {
 						</div>
 						<div className="relative mt-2 h-[24px]">
 							<Slider min={1000} max={valueToNumber(balance) - 1} value={[amount]} defaultValue={[10000]} onValueChange={handleSliderChange} />
-							<div className="flex justify-between text-gray-500 text-xs mt-2">
+							<div className="flex justify-between text-tertiary-foreground text-xs mt-2">
 								<span>0%</span>
-								<span className="text-yellow-400 font-semibold text-sm">{Math.round(betPercentage)}%</span>
+								<span className="text-secondary-foreground font-semibold text-sm">{Math.round(betPercentage)}%</span>
 								<span>100%</span>
 							</div>
 						</div>
@@ -258,7 +254,7 @@ const BetAmount = () => {
 								<LoaderIcon className={'animate-spin'} />
 							) : (
 								<>
-									{t('placeBet')} <BetValue value={Number(potentialWin + potentialBonus)} withIcon iconClassName={'border border-gray-800 rounded-full'} />
+									{t('placeBet')} <BetValue value={Number(potentialWin + potentialBonus)} withIcon iconClassName={'border border-border rounded-full'} />
 								</>
 							)}
 						</Button>
@@ -268,8 +264,8 @@ const BetAmount = () => {
 							{pie.map((item, index) => (
 								<div
 									key={index}
-									className={`relative flex items-center justify-center px-2 py-1.5 bg-primaryLight rounded-md cursor-pointer ${
-										selected === item.id ? 'border-2 border-yellow-400' : ''
+									className={`relative flex items-center justify-center px-2 py-1.5 bg-card rounded-md cursor-pointer ${
+										selected === item.id ? 'border-2 border-border' : ''
 									}`}
 									onClick={() => handleCrystalClick(item.id)}
 									tabIndex={0}
@@ -301,7 +297,7 @@ const OldRound: FC<{ round: number }> = ({ round }) => {
 
 	return (
 		<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-			<div className={'w-full border border-yellow-400/50 rounded-lg p-4 flex flex-row items-center justify-between'}>
+			<div className={'w-full border border-border/50 rounded-lg p-4 flex flex-row items-center justify-between'}>
 				<div>Round ended {DateTime.fromSeconds(end).toFormat('MM/dd T')}</div>
 				<Button onClick={handleClick}>{t('goToCurrentRound')}</Button>
 			</div>

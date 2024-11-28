@@ -8,9 +8,9 @@ import { useActualRound, useCurrentRound, useRoundBank, useRoundBets, useRoundSt
 import { useSelectedStone } from '@/src/lib/query/state.ts';
 import { shootConfetti } from '@/src/lib/utils.ts';
 import { StonesContract, ZeroAddress, arrayFrom } from '@betfinio/abi';
+import { BetValue } from '@betfinio/components/shared';
 import { Bet } from '@betfinio/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import { BetValue } from 'betfinio_app/BetValue';
 import { cx } from 'class-variance-authority';
 import { AnimatePresence, motion, useAnimation } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
@@ -277,9 +277,9 @@ const Wheel = () => {
 									onClick={() => setSelectedStone(crystal.name)}
 									className="relative flex flex-col items-center justify-center space-y-2"
 								>
-									<div className="text-xs text-white transform -scale-y-100 -scale-x-100 space-x-[3%]">
+									<div className="text-xs text-foreground transform -scale-y-100 -scale-x-100 space-x-[3%]">
 										<motion.div
-											className="absolute rounded-full bg-[#7366FF] opacity-[0.85] blur-xl"
+											className="absolute rounded-full bg-bonus opacity-[0.85] blur-xl"
 											style={{
 												width: `${70 * scale}px`, // Escala o tamanho do brilho conforme a escala geral
 												height: `${70 * scale}px`, // Escala o tamanho do brilho conforme a escala geral
@@ -296,7 +296,7 @@ const Wheel = () => {
 											}}
 										/>
 										<div className={'flex items-center gap-1 justify-center'}>
-											<Bet className="z-20 aspect-square md:w-4 md:h-4 h-3 w-3 text-yellow-400" />
+											<Bet className="z-20 aspect-square md:w-4 md:h-4 h-3 w-3 text-secondary-foreground" />
 											<motion.span
 												initial={{ opacity: 0 }}
 												animate={{ opacity: [0, 1, 1] }}
@@ -373,7 +373,7 @@ const Wheel = () => {
 								fontSize: `${10 * scale * 2}px`,
 								lineHeight: `${14 * scale * 2}px`,
 							}}
-							className={'font-light text-gray-500'}
+							className={'font-light text-tertiary-foreground'}
 						>
 							{t('waitingForSpin')}
 						</span>
