@@ -4,7 +4,7 @@ import WinnerInfo from '@/src/components/Roulette/WinnerInfo.tsx';
 import logger from '@/src/config/logger';
 import { getRoundTimes } from '@/src/lib/api';
 import { STONES } from '@/src/lib/global.ts';
-import { useActualRound, useCurrentRound, useRoundBank, useRoundBets, useRoundStatus, useSideBank } from '@/src/lib/query';
+import { useActualRound, useCurrentRound, useRoundBank, useRoundBets, useRoundStatus, useRoundWinner, useSideBank } from '@/src/lib/query';
 import { useSelectedStone } from '@/src/lib/query/state.ts';
 import { shootConfetti } from '@/src/lib/utils.ts';
 import { StonesABI, ZeroAddress, arrayFrom } from '@betfinio/abi';
@@ -88,6 +88,7 @@ const Wheel = () => {
 	const { data: sideBank = [0n, 0n, 0n, 0n, 0n] } = useSideBank(currentRound);
 	const { data: bank = 0n } = useRoundBank(currentRound);
 	const { data: bets = [] } = useRoundBets(currentRound);
+	const { data: winner = 0 } = useRoundWinner(currentRound);
 
 	const [scale, setScale] = useState(1);
 
@@ -102,11 +103,12 @@ const Wheel = () => {
 		if (status > 0 || end < Date.now() / 1000 || actualRound !== currentRound) {
 			setShowWinnerMessage(true);
 			setShowCountdown(false);
+			setSelectedStone(winner);
 		} else {
 			setShowCountdown(true);
 			setShowWinnerMessage(false);
 		}
-	}, [status, currentRound, end, actualRound]);
+	}, [status, currentRound, end, actualRound, winner]);
 
 	useEffect(() => {
 		const angle = crystals.find((crystal) => crystal.name === selectedStone)?.angle || 0;
@@ -134,11 +136,12 @@ const Wheel = () => {
 		strict: true,
 		onLogs: async (logs) => {
 			logger.warn('Winner detected', logs[0]);
-			const round = Number.parseInt(logs[0].topics[1] || '0x0', 16);
-			const side = Number.parseInt(logs[0].topics[2] || '0x0', 16);
+			const round = Number(logs[0].args.round);
+			const side = Number(logs[0].args.side);
 			if (round !== currentRound) return;
 			const angle = crystals.find((crystal) => crystal.name === side)?.angle || 0;
-			stopSpin(angle).then(async () => {
+			stopSpin(-angle).then(async () => {
+				setSelectedStone(side);
 				if (bets.find((bet) => bet.side === side && bet.player === address)) {
 					shootConfetti();
 				}
