@@ -18,7 +18,7 @@
 		"secret:prod": "bun run secret.ts -- production prod/io"
 	},
 	"dependencies": {
-		"@betfinio/abi": "^1.1.2",
+		"@betfinio/abi": "^2.0.1",
 		"@betfinio/components": "^1.3.5",
 		"@module-federation/enhanced": "^0.7.3",
 		"@nivo/core": "^0.87.0",

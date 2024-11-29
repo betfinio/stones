@@ -7,7 +7,7 @@ import { STONES } from '@/src/lib/global.ts';
 import { useActualRound, useCurrentRound, useRoundBank, useRoundBets, useRoundStatus, useSideBank } from '@/src/lib/query';
 import { useSelectedStone } from '@/src/lib/query/state.ts';
 import { shootConfetti } from '@/src/lib/utils.ts';
-import { StonesContract, ZeroAddress, arrayFrom } from '@betfinio/abi';
+import { StonesABI, ZeroAddress, arrayFrom } from '@betfinio/abi';
 import { BetValue } from '@betfinio/components/shared';
 import { Bet } from '@betfinio/ui';
 import { useQueryClient } from '@tanstack/react-query';
@@ -114,7 +114,7 @@ const Wheel = () => {
 	}, [selectedStone]);
 
 	useWatchContractEvent({
-		abi: StonesContract.abi,
+		abi: StonesABI,
 		address: STONES,
 		eventName: 'RequestedCalculation',
 		strict: true,
@@ -128,7 +128,7 @@ const Wheel = () => {
 		},
 	});
 	useWatchContractEvent({
-		abi: StonesContract.abi,
+		abi: StonesABI,
 		address: STONES,
 		eventName: 'WinnerCalculated',
 		strict: true,

@@ -8,7 +8,7 @@ import logger from '@/src/config/logger.ts';
 import { animateNewBet, fetchBetInfo } from '@/src/lib/api';
 import { STONES } from '@/src/lib/global.ts';
 import { useCurrentRound } from '@/src/lib/query';
-import { StonesContract } from '@betfinio/abi';
+import { StonesABI } from '@betfinio/abi';
 import { TooltipProvider } from '@betfinio/components/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
@@ -41,17 +41,14 @@ function Index() {
 	const config = useConfig();
 
 	useWatchContractEvent({
-		abi: StonesContract.abi,
+		abi: StonesABI,
 		address: STONES,
 		eventName: 'BetCreated',
 		strict: true,
 		onLogs: async (logs) => {
 			logger.warn('Request detected', logs[0]);
-			// @ts-ignore
-			const round = Number(logs[0]?.args?.round);
-			// @ts-ignore
+			const round = Number(logs[0].args.round);
 			const bet = logs[0]?.args?.bet as Address;
-
 			if (round !== currentRound) return;
 			const betInfo = await fetchBetInfo(bet, config);
 			animateNewBet(Number(betInfo.side), 0, queryClient, round);
