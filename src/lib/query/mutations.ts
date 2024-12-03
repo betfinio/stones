@@ -1,7 +1,7 @@
 import logger from '@/src/config/logger';
-import { type DistributeParams, type PlaceBetParams, type SpinParams, distribute, fetchRoundBank, placeBet, spin } from '@/src/lib/api';
+import { type DistributeParams, type PlaceBetParams, type SpinParams, distribute, placeBet, spin } from '@/src/lib/api';
 import { toast } from '@betfinio/components/hooks';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { getTransactionLink } from 'betfinio_app/helpers';
 import { useTranslation } from 'react-i18next';
 import type { WriteContractErrorType, WriteContractReturnType } from 'viem';
@@ -11,6 +11,8 @@ import { useConfig } from 'wagmi';
 export const usePlaceBet = () => {
 	const config = useConfig();
 	const { t } = useTranslation('stones', { keyPrefix: 'controls' });
+	const { t: tErrors } = useTranslation('shared', { keyPrefix: 'errors' });
+	const { t: tLocalError } = useTranslation('stones', { keyPrefix: 'errors' });
 	const queryClient = useQueryClient();
 	return useMutation<WriteContractReturnType, WriteContractErrorType, PlaceBetParams>({
 		mutationKey: ['stones', 'placeBet'],
@@ -30,7 +32,25 @@ export const usePlaceBet = () => {
 			logger.success('finished');
 		},
 		onError: (error) => {
-			logger.error(error);
+			const errorData = JSON.parse(JSON.stringify(error.cause));
+			if (errorData.reason) {
+				toast({
+					title: tErrors('default'),
+					description: tErrors(errorData.reason, { defaultValue: tLocalError(errorData.reason) }),
+					variant: 'destructive',
+				});
+			} else if (errorData.signature) {
+				toast({
+					title: tErrors('default'),
+					description: tErrors(errorData.signature, { defaultValue: tLocalError(errorData.signature) }),
+					variant: 'destructive',
+				});
+			} else {
+				toast({
+					title: tErrors('unknown'),
+					variant: 'destructive',
+				});
+			}
 		},
 		onMutate: () => {
 			logger.start('placing bet');

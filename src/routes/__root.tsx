@@ -1,8 +1,9 @@
+import { VersionValidation } from '@/src/components/VersionValidation.tsx';
 import instance from '@/src/i18n';
 import { Toaster } from '@betfinio/components/ui';
 import { createRootRoute } from '@tanstack/react-router';
 import { Root } from 'betfinio_app/root';
-import {VersionValidation} from "@/src/components/VersionValidation.tsx";
+import 'betfinio_app/style';
 
 export const Route = createRootRoute({
 	component: () => (
