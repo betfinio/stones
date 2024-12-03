@@ -103,7 +103,7 @@ const Wheel = () => {
 		if (status > 0 || end < Date.now() / 1000 || actualRound !== currentRound) {
 			setShowWinnerMessage(true);
 			setShowCountdown(false);
-			setSelectedStone(winner);
+			setSelectedStone(winner || 1);
 		} else {
 			setShowCountdown(true);
 			setShowWinnerMessage(false);

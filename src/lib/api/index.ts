@@ -184,7 +184,12 @@ export const placeBet = async (params: PlaceBetParams, options: Options) => {
 		BigInt(params.side),
 		BigInt(params.round),
 	]);
-
+	await simulateContract(options.config, {
+		address: PARTNER,
+		abi: PartnerABI,
+		functionName: 'placeBet',
+		args: [STONES, BigInt(params.amount) * 10n ** 18n, data],
+	});
 	return writeContract(options.config, {
 		address: PARTNER,
 		abi: PartnerABI,
@@ -218,6 +223,12 @@ export interface DistributeParams {
 export const distribute = async (params: DistributeParams, options: Options) => {
 	if (!options.config) throw new Error('Config is required');
 
+	await simulateContract(options.config, {
+		address: STONES,
+		abi: StonesABI,
+		functionName: 'executeResult',
+		args: [BigInt(params.round), 0n, 100n],
+	});
 	return writeContract(options.config, {
 		abi: StonesABI,
 		address: STONES,

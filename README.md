@@ -1,1 +1,1 @@
-# Stones game for betfin.io
+# Stones game for Betfin Platform

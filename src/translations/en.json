@@ -7,6 +7,9 @@
 		"howToPlay": "How to play",
 		"report": "Report"
 	},
+	"errors": {
+		"ST01": "Invalid input data"
+	},
 	"roulette": {
 		"roundIsOver": "Round is Over!",
 		"waitingForSpin": "Waiting for spin, stand by!",
