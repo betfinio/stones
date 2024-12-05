@@ -155,7 +155,7 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 
 				{/* Right Side - Ranking List */}
 				<div className={cx('w-full flex flex-col gap-2', { 'aimate-pulse blur-sm': areBetsLoading })}>
-					<div className={'flex justify-center '}>{t('topBets', { count: winBets.length })}</div>
+					<div className={'flex justify-center '}>{t('topWinners', { count: winBets.length })}</div>
 					<div className="w-full flex flex-col space-y-2">
 						{/* Header */}
 						<div className="flex justify-between text-tertiary-foreground text-[12px] px-4 py-2 capitalize">
