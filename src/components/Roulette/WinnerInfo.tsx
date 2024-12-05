@@ -109,7 +109,6 @@ const WinnerNotDistributed: FC<{ round: number; scale: number }> = ({ round, sca
 
 	const totalWinBank = (bank * 914n) / 1000n;
 	const sideTotalBank = sideBank[winnerSide - 1];
-	console.log(winnerSide);
 	const myWin = (betAmount * totalWinBank) / sideTotalBank;
 
 	if (isFetching || isBetsFetching || isAllBetsFetching) return null;

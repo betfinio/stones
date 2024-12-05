@@ -38,13 +38,9 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 		const filteredBets = bets.filter((bet) => bet.side === winner);
 		const sortedWinBets = filteredBets.sort((a, b) => Number(a.created) - Number(b.created));
 
-		const winnerSideBank = sortedWinBets.reduce((acc, bet) => acc + BigInt(bet.amount), 0n);
-
-		let totalBonusShares = 0n;
 		const bonusSharesPerBet = sortedWinBets.map((bet, index) => {
 			const betAmount = BigInt(bet.amount);
 			const bonusShare = betAmount * BigInt(sortedWinBets.length - index);
-			totalBonusShares += bonusShare;
 			return { bet, bonusShare };
 		});
 
@@ -52,7 +48,7 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 			const betAmount = BigInt(bet.amount);
 			const winnings = (betAmount * winBank) / (winnerSideBank || 1n);
 
-			const bonus = totalBonusShares > 0n ? (bonusShare * bonusBank) / totalBonusShares : 0n;
+			const bonus = winnerSideBonusShares > 0n ? (bonusShare * bonusBank) / winnerSideBonusShares : 0n;
 
 			return {
 				...bet,
@@ -201,7 +197,7 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 					</div>
 				</div>
 			</div>
-			{bonusBank + winBank - distributed > 10n ** 18n && (
+			{bonusBank + winBank - distributed > 0n && (
 				<div className={'border border-destructive/30 rounded-lg px-4 p-4 flex justify-between items-center'}>
 					{t('payoutNotDistributed')}
 					<Button onClick={handleDistribute}>{t('distribute')}</Button>
