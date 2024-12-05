@@ -1,4 +1,4 @@
-import { useRoundBank, useRoundBets, useRoundBetsByPlayer, useRoundStatus, useRoundWinner, useSideBank } from '@/src/lib/query';
+import { useRoundBank, useRoundBets, useRoundBetsByPlayer, useRoundStatus, useRoundWinner, useSideBank, useSideBonusShares } from '@/src/lib/query';
 import { ZeroAddress } from '@betfinio/abi';
 import { BetValue } from '@betfinio/components/shared';
 import { cx } from 'class-variance-authority';
@@ -76,6 +76,7 @@ const WinnerNotDistributed: FC<{ round: number; scale: number }> = ({ round, sca
 	const { data: winnerSide = 1, isFetching } = useRoundWinner(round);
 	const { data: bank = 0n } = useRoundBank(round);
 	const { data: sideBank = [1n, 1n, 1n, 1n, 1n] } = useSideBank(round);
+	const { data: sideBonusShares = [1n, 1n, 1n, 1n, 1n] } = useSideBonusShares(round);
 	const { data: bets = [], isFetching: isBetsFetching } = useRoundBetsByPlayer(round, address);
 	const { data: allBets = [], isFetching: isAllBetsFetching } = useRoundBets(round);
 
@@ -83,14 +84,8 @@ const WinnerNotDistributed: FC<{ round: number; scale: number }> = ({ round, sca
 
 	const sortedWinBets = [...allWinBets].sort((a, b) => Number(a.created) - Number(b.created));
 
-	let totalBonusShares = 0n;
+	const totalBonusShares = sideBonusShares[winnerSide - 1];
 	const totalWinBetsCount = BigInt(sortedWinBets.length);
-
-	sortedWinBets.forEach((bet, index) => {
-		const betAmount = BigInt(bet.amount);
-		const bonusShare = betAmount * (totalWinBetsCount - BigInt(index));
-		totalBonusShares += bonusShare;
-	});
 
 	let playerBonusShare = 0n;
 	sortedWinBets.forEach((bet, index) => {
