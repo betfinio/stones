@@ -1,4 +1,4 @@
-import { useRoundBank, useRoundBetsByPlayer, useRoundStatus, useRoundWinner, useSideBank } from '@/src/lib/query';
+import { useRoundBank, useRoundBets, useRoundBetsByPlayer, useRoundStatus, useRoundWinner, useSideBank, useSideBonusShares } from '@/src/lib/query';
 import { ZeroAddress } from '@betfinio/abi';
 import { BetValue } from '@betfinio/components/shared';
 import { cx } from 'class-variance-authority';
@@ -70,23 +70,44 @@ const WinnerInfo: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 };
 
 const WinnerNotDistributed: FC<{ round: number; scale: number }> = ({ round, scale }) => {
-	// manually calculate win and bonus amount
 	const { t } = useTranslation('stones', { keyPrefix: 'winner' });
 
 	const { address = ZeroAddress } = useAccount();
-	const { data: winnerSide = 0, isFetching } = useRoundWinner(round);
+	const { data: winnerSide = 1, isFetching } = useRoundWinner(round);
 	const { data: bank = 0n } = useRoundBank(round);
 	const { data: sideBank = [1n, 1n, 1n, 1n, 1n] } = useSideBank(round);
+	const { data: sideBonusShares = [1n, 1n, 1n, 1n, 1n] } = useSideBonusShares(round);
 	const { data: bets = [], isFetching: isBetsFetching } = useRoundBetsByPlayer(round, address);
-	// get only winning bets
-	const winBets = bets.filter((bet) => bet.side === winnerSide);
+	const { data: allBets = [], isFetching: isAllBetsFetching } = useRoundBets(round);
 
-	// calculate whole bet amount on win side by player
-	const betAmount = winBets.reduce((acc, bet) => acc + Number(bet.amount), 0);
-	// calculate win amount - fee - bonus
-	const myWin = (betAmount / Number(sideBank[winnerSide - 1])) * (Number(bank) * 0.914);
-	// calculate bonus todo
-	const myBonus = 0n;
+	const allWinBets = allBets.filter((bet) => bet.side === winnerSide);
+
+	const sortedWinBets = [...allWinBets].sort((a, b) => Number(a.created) - Number(b.created));
+
+	const totalBonusShares = sideBonusShares[winnerSide - 1];
+	const totalWinBetsCount = BigInt(sortedWinBets.length);
+
+	let playerBonusShare = 0n;
+	sortedWinBets.forEach((bet, index) => {
+		if (bet.player.toLowerCase() === address.toLowerCase()) {
+			const betAmount = BigInt(bet.amount);
+			const bonusShare = betAmount * (totalWinBetsCount - BigInt(index));
+			playerBonusShare += bonusShare;
+		}
+	});
+
+	const bonusBank = (bank * 5n) / 100n;
+
+	const myBonus = totalBonusShares > 0n ? (playerBonusShare * bonusBank) / totalBonusShares : 0n;
+
+	const betAmount = bets.filter((bet) => bet.side === winnerSide).reduce((acc, bet) => acc + BigInt(bet.amount), 0n);
+
+	const totalWinBank = (bank * 914n) / 1000n;
+	const sideTotalBank = sideBank[winnerSide - 1];
+	const myWin = (betAmount * totalWinBank) / (sideTotalBank || 1n);
+
+	if (isFetching || isBetsFetching || isAllBetsFetching) return null;
+
 	if (myWin > 0) {
 		return (
 			<motion.div
@@ -103,8 +124,6 @@ const WinnerNotDistributed: FC<{ round: number; scale: number }> = ({ round, sca
 			</motion.div>
 		);
 	}
-
-	if (isFetching || isBetsFetching) return null;
 
 	return (
 		<div
