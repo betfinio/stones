@@ -160,7 +160,7 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 						{/* Header */}
 						<div className="flex justify-between text-tertiary-foreground text-[12px] px-4 py-2 capitalize">
 							<div className="w-[20%]">№</div>
-							<div className="w-[30%]">{t('bet')}</div>
+							<div className="w-[30%]">{t('player')}</div>
 							<div className="w-[25%]">{t('win')}</div>
 							<div className="w-[25%] pl-2">{t('bonus')}</div>
 						</div>
