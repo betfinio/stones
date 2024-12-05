@@ -11,6 +11,7 @@ import { UserIcon } from 'lucide-react';
 import type { FC } from 'react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { Address } from 'viem';
 import { useAccount } from 'wagmi';
 import bronzeTrophy from '../../assets/BetHistory/trophy-bronze.svg';
 import goldTrophy from '../../assets/BetHistory/trophy-gold.svg';
@@ -32,23 +33,66 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 	const winnerSideBank = sideBank[winner - 1];
 	const winnerSideBonusShares = sideBonusShares[winner - 1];
 	const { mutate } = useDistribute();
+
 	const winBets: StonesBet[] = useMemo(() => {
-		return bets
-			.filter((bet) => bet.side === winner)
-			.sort((a, b) => Number(b.order) - Number(a.order))
-			.map((bet, index, arr) => {
-				const betAmount = bet.amount;
-				const winnings = (betAmount * winBank) / (winnerSideBank || 1n);
-				const bonusShare = betAmount * BigInt(arr.length - index);
-				const bonus = winnerSideBonusShares > 0n ? (bonusShare * bonusBank) / winnerSideBonusShares : 0n;
-				return {
+		const filteredBets = bets.filter((bet) => bet.side === winner);
+		const sortedWinBets = filteredBets.sort((a, b) => Number(a.created) - Number(b.created));
+
+		const winnerSideBank = sortedWinBets.reduce((acc, bet) => acc + BigInt(bet.amount), 0n);
+
+		let totalBonusShares = 0n;
+		const bonusSharesPerBet = sortedWinBets.map((bet, index) => {
+			const betAmount = BigInt(bet.amount);
+			const bonusShare = betAmount * BigInt(sortedWinBets.length - index);
+			totalBonusShares += bonusShare;
+			return { bet, bonusShare };
+		});
+
+		const betsWithBonuses = bonusSharesPerBet.map(({ bet, bonusShare }, index) => {
+			const betAmount = BigInt(bet.amount);
+			const winnings = (betAmount * winBank) / (winnerSideBank || 1n);
+
+			const bonus = totalBonusShares > 0n ? (bonusShare * bonusBank) / totalBonusShares : 0n;
+
+			return {
+				...bet,
+				bonus,
+				result: winnings,
+			};
+		});
+
+		const aggregatedBetsMap = new Map<Address, StonesBet>();
+
+		for (const bet of betsWithBonuses) {
+			const playerKey = bet.player.toLowerCase() as Address;
+
+			if (!aggregatedBetsMap.has(playerKey)) {
+				aggregatedBetsMap.set(playerKey, {
 					...bet,
-					bonus,
-					result: winnings,
-				};
-			})
-			.slice(0, 3);
-	}, [bets, winnerSideBank, winnerSideBonusShares]);
+					amount: 0n,
+					result: 0n,
+					bonus: 0n,
+				});
+			}
+
+			const existingBet = aggregatedBetsMap.get(playerKey);
+			if (!existingBet) continue;
+
+			existingBet.amount += BigInt(bet.amount);
+			existingBet.result += bet.result;
+			if (existingBet.bonus) {
+				existingBet.bonus += bet.bonus;
+			} else {
+				existingBet.bonus = bet.bonus;
+			}
+		}
+
+		const aggregatedWinBets = Array.from(aggregatedBetsMap.values());
+
+		aggregatedWinBets.sort((a, b) => Number(b.amount) - Number(a.amount));
+
+		return aggregatedWinBets.slice(0, 3);
+	}, [bets, winner, winBank, bonusBank]);
 
 	const trophyImages: string[] = [goldTrophy, silverTrophy, bronzeTrophy];
 
@@ -124,7 +168,7 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 						{/* Rows */}
 						{winBets.map((row, index) => (
 							<div
-								key={index}
+								key={row.player}
 								className={`flex items-center h-10 px-4 rounded-lg relative overflow-hidden ${
 									index === 0
 										? 'bg-gradient-to-r from-primary/50 via-primaryLight to-transparent shadow-[inset_0_0_0_1px_rgba(255,223,0,0.6),inset_0_0_0_1px_rgba(0,0,0,0.4)]'
@@ -142,8 +186,8 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 									{getTrophyImage(index) && <img src={getTrophyImage(index)} alt="trophy" className="h-4 inline-block mr-2" />}
 								</div>
 								<div className="flex items-center w-[30%] space-x-2">
-									<a target={'_blank'} rel={'noreferrer'} href={`${ETHSCAN}/address/${row.address}`} className="text-xs hover:text-bonus">
-										{truncateEthAddress(row.address)}
+									<a target={'_blank'} rel={'noreferrer'} href={`${ETHSCAN}/address/${row.player}`} className="text-xs hover:text-bonus">
+										{truncateEthAddress(row.player)}
 									</a>
 								</div>
 								<div className="flex items-center w-[25%] gap-1 text-secondary-foreground font-semibold text-xs">
