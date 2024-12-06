@@ -11,7 +11,8 @@ import { BetValue } from '@betfinio/components/shared';
 import { Button, Slider } from '@betfinio/components/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
-import { useBalance } from 'betfinio_app/lib/query/token';
+import { useAllowanceModal } from 'betfinio_app/allowance';
+import { useAllowance, useBalance } from 'betfinio_app/lib/query/token';
 import { cx } from 'class-variance-authority';
 import { motion } from 'framer-motion';
 import { LoaderIcon } from 'lucide-react';
@@ -42,8 +43,10 @@ const BetAmount = () => {
 	const { data: selected, setSelectedStone } = useSelectedStone();
 	const { data: round = 0 } = useCurrentRound();
 	const { data: actualRound = 0 } = useActualRound();
-	const { mutate: placeBet, isPending } = usePlaceBet();
+	const { mutate: placeBet, isPending, data, isSuccess } = usePlaceBet();
+	const { requestAllowance, setResult, requested } = useAllowanceModal();
 	const { address } = useAccount();
+	const { data: allowance = 0n } = useAllowance(address);
 	const { data: balance = 0n } = useBalance(address);
 	const { data: sideBank = [0n, 0n, 0n, 0n, 0n] } = useSideBank(round);
 	const { data: bonusShares = [0n, 0n, 0n, 0n, 0n] } = useSideBonusShares(round);
@@ -68,6 +71,17 @@ const BetAmount = () => {
 	}, [bonusShares[selected - 1], bank, selected, amount, stoneBank]);
 
 	useEffect(() => {
+		if (data && isSuccess) {
+			setResult?.(data);
+		}
+	}, [isSuccess, data]);
+	useEffect(() => {
+		if (requested) {
+			handleSpin();
+		}
+	}, [requested]);
+
+	useEffect(() => {
 		logger.info('actualRound', actualRound);
 	}, [actualRound]);
 
@@ -88,6 +102,10 @@ const BetAmount = () => {
 	};
 
 	const handleSpin = () => {
+		if (allowance < BigInt(amount)) {
+			requestAllowance?.('bet', BigInt(amount) * 10n ** 18n);
+			return;
+		}
 		placeBet({ amount: Number(amount), side: selected, round: round });
 	};
 	const isEmpty = bank === 0n;
