@@ -2,7 +2,7 @@ import { ETHSCAN } from '@/src/lib/global.ts';
 import { useDistributedInRound, useRoundBank, useRoundBets, useRoundWinner, useSideBank, useSideBonusShares } from '@/src/lib/query';
 import { useDistribute } from '@/src/lib/query/mutations.ts';
 import type { StonesBet } from '@/src/lib/types.ts';
-import { ZeroAddress, truncateEthAddress } from '@betfinio/abi';
+import { ZeroAddress, truncateEthAddress, valueToNumber } from '@betfinio/abi';
 import { BetValue } from '@betfinio/components/shared';
 import { Button } from '@betfinio/components/ui';
 import { Bet } from '@betfinio/ui';
@@ -197,7 +197,7 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 					</div>
 				</div>
 			</div>
-			{bonusBank + winBank - distributed > 0n && (
+			{valueToNumber(bonusBank) + valueToNumber(winBank) - valueToNumber(distributed) > 0n && (
 				<div className={'border border-destructive/30 rounded-lg px-4 p-4 flex justify-between items-center'}>
 					{t('payoutNotDistributed')}
 					<Button onClick={handleDistribute}>{t('distribute')}</Button>
