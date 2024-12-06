@@ -297,7 +297,7 @@ const OldRound: FC<{ round: number }> = ({ round }) => {
 
 	return (
 		<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-			<div className={'w-full border border-border/50 rounded-lg p-4 flex flex-row items-center justify-between'}>
+			<div className={'w-full border border-border/50 rounded-lg p-2 md:p-3 lg:p-4 flex flex-row items-center text-sm lg:text-base justify-between'}>
 				<div>Round ended {DateTime.fromSeconds(end).toFormat('MM/dd T')}</div>
 				<Button onClick={handleClick}>{t('goToCurrentRound')}</Button>
 			</div>
