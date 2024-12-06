@@ -91,7 +91,7 @@ export const fetchRoundBets = async (round: number, config: Config): Promise<Sto
 	});
 
 	logger.success('bets', betsData.length);
-	const bets = betsData.map((bet) => bet.result as Address);
+	const bets = betsData.map((bet) => bet.result as Address).reverse();
 	return await Promise.all(bets.map((bet) => fetchBetInfo(bet, config)));
 };
 
