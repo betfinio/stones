@@ -1,5 +1,6 @@
 import { ETHSCAN } from '@/src/lib/global.ts';
-import { useDistributedInRound, useRoundBank, useRoundBets, useRoundWinner, useSideBank, useSideBonusShares } from '@/src/lib/query';
+import { useBetsWithPossibleWinAndBonus } from '@/src/lib/gql';
+import { useDistributedInRound, useRoundBank, useRoundBets, useRoundWinner } from '@/src/lib/query';
 import { useDistribute } from '@/src/lib/query/mutations.ts';
 import type { StonesBet } from '@/src/lib/types.ts';
 import { ZeroAddress, truncateEthAddress, valueToNumber } from '@betfinio/abi';
@@ -19,78 +20,38 @@ import silverTrophy from '../../assets/BetHistory/trophy-silver.svg';
 import figureImage from '../../assets/BetRanking/duck-winner.png';
 import crystalImage from '../../assets/Roulette/crystal1.svg';
 
+const trophyImages: string[] = [goldTrophy, silverTrophy, bronzeTrophy];
+
 const BetRanking: FC<{ round: number }> = ({ round }) => {
 	const { t } = useTranslation('stones', { keyPrefix: 'betRanking' });
+	const { address = ZeroAddress } = useAccount();
 	const { data: bank = 0n } = useRoundBank(round);
 	const { data: bets = [], isLoading: areBetsLoading } = useRoundBets(round);
 	const { data: winner = 0 } = useRoundWinner(round);
 	const { data: distributed = 0n } = useDistributedInRound(round);
-	const { data: sideBank = [0n, 0n, 0n, 0n, 0n] } = useSideBank(round);
-	const { data: sideBonusShares = [0n, 0n, 0n, 0n, 0n] } = useSideBonusShares(round);
-	const winBank = (bank * 914n) / 1000n;
-	const bonusBank = (bank * 5n) / 100n;
-	const { address = ZeroAddress } = useAccount();
-	const winnerSideBank = sideBank[winner - 1];
-	const winnerSideBonusShares = sideBonusShares[winner - 1];
 	const { mutate } = useDistribute();
+	const { winBets } = useBetsWithPossibleWinAndBonus(round, winner);
 
-	const winBets: StonesBet[] = useMemo(() => {
-		const filteredBets = bets.filter((bet) => bet.side === winner);
-		const sortedWinBets = filteredBets.sort((a, b) => Number(a.created) - Number(b.created));
-
-		const bonusSharesPerBet = sortedWinBets.map((bet, index) => {
-			const betAmount = BigInt(bet.amount);
-			const bonusShare = betAmount * BigInt(sortedWinBets.length - index);
-			return { bet, bonusShare };
-		});
-
-		const betsWithBonuses = bonusSharesPerBet.map(({ bet, bonusShare }, index) => {
-			const betAmount = BigInt(bet.amount);
-			const winnings = (betAmount * winBank) / (winnerSideBank || 1n);
-
-			const bonus = winnerSideBonusShares > 0n ? (bonusShare * bonusBank) / winnerSideBonusShares : 0n;
-
-			return {
-				...bet,
-				bonus,
-				result: winnings,
-			};
-		});
-
-		const aggregatedBetsMap = new Map<Address, StonesBet>();
-
-		for (const bet of betsWithBonuses) {
+	const topWinners = useMemo(() => {
+		const aggregatedWinBets = winBets.reduce<Record<Address, StonesBet>>((acc, bet) => {
 			const playerKey = bet.player.toLowerCase() as Address;
-
-			if (!aggregatedBetsMap.has(playerKey)) {
-				aggregatedBetsMap.set(playerKey, {
-					...bet,
-					amount: 0n,
-					result: 0n,
-					bonus: 0n,
-				});
+			if (!acc[playerKey]) {
+				acc[playerKey] = { ...bet, amount: 0n, result: 0n, bonus: 0n };
 			}
-
-			const existingBet = aggregatedBetsMap.get(playerKey);
-			if (!existingBet) continue;
+			const existingBet: StonesBet = acc[playerKey];
 
 			existingBet.amount += BigInt(bet.amount);
 			existingBet.result += bet.result;
-			if (existingBet.bonus) {
-				existingBet.bonus += bet.bonus;
-			} else {
-				existingBet.bonus = bet.bonus;
-			}
-		}
+			existingBet.bonus = (existingBet.bonus ?? 0n) + (bet.bonus || 0n);
 
-		const aggregatedWinBets = Array.from(aggregatedBetsMap.values());
+			return acc;
+		}, {});
+		const sortedAggregatedWinBets = Object.values(aggregatedWinBets).sort((a, b) => Number(b.amount) - Number(a.amount));
+		return sortedAggregatedWinBets.slice(0, 3);
+	}, [winBets, round]);
 
-		aggregatedWinBets.sort((a, b) => Number(b.amount) - Number(a.amount));
-
-		return aggregatedWinBets.slice(0, 3);
-	}, [bets, winner, winBank, bonusBank]);
-
-	const trophyImages: string[] = [goldTrophy, silverTrophy, bronzeTrophy];
+	const winBank = (bank * 914n) / 1000n;
+	const bonusBank = (bank * 5n) / 100n;
 
 	const getTrophyImage = (badge: number): string | undefined => {
 		if (trophyImages[badge]) {
@@ -103,9 +64,9 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 		mutate({ round });
 	};
 
-	const userWon = useMemo(() => {
+	const userWinBet = useMemo(() => {
 		return winBets.find((bet) => bet.player === address);
-	}, [winBets]);
+	}, [winBets, address]);
 
 	return (
 		<>
@@ -113,7 +74,7 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 				{/* Left Side */}
 				<div className={cx('flex w-full max-w-[380px] h-full items-center justify-around rounded-xl border-2 border-border')}>
 					<div className="flex flex-col justify-center items-center space-y-2 h-[223px] py-4">
-						{userWon ? (
+						{userWinBet ? (
 							<div className="flex flex-col w-full items-center space-y-2">
 								<img src={crystalImage} alt="Crystal" className="h-15 w-12" />
 								<div className="flex flex-col items-center">
@@ -134,7 +95,7 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 
 						<div className="flex flex-col items-center justify-center">
 							<div className="flex w-full items-center justify-center text-foreground font-semibold ">
-								{userWon ? <span className={'text-2xl uppercase'}>{t('win')}</span> : <span>{t('couldWin')}</span>}
+								{userWinBet ? <span className={'text-2xl uppercase'}>{t('win')}</span> : <span>{t('couldWin')}</span>}
 							</div>
 							<div className="flex items-center w-full text-secondary-foreground font-semibold flex-row gap-1 justify-center">
 								<BetValue value={winBank} />
@@ -162,7 +123,7 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 						</div>
 
 						{/* Rows */}
-						{winBets.map((row, index) => (
+						{topWinners.map((row, index) => (
 							<div
 								key={row.player}
 								className={`flex items-center h-10 px-4 rounded-lg relative overflow-hidden ${

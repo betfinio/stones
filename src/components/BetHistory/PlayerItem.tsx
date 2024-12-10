@@ -32,7 +32,7 @@ const PlayerItem: FC<{ bet: StonesBet; round: number; className?: string }> = ({
 			className={cx('rounded-lg flex bg-background justify-between', className)}
 		>
 			<div className={'py-3 px-2 flex justify-between items-center grow gap-2'}>
-				<div className={'flex items-start gap-[10px]'}>
+				<div className={'flex items-start gap-2.5'}>
 					<Fox className={'w-5 h-5'} />
 					<div className={'flex flex-col text-tertiary-foreground text-xs gap-2'}>
 						<a
