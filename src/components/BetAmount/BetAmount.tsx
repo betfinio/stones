@@ -1,9 +1,9 @@
 import { MobileStoneSelect } from '@/src/components/BetAmount/MobileStoneSelect.tsx';
 import ProbabilitiesChart from '@/src/components/BetAmount/ProbabilitiesChart.tsx';
 import BetRanking from '@/src/components/BetRanking/BetRanking.tsx';
-import logger from '@/src/config/logger';
 import { getRoundTimes } from '@/src/lib/api';
-import { useActualRound, useBetAmount, useCurrentRound, useRoundBank, useRoundStatus, useSideBank, useSideBonusShares } from '@/src/lib/query';
+import { usePotentialWinWithBonus } from '@/src/lib/gql';
+import { useActualRound, useBetAmount, useCurrentRound, useRoundBank, useRoundStatus, useSideBank } from '@/src/lib/query';
 import { usePlaceBet, useSetBetAmount } from '@/src/lib/query/mutations';
 import { useSelectedStone } from '@/src/lib/query/state';
 import { arrayFrom, valueToNumber } from '@betfinio/abi';
@@ -39,36 +39,23 @@ const images: { [key: string]: string } = {
 
 const BetAmount = () => {
 	const { t } = useTranslation('stones', { keyPrefix: 'controls' });
+	const { address } = useAccount();
 	const [betPercentage, setBetPercentage] = useState(0);
 	const { data: selected, setSelectedStone } = useSelectedStone();
 	const { data: round = 0 } = useCurrentRound();
-	const { data: actualRound = 0 } = useActualRound();
-	const { mutate: placeBet, isPending, data, isSuccess } = usePlaceBet();
 	const { requestAllowance, setResult, requested } = useAllowanceModal();
-	const { address } = useAccount();
+	const { mutate: placeBet, isPending, data, isSuccess } = usePlaceBet();
 	const { data: allowance = 0n } = useAllowance(address);
 	const { data: balance = 0n } = useBalance(address);
 	const { data: sideBank = [0n, 0n, 0n, 0n, 0n] } = useSideBank(round);
-	const { data: bonusShares = [0n, 0n, 0n, 0n, 0n] } = useSideBonusShares(round);
 	const { data: bank = 0n } = useRoundBank(round);
 	const { data: amount = 10000 } = useBetAmount();
 	const { mutate: setAmount } = useSetBetAmount();
 	const [_, end] = getRoundTimes(round);
 
+	const { win, bonus } = usePotentialWinWithBonus(amount, selected);
+
 	const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
-
-	const potentialWin = useMemo(() => {
-		return ((Number(amount) + valueToNumber(bank)) * 91_4) / 100_0;
-	}, [amount, bank]);
-
-	const stoneBank = Number(amount) + valueToNumber(sideBank[selected - 1]) || 1;
-	const potentialBonus = useMemo(() => {
-		const stoneShares = valueToNumber(bonusShares[selected - 1]);
-
-		const totalShares = stoneShares + stoneBank;
-		const myShare = Number(amount);
-		return ((((valueToNumber(bank) + Number(amount)) / 100) * 5) / totalShares) * myShare;
-	}, [bonusShares[selected - 1], bank, selected, amount, stoneBank]);
 
 	useEffect(() => {
 		if (data && isSuccess) {
@@ -80,10 +67,6 @@ const BetAmount = () => {
 			handleSpin();
 		}
 	}, [requested]);
-
-	useEffect(() => {
-		logger.info('actualRound', actualRound);
-	}, [actualRound]);
 
 	const handleSliderChange = (values: number[]) => {
 		const value = values[0];
@@ -108,6 +91,7 @@ const BetAmount = () => {
 		}
 		placeBet({ amount: Number(amount), side: selected, round: round });
 	};
+
 	const isEmpty = bank === 0n;
 
 	const pie = useMemo(() => {
@@ -190,7 +174,7 @@ const BetAmount = () => {
 									<LoaderIcon className={'animate-spin'} />
 								) : (
 									<>
-										{t('placeBet')} <BetValue value={Number(potentialWin + potentialBonus)} withIcon iconClassName={'border border-border rounded-full'} />
+										{t('placeBet')} <BetValue value={Number(win + bonus)} withIcon iconClassName={'border border-border rounded-full'} />
 									</>
 								)}
 							</Button>
@@ -272,7 +256,7 @@ const BetAmount = () => {
 								<LoaderIcon className={'animate-spin'} />
 							) : (
 								<>
-									{t('placeBet')} <BetValue value={Number(potentialWin + potentialBonus)} withIcon iconClassName={'border border-border rounded-full'} />
+									{t('placeBet')} <BetValue value={Number(win + bonus)} withIcon iconClassName={'border border-border rounded-full'} />
 								</>
 							)}
 						</Button>
