@@ -3,7 +3,7 @@ import { ZeroAddress } from '@betfinio/abi';
 import { BetValue } from '@betfinio/components/shared';
 import { cx } from 'class-variance-authority';
 import { motion } from 'framer-motion';
-import type { FC } from 'react';
+import { type FC, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
 
@@ -77,38 +77,40 @@ const WinnerNotDistributed: FC<{ round: number; scale: number }> = ({ round, sca
 	const { data: bank = 0n } = useRoundBank(round);
 	const { data: sideBank = [1n, 1n, 1n, 1n, 1n] } = useSideBank(round);
 	const { data: sideBonusShares = [1n, 1n, 1n, 1n, 1n] } = useSideBonusShares(round);
-	const { data: bets = [], isFetching: isBetsFetching } = useRoundBetsByPlayer(round, address);
+	const { data: playerBets = [], isFetching: isBetsFetching } = useRoundBetsByPlayer(round, address);
 	const { data: allBets = [], isFetching: isAllBetsFetching } = useRoundBets(round);
 
-	const allWinBets = allBets.filter((bet) => bet.side === winnerSide);
+	const { win, bonus } = useMemo(() => {
+		const allWinBets = allBets.filter((bet) => bet.side === winnerSide);
+		const sortedWinBets = allWinBets.sort((a, b) => Number(a.created) - Number(b.created));
+		const totalBonusShares = sideBonusShares[winnerSide - 1];
+		const totalWinBetsCount = allWinBets.length;
 
-	const sortedWinBets = [...allWinBets].sort((a, b) => Number(a.created) - Number(b.created));
+		const { bonus: totalBonus, amount: totalAmount } = sortedWinBets.reduce(
+			(acc, bet, index) => {
+				if (bet.player.toLowerCase() === address.toLowerCase()) {
+					const betAmount = BigInt(bet.amount);
+					const bonusShare = betAmount * BigInt(totalWinBetsCount - index);
+					return { bonus: acc.bonus + bonusShare, amount: acc.amount + betAmount };
+				}
+				return acc;
+			},
+			{ bonus: 0n, amount: 0n },
+		);
 
-	const totalBonusShares = sideBonusShares[winnerSide - 1];
-	const totalWinBetsCount = BigInt(sortedWinBets.length);
+		const bonusBank = (bank * 5n) / 100n;
 
-	let playerBonusShare = 0n;
-	sortedWinBets.forEach((bet, index) => {
-		if (bet.player.toLowerCase() === address.toLowerCase()) {
-			const betAmount = BigInt(bet.amount);
-			const bonusShare = betAmount * (totalWinBetsCount - BigInt(index));
-			playerBonusShare += bonusShare;
-		}
-	});
+		const myBonus = totalBonusShares > 0n ? (totalBonus * bonusBank) / totalBonusShares : 0n;
 
-	const bonusBank = (bank * 5n) / 100n;
-
-	const myBonus = totalBonusShares > 0n ? (playerBonusShare * bonusBank) / totalBonusShares : 0n;
-
-	const betAmount = bets.filter((bet) => bet.side === winnerSide).reduce((acc, bet) => acc + BigInt(bet.amount), 0n);
-
-	const totalWinBank = (bank * 914n) / 1000n;
-	const sideTotalBank = sideBank[winnerSide - 1];
-	const myWin = (betAmount * totalWinBank) / (sideTotalBank || 1n);
+		const totalWinBank = (bank * 914n) / 1000n;
+		const sideTotalBank = sideBank[winnerSide - 1];
+		const myWin = sideTotalBank > 0n ? (totalAmount * totalWinBank) / sideTotalBank : 0n;
+		return { win: myWin, bonus: myBonus };
+	}, [round, winnerSide, bank, sideBank, sideBonusShares, playerBets, allBets]);
 
 	if (isFetching || isBetsFetching || isAllBetsFetching) return null;
 
-	if (myWin > 0) {
+	if (win > 0) {
 		return (
 			<motion.div
 				initial={{ scale: 0, y: -7 }}
@@ -117,9 +119,9 @@ const WinnerNotDistributed: FC<{ round: number; scale: number }> = ({ round, sca
 				className={'z-[6] flex flex-col items-center text-sm sm:text-base lg:text-2xl'}
 			>
 				{t('win')}:
-				<BetValue prefix={'Win: '} className={'text-secondary-foreground scale-110'} value={BigInt(myWin)} withIcon />
+				<BetValue prefix={'Win: '} className={'text-secondary-foreground scale-110'} value={BigInt(win)} withIcon />
 				<div className={'!text-bonus scale-[0.9] flex flex-row items-center gap-1'}>
-					+<BetValue prefix={'Bonus: '} iconClassName={'!text-bonus'} value={BigInt(myBonus)} withIcon />
+					+<BetValue prefix={'Bonus: '} iconClassName={'!text-bonus'} value={BigInt(bonus)} withIcon />
 				</div>
 			</motion.div>
 		);

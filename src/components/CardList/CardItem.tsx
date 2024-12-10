@@ -1,7 +1,7 @@
-import { useBetAmount, useCurrentRound, useRoundBank, useSideBank, useSideBonusShares } from '@/src/lib/query';
+import { usePotentialWinWithBonus } from '@/src/lib/gql';
+import { useBetAmount, useCurrentRound, useSideBank } from '@/src/lib/query';
 import { useSelectedStone } from '@/src/lib/query/state.ts';
 import { getStoneImage } from '@/src/lib/utils';
-import { valueToNumber } from '@betfinio/abi';
 import { BetValue } from '@betfinio/components/shared';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@betfinio/components/ui';
 import { cx } from 'class-variance-authority';
@@ -42,28 +42,15 @@ const CardItem: FC<{ stone: number }> = ({ stone }) => {
 	const { t } = useTranslation('stones', { keyPrefix: 'cards' });
 
 	const { data: round = 0 } = useCurrentRound();
-	const { data: selectedStone, setSelectedStone } = useSelectedStone();
+	const { data: selectedStone = 1, setSelectedStone } = useSelectedStone();
 	const { data: sideBank = [0n, 0n, 0n, 0n, 0n] } = useSideBank(round);
-	const { data: bonusShares = [0n, 0n, 0n, 0n, 0n] } = useSideBonusShares(round);
-	const { data: bank = 0n } = useRoundBank(round);
 	const { data: amount = 10000 } = useBetAmount();
 
-	const stoneBank = Number(amount) + valueToNumber(sideBank[stone - 1]) || 1;
-	const myBonus = useMemo(() => {
-		const stoneShares = valueToNumber(bonusShares[stone - 1]);
-
-		const totalShares = stoneShares + stoneBank;
-		const myShare = Number(amount);
-		return ((((valueToNumber(bank) + Number(amount)) / 100) * 5) / totalShares) * myShare;
-	}, [bonusShares[stone - 1], bank, stone, amount, stoneBank]);
-
-	const potentialWin = useMemo(() => {
-		return (((Number(amount) + valueToNumber(bank)) * 91_4) / 100_0 / stoneBank) * amount;
-	}, [amount, bank, stoneBank]);
+	const { win, bonus } = usePotentialWinWithBonus(amount, stone);
 
 	const multiplier = useMemo(() => {
-		return (potentialWin + myBonus) / amount;
-	}, [amount, potentialWin, myBonus]);
+		return (win + bonus) / amount;
+	}, [amount, win, bonus]);
 
 	const handleClick = () => {
 		setSelectedStone(stone);
@@ -87,7 +74,7 @@ const CardItem: FC<{ stone: number }> = ({ stone }) => {
 				<img src={getStoneImage(stone) as string} alt={'stone'} className="h-7 mb-1" />
 				<span className="block text-md font-normal tabular-nums">{displayMultiplier}</span>
 				<div className="text-bonus text-xs font-medium whitespace-nowrap flex flex-row flex-nowrap items-center justify-center">
-					+<BetValue prefix={'Bonus:'} value={myBonus} className={'!text-bonus'} />
+					+<BetValue prefix={'Bonus:'} value={bonus} className={'!text-bonus'} />
 				</div>
 			</div>
 
@@ -129,11 +116,11 @@ const CardItem: FC<{ stone: number }> = ({ stone }) => {
 					</button>
 					<div className="flex w-fit items-center mt-4 h-4 mx-auto mb-2 text-sm gap-1">
 						{t('win')}:
-						<BetValue prefix={'Win:'} value={potentialWin} withIcon />
+						<BetValue prefix={'Win:'} value={win} withIcon />
 					</div>
 					<div className="text-bonus text-xs md:text-sm font-medium whitespace-nowrap flex items-center gap-1">
 						{t('bonus')}:
-						<BetValue prefix={'Bonus:'} value={myBonus} withIcon className={'!text-bonus'} iconClassName={'!text-bonus'} />
+						<BetValue prefix={'Bonus:'} value={bonus} withIcon className={'!text-bonus'} iconClassName={'!text-bonus'} />
 					</div>
 				</div>
 			</div>

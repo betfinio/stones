@@ -96,7 +96,6 @@ export const useDistribute = () => {
 				variant: 'loading',
 				duration: 10000,
 			});
-			console.log('data', data);
 			await waitForTransactionReceipt(config.getClient(), { hash: data });
 			logger.success('transaction accepted');
 			update({ variant: 'default', title: 'Distributed', action: getTransactionLink(data), id });
