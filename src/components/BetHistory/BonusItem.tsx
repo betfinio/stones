@@ -1,5 +1,4 @@
 import { ETHSCAN } from '@/src/lib/global';
-import { useRoundBank } from '@/src/lib/query';
 import type { StonesBetWithBonus } from '@/src/lib/types';
 import { getStoneImage } from '@/src/lib/utils.ts';
 import { truncateEthAddress } from '@betfinio/abi';
@@ -10,8 +9,7 @@ import { motion } from 'framer-motion';
 import type { FC } from 'react';
 import { useAccount } from 'wagmi';
 
-const BonusItem: FC<{ bet: StonesBetWithBonus; round: number; className?: string }> = ({ bet, round, className }) => {
-	const { data: bank = 0n } = useRoundBank(round);
+const BonusItem: FC<{ bet: StonesBetWithBonus; round: number; className?: string }> = ({ bet, className }) => {
 	const { address } = useAccount();
 	const image = getStoneImage(bet.side);
 	const { data: username } = useUsername(bet.player);
@@ -27,7 +25,7 @@ const BonusItem: FC<{ bet: StonesBetWithBonus; round: number; className?: string
 			className={cx('rounded-lg flex bg-background justify-between', className)}
 		>
 			<div className={'py-3 px-2 flex justify-between items-center grow gap-2'}>
-				<div className={'flex items-start gap-[10px]'}>
+				<div className={'flex items-start gap-2.5'}>
 					<img src={image} alt={'stone'} className={'w-5 h-5'} />
 					<div className={'flex flex-col text-tertiary-foreground text-xs gap-2'}>
 						<a
