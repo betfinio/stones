@@ -7,14 +7,15 @@ import { useTranslation } from 'react-i18next';
 import { useMediaQuery } from 'react-responsive';
 import { List } from 'react-virtualized';
 
+const BONUS_PERCENTAGE = 5n;
+const PERCENTAGE_BASE = 100n;
+
 const BonusTab: FC<{ round: number }> = ({ round }) => {
 	const { t } = useTranslation('stones', { keyPrefix: 'history.tabs' });
 	const { data: bets = [] } = useRoundBets(round);
 	const { data: totalRoundBank = 0n } = useRoundBank(round);
-
+	// todo: maybe refactor?
 	const betsWithBonuses = useMemo(() => {
-		const BONUS_PERCENTAGE = 5n;
-		const PERCENTAGE_BASE = 100n;
 		const bonusBank = (totalRoundBank * BONUS_PERCENTAGE) / PERCENTAGE_BASE;
 
 		const betsBySide = bets.reduce((acc: Record<number, StonesBet[]>, bet) => {

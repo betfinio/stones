@@ -25,7 +25,7 @@ const ProbabilitiesChart: FC<{ round: number; pie: any[] }> = ({ round, pie }) =
 			<div
 				className="flex items-center justify-center space-x-2 p-2 rounded-lg text-foreground"
 				style={{
-					border: `2px solid ${datum.data.borderColor}`, // Acessando corretamente o borderColor de datum
+					border: `2px solid ${datum.data.borderColor}`,
 					backgroundColor: 'hsl(var(--popover))',
 				}}
 			>
