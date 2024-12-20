@@ -127,7 +127,7 @@ const BetAmount = () => {
 				borderColor: 'hsl(var(--ruby-border))',
 			},
 		];
-	}, [sideBank, round]);
+	}, [sideBank, round, bank]);
 
 	return (
 		<div className="w-full">
