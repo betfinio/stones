@@ -33,7 +33,6 @@ export default defineConfig({
 				betfinio_app: `betfinio_app@${process.env.PUBLIC_APP_URL}/mf-manifest.json`,
 			},
 			manifest: false,
-			dts: false,
 			shared: {
 				react: {
 					singleton: true,
