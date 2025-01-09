@@ -59,7 +59,7 @@ const AllRoundsTable = () => {
 	];
 
 	const handleClick = (row: { round: number }) => {
-		navigate({ to: '/stones', search: { round: row.round } });
+		navigate({ to: '/games/stones', search: { round: row.round } });
 	};
 
 	return <DataTable columns={columns} data={rounds} onRowClick={handleClick} />;

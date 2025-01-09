@@ -6,13 +6,13 @@ import { usePotentialWinWithBonus } from '@/src/lib/gql';
 import { useActualRound, useBetAmount, useCurrentRound, useRoundBank, useRoundStatus, useSideBank } from '@/src/lib/query';
 import { usePlaceBet, useSetBetAmount } from '@/src/lib/query/mutations';
 import { useSelectedStone } from '@/src/lib/query/state';
-import { arrayFrom, valueToNumber } from '@betfinio/abi';
+import { ZeroAddress, arrayFrom, valueToNumber } from '@betfinio/abi';
 import { BetValue } from '@betfinio/components/shared';
 import { Button, Slider } from '@betfinio/components/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
-import { useAllowanceModal } from 'betfinio_app/allowance';
-import { useAllowance, useBalance } from 'betfinio_app/lib/query/token';
+import { useAllowanceModal } from 'betfinio_context/lib/context';
+import { useAllowance, useBalance } from 'betfinio_context/lib/query';
 import { cx } from 'class-variance-authority';
 import { motion } from 'framer-motion';
 import { LoaderIcon } from 'lucide-react';
@@ -39,7 +39,7 @@ const images: { [key: string]: string } = {
 
 const BetAmount = () => {
 	const { t } = useTranslation('stones', { keyPrefix: 'controls' });
-	const { address } = useAccount();
+	const { address = ZeroAddress } = useAccount();
 	const [betPercentage, setBetPercentage] = useState(0);
 	const { data: selected, setSelectedStone } = useSelectedStone();
 	const { data: round = 0 } = useCurrentRound();
@@ -292,7 +292,7 @@ const OldRound: FC<{ round: number }> = ({ round }) => {
 	const { data: status = 0 } = useRoundStatus(round);
 
 	const handleClick = () => {
-		navigate({ to: '/stones', search: { round: actualRound } });
+		navigate({ to: '/games/stones', search: { round: actualRound } });
 		queryClient.invalidateQueries({ queryKey: ['stones', 'currentRound'] });
 	};
 	const { t } = useTranslation('stones', { keyPrefix: 'oldRound' });

@@ -17,6 +17,7 @@ export default defineConfig({
 	html: {
 		title: 'Betfin Stones',
 		favicon: './src/assets/favicon.svg',
+		template: './src/assets/index.html',
 		meta: {
 			viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
 		},
@@ -30,9 +31,15 @@ export default defineConfig({
 		pluginModuleFederation({
 			name: 'betfin_stones',
 			remotes: {
-				betfinio_app: `betfinio_app@${process.env.PUBLIC_APP_URL}/mf-manifest.json`,
+				betfinio_context: `betfinio_context@${process.env.PUBLIC_CONTEXT_URL}/mf-manifest.json`,
 			},
-			manifest: false,
+			exposes: {
+				'./style': './src/style',
+				'./i18n': './src/i18n',
+				'./route': './src/routes/games/stones/index',
+			},
+			manifest: true,
+			dts: true,
 			shared: {
 				react: {
 					singleton: true,
