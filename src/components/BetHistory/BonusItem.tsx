@@ -3,7 +3,7 @@ import type { StonesBetWithBonus } from '@/src/lib/types';
 import { getStoneImage } from '@/src/lib/utils.ts';
 import { truncateEthAddress } from '@betfinio/abi';
 import { BetValue } from '@betfinio/components/shared';
-import { useCustomUsername, useUsername } from 'betfinio_app/lib/query/username';
+import { useCustomUsername, useUsername } from 'betfinio_context/lib/query';
 import { cx } from 'class-variance-authority';
 import { motion } from 'framer-motion';
 import type { FC } from 'react';
