@@ -22,7 +22,7 @@ export const useCurrentRound = () => {
 	const config = useConfig();
 	return useQuery<number>({
 		queryKey: ['stones', 'currentRound'],
-		queryFn: () => fetchCurrentRound({ config }),
+		queryFn: () => fetchCurrentRound(config),
 	});
 };
 
@@ -47,7 +47,7 @@ export const useRoundBank = (round: number) => {
 	const config = useConfig();
 	return useQuery<bigint>({
 		queryKey: ['stones', 'round', round, 'bank'],
-		queryFn: () => fetchRoundBank(round, { config }),
+		queryFn: () => fetchRoundBank(round, config),
 	});
 };
 
@@ -55,7 +55,7 @@ export const useRoundStatus = (round: number) => {
 	const config = useConfig();
 	return useQuery<number>({
 		queryKey: ['stones', 'round', round, 'status'],
-		queryFn: () => fetchRoundStatus(round, { config }),
+		queryFn: () => fetchRoundStatus(round, config),
 	});
 };
 
@@ -63,7 +63,7 @@ export const useDistributedInRound = (round: number) => {
 	const config = useConfig();
 	return useQuery<bigint>({
 		queryKey: ['stones', 'round', round, 'distributed'],
-		queryFn: () => fetchDistributedInRound(round, { config }),
+		queryFn: () => fetchDistributedInRound(round, config),
 	});
 };
 
@@ -71,21 +71,21 @@ export const useSideBank = (round: number) => {
 	const config = useConfig();
 	return useQuery<bigint[]>({
 		queryKey: ['stones', 'round', round, 'sideBank'],
-		queryFn: () => fetchRoundSideBank(round, { config }),
+		queryFn: () => fetchRoundSideBank(round, config),
 	});
 };
 export const useSideBonusShares = (round: number) => {
 	const config = useConfig();
 	return useQuery<bigint[]>({
 		queryKey: ['stones', 'round', round, 'sideBonusShares'],
-		queryFn: () => fetchRoundSideBonusShares(round, { config }),
+		queryFn: () => fetchRoundSideBonusShares(round, config),
 	});
 };
 export const useSideBetsCount = (round: number) => {
 	const config = useConfig();
 	return useQuery<bigint[]>({
 		queryKey: ['stones', 'round', round, 'sideBetsCount'],
-		queryFn: () => fetchRoundSideBetsCount(round, { config }),
+		queryFn: () => fetchRoundSideBetsCount(round, config),
 	});
 };
 
@@ -107,7 +107,7 @@ export const useStonesInfo = (round: number) => {
 	const config = useConfig();
 	return useQuery<StoneInfo[]>({
 		queryKey: ['stones', 'round', round, 'stones'],
-		queryFn: () => fetchRoundStones(round, { config }),
+		queryFn: () => fetchRoundStones(round, config),
 	});
 };
 

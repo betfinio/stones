@@ -11,10 +11,8 @@ import { StonesABI, ZeroAddress, arrayFrom } from '@betfinio/abi';
 import { BetValue } from '@betfinio/components/shared';
 import { Bet } from '@betfinio/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import { cx } from 'class-variance-authority';
 import { AnimatePresence, motion, useAnimation } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useAccount, useWatchContractEvent } from 'wagmi';
 import arrowdown from '../../assets/Roulette/arrow-down.svg';
 import neonImage from '../../assets/Roulette/neon-glow.png';
@@ -100,11 +98,11 @@ const Wheel = () => {
 	const { data: status = 0 } = useRoundStatus(currentRound);
 	const [_, end] = getRoundTimes(currentRound);
 	useEffect(() => {
-		if (status > 0 || end < Date.now() / 1000 || actualRound !== currentRound) {
+		if (status > 0 || end < Date.now() / 1000) {
 			setShowWinnerMessage(true);
 			setShowCountdown(false);
 			setSelectedStone(winner || 1);
-		} else {
+		} else if (actualRound === currentRound) {
 			setShowCountdown(true);
 			setShowWinnerMessage(false);
 		}
@@ -145,8 +143,8 @@ const Wheel = () => {
 				if (bets.find((bet) => bet.side === side && bet.player === address)) {
 					shootConfetti();
 				}
-				await queryClient.invalidateQueries({ queryKey: ['stones', 'round', round] });
 				setShowWinnerMessage(true);
+				await queryClient.invalidateQueries({ queryKey: ['stones', 'round', round] });
 			});
 		},
 	});
@@ -219,8 +217,6 @@ const Wheel = () => {
 			window.removeEventListener('resize', updateContainerSize);
 		};
 	}, []);
-
-	const { t } = useTranslation('stones', { keyPrefix: 'roulette' });
 
 	return (
 		<div
@@ -362,25 +358,6 @@ const Wheel = () => {
 						/>
 					</motion.div>
 					{showWinnerMessage && <WinnerInfo round={currentRound} scale={scale} />}
-					<div
-						key={'round-over'}
-						className={cx('flex flex-col')}
-						style={{
-							fontSize: `${17 * scale * 2}px`,
-							lineHeight: `${17 * scale * 2}px`,
-						}}
-					>
-						<span>{t('roundIsOver')}</span>
-						<span
-							style={{
-								fontSize: `${10 * scale * 2}px`,
-								lineHeight: `${14 * scale * 2}px`,
-							}}
-							className={'font-light text-tertiary-foreground'}
-						>
-							{t('waitingForSpin')}
-						</span>
-					</div>
 				</AnimatePresence>
 			</div>
 		</div>

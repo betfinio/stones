@@ -4,13 +4,12 @@ import type { StoneInfo, StonesBet } from '@/src/lib/types';
 import { PartnerABI, StonesABI, StonesBetABI, arrayFrom } from '@betfinio/abi';
 import type { QueryClient } from '@tanstack/react-query';
 import { type Config, multicall, readContract, simulateContract, writeContract } from '@wagmi/core';
-import type { Options } from 'betfinio_app/lib/types';
 import { type Address, encodeAbiParameters, parseAbiParameters } from 'viem';
 
-export const fetchCurrentRound = async (options: Options): Promise<number> => {
-	if (!options.config) throw new Error('Config is required');
+export const fetchCurrentRound = async (config: Config): Promise<number> => {
+	if (!config) throw new Error('Config is required');
 	return Number(
-		await readContract(options.config, {
+		await readContract(config, {
 			abi: StonesABI,
 			address: STONES,
 			functionName: 'getCurrentRound',
@@ -18,19 +17,19 @@ export const fetchCurrentRound = async (options: Options): Promise<number> => {
 		}),
 	);
 };
-export const fetchRoundBank = async (round: number, options: Options): Promise<bigint> => {
-	if (!options.config) throw new Error('Config is required');
-	return (await readContract(options.config, {
+export const fetchRoundBank = async (round: number, config: Config): Promise<bigint> => {
+	if (!config) throw new Error('Config is required');
+	return (await readContract(config, {
 		abi: StonesABI,
 		address: STONES,
 		functionName: 'roundBankBySide',
 		args: [BigInt(round), BigInt(0)],
 	})) as bigint;
 };
-export const fetchRoundSideBank = async (round: number, options: Options): Promise<bigint[]> => {
-	if (!options.config) throw new Error('Config is required');
+export const fetchRoundSideBank = async (round: number, config: Config): Promise<bigint[]> => {
+	if (!config) throw new Error('Config is required');
 	logger.start('fetching round side bank', round);
-	const data = await multicall(options.config, {
+	const data = await multicall(config, {
 		contracts: arrayFrom(5).map((_, i) => ({
 			address: STONES,
 			abi: StonesABI,
@@ -42,10 +41,10 @@ export const fetchRoundSideBank = async (round: number, options: Options): Promi
 	return data.map((item) => item.result as bigint);
 };
 
-export const fetchRoundSideBonusShares = async (round: number, options: Options): Promise<bigint[]> => {
-	if (!options.config) throw new Error('Config is required');
+export const fetchRoundSideBonusShares = async (round: number, config: Config): Promise<bigint[]> => {
+	if (!config) throw new Error('Config is required');
 	logger.start('fetching round side bonus shares', round);
-	const data = await multicall(options.config, {
+	const data = await multicall(config, {
 		contracts: arrayFrom(5).map((_, i) => ({
 			address: STONES,
 			abi: StonesABI,
@@ -56,10 +55,10 @@ export const fetchRoundSideBonusShares = async (round: number, options: Options)
 	logger.success('side bonus shares', data.length);
 	return data.map((item) => item.result as bigint);
 };
-export const fetchRoundSideBetsCount = async (round: number, options: Options): Promise<bigint[]> => {
-	if (!options.config) throw new Error('Config is required');
+export const fetchRoundSideBetsCount = async (round: number, config: Config): Promise<bigint[]> => {
+	if (!config) throw new Error('Config is required');
 	logger.start('fetching round side bank', round);
-	const data = await multicall(options.config, {
+	const data = await multicall(config, {
 		contracts: arrayFrom(5).map((_, i) => ({
 			address: STONES,
 			abi: StonesABI,
@@ -119,10 +118,10 @@ export const fetchBetInfo = async (bet: Address, config: Config): Promise<Stones
 	} as StonesBet;
 };
 
-export const fetchRoundStatus = async (round: number, options: Options): Promise<number> => {
-	if (!options.config) throw new Error('Config is required');
+export const fetchRoundStatus = async (round: number, config: Config): Promise<number> => {
+	if (!config) throw new Error('Config is required');
 	return Number(
-		await readContract(options.config, {
+		await readContract(config, {
 			abi: StonesABI,
 			address: STONES,
 			functionName: 'roundStatus',
@@ -130,9 +129,9 @@ export const fetchRoundStatus = async (round: number, options: Options): Promise
 		}),
 	);
 };
-export const fetchDistributedInRound = async (round: number, options: Options): Promise<bigint> => {
-	if (!options.config) throw new Error('Config is required');
-	return (await readContract(options.config, {
+export const fetchDistributedInRound = async (round: number, config: Config): Promise<bigint> => {
+	if (!config) throw new Error('Config is required');
+	return (await readContract(config, {
 		abi: StonesABI,
 		address: STONES,
 		functionName: 'distributedInRound',
@@ -140,10 +139,10 @@ export const fetchDistributedInRound = async (round: number, options: Options): 
 	})) as bigint;
 };
 
-export const fetchRoundStones = async (round: number, options: Options): Promise<StoneInfo[]> => {
+export const fetchRoundStones = async (round: number, config: Config): Promise<StoneInfo[]> => {
 	if (round === 0) return [];
 	// biome-ignore lint/style/noNonNullAssertion: <explanation>
-	const probabilities = await multicall(options.config!, {
+	const probabilities = await multicall(config!, {
 		contracts: arrayFrom(6).map((_, i) => ({
 			abi: StonesABI,
 			address: STONES,
@@ -152,7 +151,7 @@ export const fetchRoundStones = async (round: number, options: Options): Promise
 		})),
 	});
 	// biome-ignore lint/style/noNonNullAssertion: <explanation>
-	const banks = await multicall(options.config!, {
+	const banks = await multicall(config!, {
 		contracts: arrayFrom(6).map((_, i) => ({
 			abi: StonesABI,
 			address: STONES,
@@ -177,20 +176,20 @@ export interface PlaceBetParams {
 	side: number; // 1-5,
 	round: number;
 }
-export const placeBet = async (params: PlaceBetParams, options: Options) => {
-	if (!options.config) throw new Error('Config is required');
+export const placeBet = async (params: PlaceBetParams, config: Config) => {
+	if (!config) throw new Error('Config is required');
 	const data = encodeAbiParameters(parseAbiParameters('uint256 amount, uint256 side, uint256 round'), [
 		BigInt(params.amount),
 		BigInt(params.side),
 		BigInt(params.round),
 	]);
-	await simulateContract(options.config, {
+	await simulateContract(config, {
 		address: PARTNER,
 		abi: PartnerABI,
 		functionName: 'placeBet',
 		args: [STONES, BigInt(params.amount) * 10n ** 18n, data],
 	});
-	return writeContract(options.config, {
+	return writeContract(config, {
 		address: PARTNER,
 		abi: PartnerABI,
 		functionName: 'placeBet',
@@ -201,15 +200,15 @@ export interface SpinParams {
 	round: number;
 }
 
-export const spin = async (params: SpinParams, options: Options) => {
-	if (!options.config) throw new Error('Config is required');
-	await simulateContract(options.config, {
+export const spin = async (params: SpinParams, config: Config) => {
+	if (!config) throw new Error('Config is required');
+	await simulateContract(config, {
 		address: STONES,
 		abi: StonesABI,
 		functionName: 'roll',
 		args: [BigInt(params.round)],
 	});
-	return writeContract(options.config, {
+	return writeContract(config, {
 		address: STONES,
 		abi: StonesABI,
 		functionName: 'roll',
@@ -220,16 +219,16 @@ export interface DistributeParams {
 	round: number;
 }
 
-export const distribute = async (params: DistributeParams, options: Options) => {
-	if (!options.config) throw new Error('Config is required');
+export const distribute = async (params: DistributeParams, config: Config) => {
+	if (!config) throw new Error('Config is required');
 
-	await simulateContract(options.config, {
+	await simulateContract(config, {
 		address: STONES,
 		abi: StonesABI,
 		functionName: 'executeResult',
 		args: [BigInt(params.round), 0n, 100n],
 	});
-	return writeContract(options.config, {
+	return writeContract(config, {
 		abi: StonesABI,
 		address: STONES,
 		functionName: 'executeResult',
