@@ -1,18 +1,11 @@
+import preset from '@betfinio/components/tailwind-config';
+import animate from 'tailwindcss-animate';
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-	presets: [require('@betfinio/components/tailwind-config')],
+	presets: [preset],
 	darkMode: ['class'],
 	important: '.stones',
 	content: ['./src/**/*.{ts,tsx}'],
-	prefix: '',
-	theme: {
-		container: {
-			center: true,
-			padding: '2rem',
-			screens: {
-				'2xl': '1400px',
-			},
-		},
-	},
-	plugins: [require('tailwindcss-animate')],
+	plugins: [animate],
 };

@@ -2,11 +2,11 @@ import type { i18n } from 'i18next';
 import * as i18 from 'i18next';
 import ICU from 'i18next-icu';
 import { initReactI18next } from 'react-i18next';
-import czJSON from './translations/cz.json';
+import csJSON from './translations/cs.json';
 import enJSON from './translations/en.json';
 import ruJSON from './translations/ru.json';
 
-import { sharedLang } from 'betfinio_app/locales/index';
+import { sharedLang } from 'betfinio_context/translations';
 import I18nextBrowserLanguageDetector from 'i18next-browser-languagedetector';
 
 export const resources = {
@@ -15,8 +15,8 @@ export const resources = {
 		shared: sharedLang.en,
 	},
 	cs: {
-		stones: czJSON,
-		shared: sharedLang.cz,
+		stones: csJSON,
+		shared: sharedLang.cs,
 	},
 	ru: {
 		stones: ruJSON,
