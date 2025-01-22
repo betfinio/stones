@@ -100,7 +100,7 @@ export const populateStonesBet = (data: PlayerBetsQuery): StonesBet[] => {
 				player: bet.player,
 				order: Number(bet.order),
 				game: STONES,
-				round: Number(bet.round),
+				round: Number(bet.round.round),
 				amount: BigInt(bet.amount),
 				address: bet.bet,
 				created: bet.blockTimestamp,
