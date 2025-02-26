@@ -66,7 +66,7 @@
 		"bonus": "bonus",
 		"distribute": "Distribute",
 		"payoutNotDistributed": "Payout was not distributed",
-		"topWinners": "Top {count, plural, =1 {# winner} other {# winners}}"
+		"topWinners": "Top winners"
 	},
 	"table": {
 		"tabs": {
