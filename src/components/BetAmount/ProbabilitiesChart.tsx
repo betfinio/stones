@@ -46,7 +46,7 @@ const ProbabilitiesChart: FC<{ round: number; pie: any[] }> = ({ round, pie }) =
 			exit={{ opacity: 1 }}
 			className="flex flex-col justify-center items-center bg-card rounded-lg h-[110px]"
 		>
-			<div className="flex flex-row h-[110px] items-center justify-center py-3">
+			<div className="flex flex-row h-[130px] items-center justify-center py-3">
 				{/* Crystal List */}
 				<div className="flex flex-col justify-between h-full ml-5">
 					{pie.map((item, index) => (

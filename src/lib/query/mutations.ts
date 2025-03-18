@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { getTransactionLink } from 'betfinio_context/lib/helpers';
 import { useTranslation } from 'react-i18next';
 import type { WriteContractErrorType, WriteContractReturnType } from 'viem';
-import { waitForTransactionReceipt } from 'viem/actions';
+import { getTransaction, waitForTransactionReceipt } from 'viem/actions';
 import { useConfig } from 'wagmi';
 
 export const usePlaceBet = () => {
@@ -25,7 +25,17 @@ export const usePlaceBet = () => {
 				variant: 'loading',
 				duration: 10000,
 			});
-			await waitForTransactionReceipt(config.getClient(), { hash: data });
+			const result = await waitForTransactionReceipt(config.getClient(), { hash: data });
+			if (result.status === 'reverted') {
+				update({
+					title: tErrors('default'),
+					description: tErrors('unknown'),
+					variant: 'destructive',
+					id,
+				});
+				logger.error('transaction reverted', data);
+				return;
+			}
 			logger.success('transaction accepted');
 			update({ variant: 'default', description: t('success.message'), title: t('success.title'), action: getTransactionLink(data), id });
 			queryClient.invalidateQueries({ queryKey: ['stones'] });
