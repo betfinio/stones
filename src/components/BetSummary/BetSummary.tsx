@@ -1,7 +1,7 @@
 import { useCurrentRound, useRoundBank, useRoundBets } from '@/src/lib/query';
 import { ZeroAddress } from '@betfinio/abi';
+import { Bet, MoneyHand } from '@betfinio/components/icons';
 import { BetValue } from '@betfinio/components/shared';
-import { Bet, MoneyHand } from '@betfinio/ui';
 import { UserIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';

@@ -14,6 +14,7 @@ const columnHelper = createColumnHelper<{ round: number }>();
 
 const AllRoundsTable = () => {
 	const { data: rounds = [] } = useRounds();
+	const { t: tShared } = useTranslation('shared', { keyPrefix: 'tables' });
 	const { t } = useTranslation('stones', { keyPrefix: 'table.columns' });
 	const navigate = useNavigate();
 
@@ -62,7 +63,7 @@ const AllRoundsTable = () => {
 		navigate({ to: '/games/stones', search: { round: row.round } });
 	};
 
-	return <DataTable columns={columns} data={rounds} onRowClick={handleClick} />;
+	return <DataTable columns={columns} data={rounds} onRowClick={handleClick} t={tShared} />;
 };
 
 export default AllRoundsTable;

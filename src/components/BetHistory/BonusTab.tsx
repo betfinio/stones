@@ -55,7 +55,7 @@ const BonusTab: FC<{ round: number }> = ({ round }) => {
 		}
 
 		return betsWithCalculatedBonuses;
-	}, [bets, totalRoundBank]);
+	}, [bets.length, totalRoundBank]);
 
 	const renderRow = ({ index, style }: { index: number; style: CSSProperties }) => {
 		const player = betsWithBonuses[index];

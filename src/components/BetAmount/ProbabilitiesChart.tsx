@@ -5,7 +5,7 @@ import crystal4 from '@/src/assets/Roulette/crystal4.svg';
 import crystal5 from '@/src/assets/Roulette/crystal5.svg';
 import { useRoundBank } from '@/src/lib/query';
 import { ResponsivePie } from '@nivo/pie';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import type { FC } from 'react';
 
 const images: { [key: string]: string } = {
