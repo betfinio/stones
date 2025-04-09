@@ -10,7 +10,7 @@ import { animateNewBet, fetchBetInfo } from '@/src/lib/api';
 import { STONES } from '@/src/lib/global.ts';
 import { useCurrentRound } from '@/src/lib/query';
 import { StonesABI } from '@betfinio/abi';
-import { Toaster, TooltipProvider } from '@betfinio/components/ui';
+import { SonnerToaster, TooltipProvider } from '@betfinio/components/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { AnimatePresence } from 'framer-motion';
@@ -83,7 +83,7 @@ export function StonesPage() {
 					</AnimatePresence>
 				</div>
 			</div>
-			<Toaster />
+			<SonnerToaster />
 			<VersionValidation repository={'stones'} branch={import.meta.env.PUBLIC_BRANCH} current={import.meta.env.PUBLIC_DEPLOYED} />
 		</TooltipProvider>
 	);

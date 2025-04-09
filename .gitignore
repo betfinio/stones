@@ -20,3 +20,4 @@ bun.lockb
 .npmrc
 
 .graphclient/
+.husky/

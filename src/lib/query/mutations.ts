@@ -1,6 +1,6 @@
 import logger from '@/src/config/logger';
 import { type DistributeParams, type PlaceBetParams, type SpinParams, distribute, placeBet, spin } from '@/src/lib/api';
-import { toast } from '@betfinio/components/hooks';
+import { toast } from '@betfinio/components/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { getTransactionLink } from 'betfinio_context/lib/helpers';
 import { useTranslation } from 'react-i18next';
@@ -19,47 +19,32 @@ export const usePlaceBet = () => {
 		mutationFn: (params) => placeBet(params, config),
 		onSuccess: async (data) => {
 			logger.success('transaction submitted');
-			const { update, id } = toast({
-				title: t('pending.title'),
-				description: t('pending.message'),
-				variant: 'loading',
-				duration: 10000,
+
+			const promise = async () => {
+				await waitForTransactionReceipt(config.getClient(), { hash: data });
+			};
+
+			toast.promise(promise, {
+				loading: t('pending.title'),
+				success: t('success.title'),
+				error: tErrors('default'),
+				action: getTransactionLink(data),
 			});
-			const result = await waitForTransactionReceipt(config.getClient(), { hash: data });
-			if (result.status === 'reverted') {
-				update({
-					title: tErrors('default'),
-					description: tErrors('unknown'),
-					variant: 'destructive',
-					id,
-				});
-				logger.error('transaction reverted', data);
-				return;
-			}
-			logger.success('transaction accepted');
-			update({ variant: 'default', description: t('success.message'), title: t('success.title'), action: getTransactionLink(data), id });
+
 			queryClient.invalidateQueries({ queryKey: ['stones'] });
-			logger.success('finished');
 		},
 		onError: (error) => {
 			const errorData = JSON.parse(JSON.stringify(error.cause));
 			if (errorData.reason) {
-				toast({
-					title: tErrors('default'),
+				toast.error(tErrors('default'), {
 					description: tErrors(errorData.reason, { defaultValue: tLocalError(errorData.reason) }),
-					variant: 'destructive',
 				});
 			} else if (errorData.signature) {
-				toast({
-					title: tErrors('default'),
+				toast.error(tErrors('default'), {
 					description: tErrors(errorData.signature, { defaultValue: tLocalError(errorData.signature) }),
-					variant: 'destructive',
 				});
 			} else {
-				toast({
-					title: tErrors('unknown'),
-					variant: 'destructive',
-				});
+				toast.error(tErrors('unknown'));
 			}
 		},
 		onMutate: () => {
@@ -75,14 +60,17 @@ export const useSpin = () => {
 		mutationFn: (params) => spin(params, config),
 		onSuccess: async (data) => {
 			logger.success('transaction submitted');
-			const { update, id } = toast({
-				title: 'Spinning',
-				variant: 'loading',
-				duration: 10000,
+
+			const promise = async () => {
+				await waitForTransactionReceipt(config.getClient(), { hash: data });
+			};
+
+			toast.promise(promise, {
+				loading: 'Spinning',
+				success: 'Requested',
+				action: getTransactionLink(data),
 			});
-			await waitForTransactionReceipt(config.getClient(), { hash: data });
-			logger.success('transaction accepted');
-			update({ variant: 'default', title: 'Requested', action: getTransactionLink(data), id });
+
 			logger.success('finished');
 		},
 		onError: (error) => {
@@ -101,17 +89,20 @@ export const useDistribute = () => {
 		mutationFn: (params) => distribute(params, config),
 		onSuccess: async (data) => {
 			logger.success('transaction submitted');
-			const { update, id } = toast({
-				title: 'Distributing',
-				variant: 'loading',
-				duration: 10000,
+
+			const promise = async () => {
+				await waitForTransactionReceipt(config.getClient(), { hash: data });
+			};
+
+			toast.promise(promise, {
+				loading: 'Distributing',
+				success: 'Distributed',
+				action: getTransactionLink(data),
 			});
-			await waitForTransactionReceipt(config.getClient(), { hash: data });
-			logger.success('transaction accepted');
-			update({ variant: 'default', title: 'Distributed', action: getTransactionLink(data), id });
 			logger.success('finished');
 		},
 		onError: (error) => {
+			toast.error('Distribution failed');
 			logger.error(error);
 		},
 		onMutate: () => {
