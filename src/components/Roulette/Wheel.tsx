@@ -230,7 +230,7 @@ const Wheel = () => {
 			}}
 		>
 			<EffectsLayer round={currentRound} />
-			<div className={'relative w-full mx-auto aspect-square z-3'}>
+			<div className={'relative w-full mx-auto aspect-square z-[3]'}>
 				<motion.div
 					key="wheel"
 					className="relative mx-auto -translate-y-full cursor-pointer"

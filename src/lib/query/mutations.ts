@@ -34,6 +34,7 @@ export const usePlaceBet = () => {
 			queryClient.invalidateQueries({ queryKey: ['stones'] });
 		},
 		onError: (error) => {
+			//@ts-ignore
 			const errorData = JSON.parse(JSON.stringify(error.cause));
 			if (errorData.reason) {
 				toast.error(tErrors('default'), {
