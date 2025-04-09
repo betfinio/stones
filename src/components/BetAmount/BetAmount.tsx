@@ -197,7 +197,7 @@ const BetAmount = () => {
 								>
 									<img src={images[`crystal${crystal + 1}`]} alt={`crystal-${index}`} className="h-[15px] z-20" />
 									{index === 0 && (
-										<div className="absolute top-[2px] w-[20px] h-[20px] rounded-full bg-bonus opacity-70 blur-sm z-10 hover:scale-110 transition-all ease-linear" />
+										<div className="absolute top-[2px] w-[20px] h-[20px] rounded-full bg-bonus opacity-70 blur-xs z-10 hover:scale-110 transition-all ease-linear" />
 									)}
 								</div>
 							))}

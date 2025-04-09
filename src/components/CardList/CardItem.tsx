@@ -74,12 +74,12 @@ const CardItem: FC<{ stone: number }> = ({ stone }) => {
 				<img src={getStoneImage(stone) as string} alt={'stone'} className="h-7 mb-1" />
 				<span className="block text-md font-normal tabular-nums">{displayMultiplier}</span>
 				<div className="text-bonus text-xs font-medium whitespace-nowrap flex flex-row flex-nowrap items-center justify-center">
-					+<BetValue prefix={'Bonus:'} value={bonus} className={'!text-bonus'} />
+					+<BetValue prefix={'Bonus:'} value={bonus} className={'text-bonus!'} />
 				</div>
 			</div>
 
 			<div
-				className="hidden md:block group relative flex-shrink-0 text-foreground transition-all duration-300 w-36 transform mx-auto overflow-visible cursor-pointer"
+				className="hidden md:block group relative shrink-0 text-foreground transition-all duration-300 w-36 transform mx-auto overflow-visible cursor-pointer"
 				onClick={handleClick}
 			>
 				<Tooltip>
@@ -101,7 +101,7 @@ const CardItem: FC<{ stone: number }> = ({ stone }) => {
 				<div
 					className={cx(
 						'relative z-10 mt-8 flex flex-col border border-transparent items-center text-center bg-card rounded-xl p-4 pt-16 w-36 duration-300',
-						selectedStone === stone && '!border-primary',
+						selectedStone === stone && 'border-primary!',
 					)}
 				>
 					<span className="block text-md font-normal tabular-nums">{displayMultiplier}</span>
@@ -109,7 +109,7 @@ const CardItem: FC<{ stone: number }> = ({ stone }) => {
 						type="button"
 						className={cx(
 							'border-2 border-border text-foreground text-sm capitalize px-1 py-2 rounded-lg mt-2 transition-all duration-300 ease-out hover:bg-primary hover:text-primary-foreground w-full',
-							selectedStone === stone && '!bg-primary !text-primary-foreground',
+							selectedStone === stone && 'bg-primary! text-primary-foreground!',
 						)}
 					>
 						{selectedStone === stone ? t('selected') : t('select')}
@@ -120,7 +120,7 @@ const CardItem: FC<{ stone: number }> = ({ stone }) => {
 					</div>
 					<div className="text-bonus text-xs md:text-sm font-medium whitespace-nowrap flex items-center gap-1">
 						{t('bonus')}:
-						<BetValue prefix={'Bonus:'} value={bonus} withIcon className={'!text-bonus'} iconClassName={'!text-bonus'} />
+						<BetValue prefix={'Bonus:'} value={bonus} withIcon className={'text-bonus!'} iconClassName={'text-bonus!'} />
 					</div>
 				</div>
 			</div>

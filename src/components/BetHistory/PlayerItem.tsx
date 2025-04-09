@@ -40,7 +40,7 @@ const PlayerItem: FC<{ bet: StonesBet; round: number; className?: string }> = ({
 							target={'_blank'}
 							className={cx(
 								'font-semibold text-sm text-tertiary-foreground hover:underline',
-								bet.player.toLowerCase() === address?.toLowerCase() && '!text-secondary-foreground',
+								bet.player.toLowerCase() === address?.toLowerCase() && 'text-secondary-foreground!',
 							)}
 							rel="noreferrer"
 						>
