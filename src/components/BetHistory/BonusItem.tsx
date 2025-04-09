@@ -5,7 +5,7 @@ import { truncateEthAddress } from '@betfinio/abi';
 import { BetValue } from '@betfinio/components/shared';
 import { useCustomUsername, useUsername } from 'betfinio_context/lib/query';
 import { cx } from 'class-variance-authority';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import type { FC } from 'react';
 import { useAccount } from 'wagmi';
 

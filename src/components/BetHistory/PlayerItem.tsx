@@ -6,7 +6,7 @@ import { Fox } from '@betfinio/components/icons';
 import { BetValue } from '@betfinio/components/shared';
 import { useCustomUsername, useUsername } from 'betfinio_context/lib/query';
 import { cx } from 'class-variance-authority';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
