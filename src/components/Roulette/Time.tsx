@@ -1,6 +1,6 @@
 import { getRoundTimes } from '@/src/lib/api';
 import { cx } from 'class-variance-authority';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { type FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

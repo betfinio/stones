@@ -10,10 +10,10 @@ import { animateNewBet, fetchBetInfo } from '@/src/lib/api';
 import { STONES } from '@/src/lib/global.ts';
 import { useCurrentRound } from '@/src/lib/query';
 import { StonesABI } from '@betfinio/abi';
-import { Toaster, TooltipProvider } from '@betfinio/components/ui';
+import { SonnerToaster, TooltipProvider } from '@betfinio/components/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'motion/react';
 import { useEffect } from 'react';
 import type { Address } from 'viem';
 import { useConfig, useWatchContractEvent } from 'wagmi';
@@ -59,7 +59,7 @@ export function StonesPage() {
 	return (
 		<TooltipProvider>
 			<div className={'w-full h-full stones'}>
-				<div className="w-full p-2 md:p-3 lg:p-4 rounded-md text-foreground h-full 2xl:pr-0 overflow-hidden grid grid-cols-12 gap-2">
+				<div className="w-full p-2 md:py-3 lg:py-4 rounded-md text-foreground h-full 2xl:px-0 overflow-hidden grid grid-cols-12 gap-2">
 					<div className={'col-span-12 lg:col-span-8'}>
 						<Roulette />
 					</div>
@@ -83,7 +83,7 @@ export function StonesPage() {
 					</AnimatePresence>
 				</div>
 			</div>
-			<Toaster />
+			<SonnerToaster />
 			<VersionValidation repository={'stones'} branch={import.meta.env.PUBLIC_BRANCH} current={import.meta.env.PUBLIC_DEPLOYED} />
 		</TooltipProvider>
 	);

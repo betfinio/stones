@@ -4,9 +4,9 @@ import { useDistributedInRound, useRoundBank, useRoundBets, useRoundWinner } fro
 import { useDistribute } from '@/src/lib/query/mutations.ts';
 import type { StonesBet } from '@/src/lib/types.ts';
 import { ZeroAddress, truncateEthAddress, valueToNumber } from '@betfinio/abi';
+import { Bet } from '@betfinio/components/icons';
 import { BetValue } from '@betfinio/components/shared';
 import { Button } from '@betfinio/components/ui';
-import { Bet } from '@betfinio/ui';
 import { cx } from 'class-variance-authority';
 import { UserIcon } from 'lucide-react';
 import type { FC } from 'react';
@@ -102,7 +102,7 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 								<Bet className={'text-secondary-foreground w-4 h-4'} />
 							</div>
 							<div className="text-bonus flex items-center justify-center text-xs mt-1 font-semibold gap-1">
-								<BetValue prefix={'Bonus: '} value={bonusBank} withIcon iconClassName={'!text-bonus !w-3 !h-3'} />
+								<BetValue prefix={'Bonus: '} value={bonusBank} withIcon iconClassName={'text-bonus! w-3! h-3!'} />
 								<span className={'uppercase'}>{t('bonus')}</span>
 							</div>
 						</div>
@@ -111,8 +111,8 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 				</div>
 
 				{/* Right Side - Ranking List */}
-				<div className={cx('w-full flex flex-col gap-2', { 'aimate-pulse blur-sm': areBetsLoading })}>
-					<div className={'flex justify-center '}>{t('topWinners', { count: winBets.length })}</div>
+				<div className={cx('w-full flex flex-col gap-2', { 'aimate-pulse blur-xs': areBetsLoading })}>
+					<div className={'flex justify-center '}>{t('topWinners')}</div>
 					<div className="w-full flex flex-col space-y-2">
 						{/* Header */}
 						<div className="flex justify-between text-tertiary-foreground text-[12px] px-4 py-2 capitalize">
@@ -128,11 +128,11 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 								key={row.player}
 								className={`flex items-center h-10 px-4 rounded-lg relative overflow-hidden ${
 									index === 0
-										? 'bg-gradient-to-r from-primary/50 via-primaryLight to-transparent shadow-[inset_0_0_0_1px_rgba(255,223,0,0.6),inset_0_0_0_1px_rgba(0,0,0,0.4)]'
+										? 'bg-linear-to-r from-primary/50 via-primaryLight to-transparent shadow-[inset_0_0_0_1px_rgba(255,223,0,0.6),inset_0_0_0_1px_rgba(0,0,0,0.4)]'
 										: index === 1
-											? 'bg-gradient-to-r from-tertiary-foreground/20 via-primaryLight to-transparent shadow-[inset_0_0_0_1px_rgba(192,192,192,0.6),inset_0_0_0_1px_rgba(0,0,0,0.4)]'
+											? 'bg-linear-to-r from-tertiary-foreground/20 via-primaryLight to-transparent shadow-[inset_0_0_0_1px_rgba(192,192,192,0.6),inset_0_0_0_1px_rgba(0,0,0,0.4)]'
 											: index === 2
-												? 'bg-gradient-to-r from-orange-600/50 via-primaryLight to-transparent shadow-[inset_0_0_0_1px_rgba(205,127,50,0.6),inset_0_0_0_1px_rgba(0,0,0,0.4)]'
+												? 'bg-linear-to-r from-orange-600/50 via-primaryLight to-transparent shadow-[inset_0_0_0_1px_rgba(205,127,50,0.6),inset_0_0_0_1px_rgba(0,0,0,0.4)]'
 												: index % 2 === 0
 													? 'bg-card'
 													: 'bg-transparent'
