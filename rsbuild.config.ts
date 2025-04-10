@@ -38,6 +38,7 @@ export default defineConfig({
 				'./i18n': './src/i18n',
 				'./route': './src/routes/games/stones/index',
 			},
+			shareStrategy: 'loaded-first',
 			manifest: true,
 			dts: true,
 			shared: {

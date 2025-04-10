@@ -10,7 +10,7 @@ const BetHistory = () => {
 	const { data: round = 0 } = useCurrentRound();
 	return (
 		<div className="w-full min-h-[300px] lg:h-[650px] p-2 md:p-3 border border-border rounded-lg bg-card">
-			<Tabs defaultValue={'bets'} className={'md:max-w-[350px]'}>
+			<Tabs defaultValue={'bets'} className={''}>
 				<TabsList className={'w-full bg-transparent justify-between gap-2 grid grid-cols-3'}>
 					<TabsTrigger value={'bets'}>{t('bets')}</TabsTrigger>
 					<TabsTrigger value={'players'}>{t('players')}</TabsTrigger>

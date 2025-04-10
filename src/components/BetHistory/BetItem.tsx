@@ -6,7 +6,7 @@ import { truncateEthAddress } from '@betfinio/abi';
 import { BetValue } from '@betfinio/components/shared';
 import { useCustomUsername, useUsername } from 'betfinio_context/lib/query';
 import { cx } from 'class-variance-authority';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import type { FC } from 'react';
 import { useAccount } from 'wagmi';
 
@@ -36,7 +36,7 @@ const BetItem: FC<{ bet: StonesBet; round: number; className?: string }> = ({ be
 							target={'_blank'}
 							className={cx(
 								'font-semibold text-sm text-tertiary-foreground hover:underline',
-								bet.player.toLowerCase() === address?.toLowerCase() && '!text-secondary-foreground',
+								bet.player.toLowerCase() === address?.toLowerCase() && 'text-secondary-foreground!',
 							)}
 							rel="noreferrer"
 						>

@@ -12,7 +12,7 @@ const PlayersTab: FC<{ round: number }> = ({ round }) => {
 	const { data: bets = [] } = useRoundBets(round);
 	const players = useMemo(() => {
 		return mapBetsToAuthors([...bets]).sort((a, b) => Number(b.amount - a.amount));
-	}, [bets]);
+	}, [bets.length]);
 
 	const renderRow = ({ index, style }: { index: number; style: CSSProperties }) => {
 		const player = players[index];

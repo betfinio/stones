@@ -14,9 +14,9 @@ import { useNavigate } from '@tanstack/react-router';
 import { useAllowanceModal } from 'betfinio_context/lib/context';
 import { useAllowance, useBalance } from 'betfinio_context/lib/query';
 import { cx } from 'class-variance-authority';
-import { motion } from 'framer-motion';
 import { LoaderIcon } from 'lucide-react';
 import { DateTime } from 'luxon';
+import { motion } from 'motion/react';
 import { type FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
@@ -197,7 +197,7 @@ const BetAmount = () => {
 								>
 									<img src={images[`crystal${crystal + 1}`]} alt={`crystal-${index}`} className="h-[15px] z-20" />
 									{index === 0 && (
-										<div className="absolute top-[2px] w-[20px] h-[20px] rounded-full bg-bonus opacity-70 blur-sm z-10 hover:scale-110 transition-all ease-linear" />
+										<div className="absolute top-[2px] w-[20px] h-[20px] rounded-full bg-bonus opacity-70 blur-xs z-10 hover:scale-110 transition-all ease-linear" />
 									)}
 								</div>
 							))}
@@ -211,7 +211,7 @@ const BetAmount = () => {
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0 }}
-					className="flex flex-col md:flex-row justify-center items-center md:items-end space-y-4 md:space-y-0 md:space-x-6 w-full"
+					className="flex flex-col md:flex-row justify-center items-center md:items-center space-y-4 md:space-y-0 md:space-x-6 w-full"
 				>
 					<ProbabilitiesChart round={round} pie={pie} />
 

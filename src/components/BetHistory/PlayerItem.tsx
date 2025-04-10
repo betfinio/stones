@@ -2,11 +2,11 @@ import { ETHSCAN } from '@/src/lib/global';
 import { useRoundBank, useRoundBets } from '@/src/lib/query';
 import type { StonesBet } from '@/src/lib/types';
 import { truncateEthAddress } from '@betfinio/abi';
+import { Fox } from '@betfinio/components/icons';
 import { BetValue } from '@betfinio/components/shared';
-import { Fox } from '@betfinio/ui';
 import { useCustomUsername, useUsername } from 'betfinio_context/lib/query';
 import { cx } from 'class-variance-authority';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
@@ -40,7 +40,7 @@ const PlayerItem: FC<{ bet: StonesBet; round: number; className?: string }> = ({
 							target={'_blank'}
 							className={cx(
 								'font-semibold text-sm text-tertiary-foreground hover:underline',
-								bet.player.toLowerCase() === address?.toLowerCase() && '!text-secondary-foreground',
+								bet.player.toLowerCase() === address?.toLowerCase() && 'text-secondary-foreground!',
 							)}
 							rel="noreferrer"
 						>

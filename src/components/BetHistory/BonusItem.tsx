@@ -5,7 +5,7 @@ import { truncateEthAddress } from '@betfinio/abi';
 import { BetValue } from '@betfinio/components/shared';
 import { useCustomUsername, useUsername } from 'betfinio_context/lib/query';
 import { cx } from 'class-variance-authority';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import type { FC } from 'react';
 import { useAccount } from 'wagmi';
 
@@ -33,7 +33,7 @@ const BonusItem: FC<{ bet: StonesBetWithBonus; round: number; className?: string
 							target={'_blank'}
 							className={cx(
 								'font-semibold text-sm text-tertiary-foreground hover:underline',
-								bet.player.toLowerCase() === address?.toLowerCase() && '!text-secondary-foreground',
+								bet.player.toLowerCase() === address?.toLowerCase() && 'text-secondary-foreground!',
 							)}
 							rel="noreferrer"
 						>
@@ -45,7 +45,7 @@ const BonusItem: FC<{ bet: StonesBetWithBonus; round: number; className?: string
 					</div>
 				</div>
 				<div className={'flex flex-col items-end text-xs gap-2 text-bonus'}>
-					<BetValue precision={2} value={bet.potentialBonus} iconClassName={'!text-bonus'} withIcon />
+					<BetValue precision={2} value={bet.potentialBonus} iconClassName={'text-bonus!'} withIcon />
 				</div>
 			</div>
 		</motion.div>
