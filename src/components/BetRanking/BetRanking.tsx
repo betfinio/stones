@@ -3,10 +3,11 @@ import { useBetsWithPossibleWinAndBonus } from '@/src/lib/gql';
 import { useDistributedInRound, useRoundBank, useRoundBets, useRoundWinner } from '@/src/lib/query';
 import { useDistribute } from '@/src/lib/query/mutations.ts';
 import type { StonesBet } from '@/src/lib/types.ts';
-import { ZeroAddress, truncateEthAddress, valueToNumber } from '@betfinio/abi';
+import { ZeroAddress, valueToNumber } from '@betfinio/abi';
 import { Bet } from '@betfinio/components/icons';
 import { BetValue } from '@betfinio/components/shared';
 import { Button } from '@betfinio/components/ui';
+import { useUsername } from 'betfinio_context/lib/query';
 import { cx } from 'class-variance-authority';
 import { UserIcon } from 'lucide-react';
 import type { FC } from 'react';
@@ -52,13 +53,6 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 
 	const winBank = (bank * 914n) / 1000n;
 	const bonusBank = (bank * 5n) / 100n;
-
-	const getTrophyImage = (badge: number): string | undefined => {
-		if (trophyImages[badge]) {
-			return trophyImages[badge];
-		}
-		return undefined;
-	};
 
 	const handleDistribute = () => {
 		mutate({ round });
@@ -124,36 +118,7 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 
 						{/* Rows */}
 						{topWinners.map((row, index) => (
-							<div
-								key={row.player}
-								className={`flex items-center h-10 px-4 rounded-lg relative overflow-hidden ${
-									index === 0
-										? 'bg-linear-to-r from-primary/50 via-primaryLight to-transparent shadow-[inset_0_0_0_1px_rgba(255,223,0,0.6),inset_0_0_0_1px_rgba(0,0,0,0.4)]'
-										: index === 1
-											? 'bg-linear-to-r from-tertiary-foreground/20 via-primaryLight to-transparent shadow-[inset_0_0_0_1px_rgba(192,192,192,0.6),inset_0_0_0_1px_rgba(0,0,0,0.4)]'
-											: index === 2
-												? 'bg-linear-to-r from-orange-600/50 via-primaryLight to-transparent shadow-[inset_0_0_0_1px_rgba(205,127,50,0.6),inset_0_0_0_1px_rgba(0,0,0,0.4)]'
-												: index % 2 === 0
-													? 'bg-card'
-													: 'bg-transparent'
-								} transition-all duration-300`}
-							>
-								<div className="flex items-center w-[20%]">
-									<span className="mr-2 text-xs">#{index + 1}</span>
-									{getTrophyImage(index) && <img src={getTrophyImage(index)} alt="trophy" className="h-4 inline-block mr-2" />}
-								</div>
-								<div className="flex items-center w-[30%] space-x-2">
-									<a target={'_blank'} rel={'noreferrer'} href={`${ETHSCAN}/address/${row.player}`} className="text-xs hover:text-bonus">
-										{truncateEthAddress(row.player)}
-									</a>
-								</div>
-								<div className="flex items-center w-[25%] gap-1 text-secondary-foreground font-semibold text-xs">
-									<BetValue value={row.result || 0n} withIcon={true} iconClassName={'w-3 h-3'} />
-								</div>
-								<div className="flex items-center w-[25%] gap-1 text-bonus font-semibold text-xs pl-2">
-									<BetValue value={row.bonus || 0n} withIcon={true} iconClassName={'w-3 h-3'} />
-								</div>
-							</div>
+							<WinnerRow key={row.player} bet={row} index={index} />
 						))}
 					</div>
 				</div>
@@ -169,3 +134,47 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 };
 
 export default BetRanking;
+
+const WinnerRow: FC<{ bet: StonesBet; index: number }> = ({ bet, index }) => {
+	const { address } = useAccount();
+	const { data: username } = useUsername(bet.player, address);
+
+	const getTrophyImage = (badge: number): string | undefined => {
+		if (trophyImages[badge]) {
+			return trophyImages[badge];
+		}
+		return undefined;
+	};
+	return (
+		<div
+			key={bet.player}
+			className={`flex items-center h-10 px-4 rounded-lg relative overflow-hidden ${
+				index === 0
+					? 'bg-linear-to-r from-primary/50 via-primaryLight to-transparent shadow-[inset_0_0_0_1px_rgba(255,223,0,0.6),inset_0_0_0_1px_rgba(0,0,0,0.4)]'
+					: index === 1
+						? 'bg-linear-to-r from-tertiary-foreground/20 via-primaryLight to-transparent shadow-[inset_0_0_0_1px_rgba(192,192,192,0.6),inset_0_0_0_1px_rgba(0,0,0,0.4)]'
+						: index === 2
+							? 'bg-linear-to-r from-orange-600/50 via-primaryLight to-transparent shadow-[inset_0_0_0_1px_rgba(205,127,50,0.6),inset_0_0_0_1px_rgba(0,0,0,0.4)]'
+							: index % 2 === 0
+								? 'bg-card'
+								: 'bg-transparent'
+			} transition-all duration-300`}
+		>
+			<div className="flex items-center w-[20%]">
+				<span className="mr-2 text-xs">#{index + 1}</span>
+				{getTrophyImage(index) && <img src={getTrophyImage(index)} alt="trophy" className="h-4 inline-block mr-2" />}
+			</div>
+			<div className="flex items-center w-[30%] space-x-2">
+				<a target={'_blank'} rel={'noreferrer'} href={`${ETHSCAN}/address/${bet.player}`} className="text-xs hover:text-bonus">
+					{username}
+				</a>
+			</div>
+			<div className="flex items-center w-[25%] gap-1 text-secondary-foreground font-semibold text-xs">
+				<BetValue value={bet.result || 0n} withIcon={true} iconClassName={'w-3 h-3'} />
+			</div>
+			<div className="flex items-center w-[25%] gap-1 text-bonus font-semibold text-xs pl-2">
+				<BetValue value={bet.bonus || 0n} withIcon={true} iconClassName={'w-3 h-3'} />
+			</div>
+		</div>
+	);
+};
