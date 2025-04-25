@@ -1,0 +1,29 @@
+name: Inlang Workflow
+
+on:
+  push:
+    branches:
+      - inlang
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: 20
+
+jobs:
+  inlang-pr:
+    name: Create Inlang PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Create PR to dev
+        env:
+          GH_TOKEN: ${{ github.token }}
+        continue-on-error: true
+        run: |
+          gh pr create -B dev -H inlang \
+            --title 'Update locales' \
+            --body 'Created by Github Action'
