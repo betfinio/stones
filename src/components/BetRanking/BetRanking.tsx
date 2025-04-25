@@ -84,7 +84,7 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 								</div>
 							</div>
 						) : (
-							<div className={'grow flex items-center'}>{t('roundOver')}</div>
+							<div className={'flex items-center'}>{t('roundOver')}</div>
 						)}
 
 						<div className="flex flex-col items-center justify-center">

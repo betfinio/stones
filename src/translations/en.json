@@ -21,7 +21,9 @@
 		"roundIsOver": "Round is Over",
 		"waitingForSpin": "Waiting for spin, stand by",
 		"lose": "You didn't win",
-		"win": "You win"
+		"win": "You win",
+		"couldWin": "You could win",
+		"bonus": "Bonus"
 	},
 	"controls": {
 		"betAmount": "Bet amount",
