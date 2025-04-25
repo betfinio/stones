@@ -3,7 +3,7 @@ import { useActualRound, useCurrentRound } from '@/src/lib/query';
 import { arrayFrom } from '@betfinio/abi';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@betfinio/components/ui';
 import { cx } from 'class-variance-authority';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { FaArrowLeftLong, FaArrowRightLong } from 'react-icons/fa6';
 import { useMediaQuery } from 'react-responsive';
 

@@ -20,6 +20,7 @@ const MyBetsTable = () => {
 	const { address = ZeroAddress } = useAccount();
 	const { data: rounds = [] } = usePlayerBets(address);
 	const { t } = useTranslation('stones', { keyPrefix: 'table.columns' });
+	const { t: tShared } = useTranslation('shared', { keyPrefix: 'tables' });
 	const navigate = useNavigate();
 
 	const columns: ColumnDef<StonesBet, never>[] = [
@@ -70,7 +71,7 @@ const MyBetsTable = () => {
 		navigate({ to: '/games/stones', search: { round: row.round } });
 	};
 
-	return <DataTable columns={columns} data={rounds} onRowClick={handleClick} />;
+	return <DataTable columns={columns} data={rounds} onRowClick={handleClick} t={tShared} />;
 };
 
 export default MyBetsTable;

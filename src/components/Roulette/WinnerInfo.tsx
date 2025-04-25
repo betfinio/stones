@@ -2,7 +2,7 @@ import { useRoundBank, useRoundBets, useRoundBetsByPlayer, useRoundStatus, useRo
 import { ZeroAddress } from '@betfinio/abi';
 import { BetValue } from '@betfinio/components/shared';
 import { cx } from 'class-variance-authority';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { type FC, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
@@ -116,12 +116,12 @@ const WinnerNotDistributed: FC<{ round: number; scale: number }> = ({ round, sca
 				initial={{ scale: 0, y: -7 }}
 				animate={{ scale: 1 }}
 				exit={{ scale: 0 }}
-				className={'z-[6] flex flex-col items-center text-sm sm:text-base lg:text-2xl'}
+				className={'z-6 flex flex-col items-center text-sm sm:text-base lg:text-2xl'}
 			>
 				{t('win')}:
 				<BetValue prefix={'Win: '} className={'text-secondary-foreground scale-110'} value={BigInt(win)} withIcon />
-				<div className={'!text-bonus scale-[0.9] flex flex-row items-center gap-1'}>
-					+<BetValue prefix={'Bonus: '} iconClassName={'!text-bonus'} value={BigInt(bonus)} withIcon />
+				<div className={'text-bonus! scale-[0.9] flex flex-row items-center gap-1'}>
+					+<BetValue prefix={'Bonus: '} iconClassName={'text-bonus!'} value={BigInt(bonus)} withIcon />
 				</div>
 			</motion.div>
 		);
@@ -129,7 +129,7 @@ const WinnerNotDistributed: FC<{ round: number; scale: number }> = ({ round, sca
 
 	return (
 		<div
-			className={'z-[6]'}
+			className={'z-6'}
 			style={{
 				fontSize: `${36 * scale}px`,
 			}}

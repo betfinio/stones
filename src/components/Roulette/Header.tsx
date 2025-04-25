@@ -39,7 +39,7 @@ const Header = () => {
 			</div>
 			<div className="flex items-center space-x-6">
 				<a
-					href={'https://betfin.gitbook.io/betfin-public/games-guide/stones'}
+					href={'https://betfin.gitbook.io/betfin-public/games-manual/games-guide/stones'}
 					target={'_blank'}
 					rel="noreferrer"
 					className="flex flex-col items-center cursor-pointer hover:text-secondary-foreground"

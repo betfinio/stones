@@ -8,10 +8,10 @@ import { useActualRound, useCurrentRound, useRoundBank, useRoundBets, useRoundSt
 import { useSelectedStone } from '@/src/lib/query/state.ts';
 import { shootConfetti } from '@/src/lib/utils.ts';
 import { StonesABI, ZeroAddress, arrayFrom } from '@betfinio/abi';
+import { Bet } from '@betfinio/components/icons';
 import { BetValue } from '@betfinio/components/shared';
-import { Bet } from '@betfinio/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import { AnimatePresence, motion, useAnimation } from 'framer-motion';
+import { AnimatePresence, motion, useAnimation } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { useAccount, useWatchContractEvent } from 'wagmi';
 import arrowdown from '../../assets/Roulette/arrow-down.svg';
