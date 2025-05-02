@@ -1,10 +1,9 @@
 import { ETHSCAN } from '@/src/lib/global';
 import { useRoundBank, useRoundBets } from '@/src/lib/query';
 import type { StonesBet } from '@/src/lib/types';
-import { truncateEthAddress } from '@betfinio/abi';
 import { Fox } from '@betfinio/components/icons';
 import { BetValue } from '@betfinio/components/shared';
-import { useCustomUsername, useUsername } from 'betfinio_context/lib/query';
+import { useUsername } from 'betfinio_context/lib/query';
 import { cx } from 'class-variance-authority';
 import { motion } from 'motion/react';
 import type { FC } from 'react';
@@ -19,8 +18,7 @@ const PlayerItem: FC<{ bet: StonesBet; round: number; className?: string }> = ({
 	const { data: bets = [] } = useRoundBets(round);
 	const { address } = useAccount();
 	const betsNumber = bets.filter((b) => b.player === bet.player).length;
-	const { data: username } = useUsername(bet.player);
-	const { data: customUsername } = useCustomUsername(address, bet.player);
+	const { data: username } = useUsername(bet.player, address);
 	return (
 		<motion.div
 			key={bet.player}
@@ -44,7 +42,7 @@ const PlayerItem: FC<{ bet: StonesBet; round: number; className?: string }> = ({
 							)}
 							rel="noreferrer"
 						>
-							{customUsername || username || truncateEthAddress(bet.player)}
+							{username}
 						</a>
 						<span className={cx('opacity-0', betsNumber > 0 && 'opacity-100')}>{t('betCount', { count: betsNumber })}</span>
 					</div>
