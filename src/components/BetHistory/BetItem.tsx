@@ -4,7 +4,7 @@ import type { StonesBet } from '@/src/lib/types';
 import { getStoneImage } from '@/src/lib/utils';
 import { truncateEthAddress } from '@betfinio/abi';
 import { BetValue } from '@betfinio/components/shared';
-import { useCustomUsername, useUsername } from 'betfinio_context/lib/query';
+import { useUsername } from 'betfinio_context/lib/query';
 import { cx } from 'class-variance-authority';
 import { motion } from 'motion/react';
 import type { FC } from 'react';
@@ -15,8 +15,7 @@ const BetItem: FC<{ bet: StonesBet; round: number; className?: string }> = ({ be
 	const share = Number(bet.amount * 100n) / Number(bank);
 	const { address } = useAccount();
 	const image = getStoneImage(bet.side);
-	const { data: username } = useUsername(bet.player);
-	const { data: customUsername } = useCustomUsername(address, bet.player);
+	const { data: username } = useUsername(bet.player, address);
 	return (
 		<motion.div
 			key={bet.address}
@@ -40,7 +39,7 @@ const BetItem: FC<{ bet: StonesBet; round: number; className?: string }> = ({ be
 							)}
 							rel="noreferrer"
 						>
-							{customUsername || username || truncateEthAddress(bet.player)}
+							{username}
 						</a>
 						<a href={`${ETHSCAN}/address/${bet.address}`} target={'_blank'} rel={'noreferrer'}>
 							{truncateEthAddress(bet.address)}

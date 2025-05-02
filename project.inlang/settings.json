@@ -1,0 +1,10 @@
+{
+	"$schema": "https://inlang.com/schema/project-settings",
+	"modules": ["https://cdn.jsdelivr.net/npm/@inlang/plugin-json@latest/dist/index.js"],
+	"plugin.inlang.json": {
+		"pathPattern": "./src/translations/{languageTag}.json",
+		"variableReferencePattern": ["{", "}"]
+	},
+	"sourceLanguageTag": "en",
+	"languageTags": ["en", "cs", "es", "ru"]
+}

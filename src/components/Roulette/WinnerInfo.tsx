@@ -8,11 +8,14 @@ import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
 
 const WinnerInfo: FC<{ round: number; scale: number }> = ({ round, scale }) => {
-	const { data: status } = useRoundStatus(round);
+	const { data: status, isLoading: isStatusLoading } = useRoundStatus(round);
 
 	const { t } = useTranslation('stones', { keyPrefix: 'winner' });
 
 	const getContent = () => {
+		if (isStatusLoading) {
+			return null;
+		}
 		if (status === 2) {
 			// winner selected, but not distributed
 			return <WinnerNotDistributed scale={scale} round={round} />;
@@ -75,6 +78,8 @@ const WinnerNotDistributed: FC<{ round: number; scale: number }> = ({ round, sca
 	const { address = ZeroAddress } = useAccount();
 	const { data: winnerSide = 1, isFetching } = useRoundWinner(round);
 	const { data: bank = 0n } = useRoundBank(round);
+	const winBank = (bank * 914n) / 1000n;
+	const bonusBank = (bank * 5n) / 100n;
 	const { data: sideBank = [1n, 1n, 1n, 1n, 1n] } = useSideBank(round);
 	const { data: sideBonusShares = [1n, 1n, 1n, 1n, 1n] } = useSideBonusShares(round);
 	const { data: playerBets = [], isFetching: isBetsFetching } = useRoundBetsByPlayer(round, address);
@@ -134,7 +139,23 @@ const WinnerNotDistributed: FC<{ round: number; scale: number }> = ({ round, sca
 				fontSize: `${36 * scale}px`,
 			}}
 		>
-			{t('lose')}
+			<span>{t('roundIsOver')}!</span>
+
+			<div
+				style={{
+					fontSize: `${10 * scale * 2}px`,
+					lineHeight: `${14 * scale * 2}px`,
+				}}
+				className={'font-light text-tertiary-foreground flex flex-row justify-center items-center gap-1'}
+			>
+				{t('couldWin')}:
+				<BetValue className={'text-secondary-foreground '} value={BigInt(winBank)} withIcon />
+			</div>
+
+			<div className="text-bonus flex items-center justify-center text-xs mt-1 font-semibold gap-1">
+				<BetValue prefix={'Bonus: '} value={bonusBank} withIcon iconClassName={'text-bonus! w-3! h-3!'} />
+				<span className={'uppercase'}>{t('bonus')}</span>
+			</div>
 		</div>
 	);
 };

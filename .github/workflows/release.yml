@@ -1,0 +1,26 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - dev
+
+jobs:
+  release-pr:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Create PRs to prod branches
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for branch in io games gg; do
+            echo "Creating PR for prod/$branch"
+            gh pr create -B prod/$branch -H dev \
+              --title "Release to prod/$branch" \
+              --body 'Created by Github Action' || \
+              echo "PR for prod/$branch already exists or couldn't be created, continuing..."
+          done
