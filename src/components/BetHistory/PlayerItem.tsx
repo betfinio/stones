@@ -1,10 +1,12 @@
 import { ETHSCAN } from '@/src/lib/global';
 import { useRoundBank, useRoundBets } from '@/src/lib/query';
 import type { StonesBet } from '@/src/lib/types';
+import { cn } from '@betfinio/components';
 import { Fox } from '@betfinio/components/icons';
 import { BetValue } from '@betfinio/components/shared';
 import { useUsername } from 'betfinio_context/lib/query';
 import { cx } from 'class-variance-authority';
+import { ArrowRightFromLineIcon, MoveRightIcon } from 'lucide-react';
 import { motion } from 'motion/react';
 import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -49,9 +51,33 @@ const PlayerItem: FC<{ bet: StonesBet; round: number; className?: string }> = ({
 				</div>
 				<div className={'flex flex-col items-end text-xs gap-2'}>
 					<span className={'font-semibold text-sm'}>{share.toFixed(2)}%</span>
-					<span>
-						<BetValue precision={2} value={bet.amount} withIcon />
-					</span>
+					<div className={'flex gap-2 items-center'}>
+						<span>
+							<BetValue iconClassName={'size-3'} precision={2} value={bet.amount} withIcon className="w-2" />
+						</span>
+						<MoveRightIcon
+							className={cn('size-3', {
+								hidden: bet.status !== 2n,
+							})}
+						/>
+
+						<span
+							className={cn({
+								hidden: bet.status !== 2n,
+							})}
+						>
+							<BetValue
+								iconClassName={'size-3'}
+								precision={2}
+								value={bet.result}
+								withIcon
+								className={cn({
+									'text-destructive': bet.result === 0n,
+									'text-success': bet.result > 0n,
+								})}
+							/>
+						</span>
+					</div>
 				</div>
 			</div>
 		</motion.div>

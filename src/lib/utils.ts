@@ -50,11 +50,12 @@ export const mapBetsToAuthors = (bets: StonesBet[]): StonesAuthor[] => {
 	return [...bets].reduce((acc: StonesAuthor[], val) => {
 		const author = acc.findIndex((bet) => bet.player === val.player);
 		if (author === -1) {
-			acc.push({ ...val, betsNumber: 1 });
+			acc.push({ ...val, betsNumber: 1, result: val.result ?? 0n });
 			return acc;
 		}
 		acc[author].amount += val.amount;
 		acc[author].betsNumber += 1;
+		acc[author].result += val.result ?? 0n;
 		return acc;
 	}, []);
 };

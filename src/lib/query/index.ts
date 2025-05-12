@@ -97,9 +97,10 @@ export const useRoundBets = (round: number) => {
 	});
 };
 export const useRoundBetsByPlayer = (round: number, player: Address) => {
+	const config = useConfig();
 	return useQuery<StonesBet[]>({
 		queryKey: ['stones', 'round', round, 'bets', player],
-		queryFn: () => fetchRoundBetsByPlayer(round, player),
+		queryFn: () => fetchRoundBetsByPlayer(round, player, config),
 	});
 };
 
@@ -112,9 +113,10 @@ export const useStonesInfo = (round: number) => {
 };
 
 export const usePlayerBets = (player: Address) => {
+	const config = useConfig();
 	return useQuery<StonesBet[]>({
 		queryKey: ['stones', 'player', player, 'bets'],
-		queryFn: () => fetchBetsByPlayer(player),
+		queryFn: () => fetchBetsByPlayer(player, config),
 	});
 };
 
