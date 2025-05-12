@@ -10,9 +10,10 @@ import { List } from 'react-virtualized';
 const PlayersTab: FC<{ round: number }> = ({ round }) => {
 	const { t } = useTranslation('stones', { keyPrefix: 'history.tabs' });
 	const { data: bets = [] } = useRoundBets(round);
+
 	const players = useMemo(() => {
 		return mapBetsToAuthors([...bets]).sort((a, b) => Number(b.amount - a.amount));
-	}, [bets.length]);
+	}, [bets]);
 	const renderRow = ({ index, style }: { index: number; style: CSSProperties }) => {
 		const player = players[index];
 		return (

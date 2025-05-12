@@ -14,7 +14,6 @@ import { useAccount } from 'wagmi';
 
 const PlayerItem: FC<{ bet: StonesBet; round: number; className?: string }> = ({ bet, round, className }) => {
 	const { t } = useTranslation('stones', { keyPrefix: 'history' });
-
 	const { data: bank = 0n } = useRoundBank(round);
 	const share = Number(bet.amount * 100n) / Number(bank);
 	const { data: bets = [] } = useRoundBets(round);
@@ -57,13 +56,13 @@ const PlayerItem: FC<{ bet: StonesBet; round: number; className?: string }> = ({
 						</span>
 						<MoveRightIcon
 							className={cn('size-3', {
-								hidden: bet.status !== 2n,
+								hidden: [0n, 1n].includes(bet.status),
 							})}
 						/>
 
 						<span
 							className={cn({
-								hidden: bet.status !== 2n,
+								hidden: [0n, 1n].includes(bet.status),
 							})}
 						>
 							<BetValue

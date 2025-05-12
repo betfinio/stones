@@ -30,7 +30,7 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 	const { data: bets = [], isLoading: areBetsLoading } = useRoundBets(round);
 	const { data: winner = 0 } = useRoundWinner(round);
 	const { data: distributed = 0n } = useDistributedInRound(round);
-	const { mutate } = useDistribute();
+	const { mutate: distribute } = useDistribute();
 	const { winBets } = useBetsWithPossibleWinAndBonus(round, winner);
 
 	const topWinners = useMemo(() => {
@@ -55,7 +55,7 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 	const bonusBank = (bank * 5n) / 100n;
 
 	const handleDistribute = () => {
-		mutate({ round });
+		distribute({ round });
 	};
 
 	const userWinBet = useMemo(() => {

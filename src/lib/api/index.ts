@@ -230,6 +230,19 @@ export const distribute = async (params: DistributeParams, config: Config) => {
 		functionName: 'executeResult',
 		args: [BigInt(params.round), 0n, 100n],
 	});
+
+	await simulateContract(config, {
+		address: STONES,
+		abi: StonesABI,
+		functionName: 'settleLostBets',
+		args: [BigInt(params.round), 0n, 100n],
+	});
+	await writeContract(config, {
+		abi: StonesABI,
+		address: STONES,
+		functionName: 'settleLostBets',
+		args: [BigInt(params.round), 0n, 100n],
+	});
 	return writeContract(config, {
 		abi: StonesABI,
 		address: STONES,
