@@ -2,15 +2,16 @@ import BetResult from '@/src/components/TableBet/columns/BetResult.tsx';
 import BetsAmountCell from '@/src/components/TableBet/columns/BetsAmountCell.tsx';
 import RoundCell from '@/src/components/TableBet/columns/RoundCell.tsx';
 import WinnerCell from '@/src/components/TableBet/columns/WinnerCell.tsx';
-import { usePlayerBets } from '@/src/lib/query';
+import { useCurrentRound, usePlayerBets } from '@/src/lib/query';
 import type { StonesBet } from '@/src/lib/types.ts';
 import { getStoneImage } from '@/src/lib/utils.ts';
 import { ZeroAddress } from '@betfinio/abi';
 import { BetValue } from '@betfinio/components/shared';
 import { DataTable } from '@betfinio/components/shared';
 import { useNavigate } from '@tanstack/react-router';
-import { type ColumnDef, createColumnHelper } from '@tanstack/react-table';
+import { type ColumnDef, type Table, createColumnHelper } from '@tanstack/react-table';
 import { DateTime } from 'luxon';
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
 
@@ -22,6 +23,9 @@ const MyBetsTable = () => {
 	const { t } = useTranslation('stones', { keyPrefix: 'table.columns' });
 	const { t: tShared } = useTranslation('shared', { keyPrefix: 'tables' });
 	const navigate = useNavigate();
+	const tableRef = useRef<Table<{ round: number }>>(null);
+
+	const { data: currentRound = 0 } = useCurrentRound();
 
 	const columns: ColumnDef<StonesBet, never>[] = [
 		columnHelper.accessor('round', {
@@ -70,6 +74,14 @@ const MyBetsTable = () => {
 	const handleClick = (row: { round: number }) => {
 		navigate({ to: '/games/stones', search: { round: row.round } });
 	};
+
+	useEffect(() => {
+		const rowIndex = rounds.findIndex((round) => round.round === currentRound);
+
+		tableRef.current?.setState((state) => {
+			return { ...state, rowSelection: { [rowIndex]: true } };
+		});
+	}, [rounds, currentRound]);
 
 	return <DataTable columns={columns} data={rounds} onRowClick={handleClick} t={tShared} />;
 };

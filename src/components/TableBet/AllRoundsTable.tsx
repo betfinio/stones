@@ -4,10 +4,11 @@ import BonusAmountCell from '@/src/components/TableBet/columns/BonusAmountCell.t
 import RoundCell from '@/src/components/TableBet/columns/RoundCell.tsx';
 import StakingEarningCell from '@/src/components/TableBet/columns/StakingEarningCell.tsx';
 import WinnerCell from '@/src/components/TableBet/columns/WinnerCell.tsx';
-import { useRounds } from '@/src/lib/query';
-import { DataTable } from '@betfinio/components/shared';
+import { useCurrentRound, useRounds } from '@/src/lib/query';
+import { DataTable } from '@betfinio/components';
 import { useNavigate } from '@tanstack/react-router';
-import { createColumnHelper } from '@tanstack/react-table';
+import { type Table, createColumnHelper } from '@tanstack/react-table';
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const columnHelper = createColumnHelper<{ round: number }>();
@@ -17,6 +18,8 @@ const AllRoundsTable = () => {
 	const { t: tShared } = useTranslation('shared', { keyPrefix: 'tables' });
 	const { t } = useTranslation('stones', { keyPrefix: 'table.columns' });
 	const navigate = useNavigate();
+	const tableRef = useRef<Table<{ round: number }>>(null);
+	const { data: currentRound = 0 } = useCurrentRound();
 
 	const columns = [
 		columnHelper.accessor('round', {
@@ -63,7 +66,15 @@ const AllRoundsTable = () => {
 		navigate({ to: '/games/stones', search: { round: row.round } });
 	};
 
-	return <DataTable columns={columns} data={rounds} onRowClick={handleClick} t={tShared} />;
+	useEffect(() => {
+		const rowIndex = rounds.findIndex((round) => round.round === currentRound);
+
+		tableRef.current?.setState((state) => {
+			return { ...state, rowSelection: { [rowIndex]: true } };
+		});
+	}, [rounds, currentRound]);
+
+	return <DataTable tableRef={tableRef} columns={columns} data={rounds} onRowClick={handleClick} t={tShared} />;
 };
 
 export default AllRoundsTable;
