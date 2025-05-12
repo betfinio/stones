@@ -89,13 +89,15 @@ export const fetchRoundBets = async (round: number, config: Config): Promise<Sto
 		})),
 	});
 
-	logger.success('bets', betsData.length);
+	logger.success('bets', betsData.length, round);
 	const bets = betsData.map((bet) => bet.result as Address).reverse();
+
 	return await Promise.all(bets.map((bet) => fetchBetInfo(bet, config)));
 };
 
 export const fetchBetInfo = async (bet: Address, config: Config): Promise<StonesBet> => {
 	if (!config) throw new Error('Config is required');
+
 	const info = (await readContract(config, {
 		address: bet,
 		abi: StonesBetABI,
@@ -228,6 +230,19 @@ export const distribute = async (params: DistributeParams, config: Config) => {
 		functionName: 'executeResult',
 		args: [BigInt(params.round), 0n, 100n],
 	});
+
+	await simulateContract(config, {
+		address: STONES,
+		abi: StonesABI,
+		functionName: 'settleLostBets',
+		args: [BigInt(params.round), 0n, 100n],
+	});
+	await writeContract(config, {
+		abi: StonesABI,
+		address: STONES,
+		functionName: 'settleLostBets',
+		args: [BigInt(params.round), 0n, 100n],
+	});
 	return writeContract(config, {
 		abi: StonesABI,
 		address: STONES,
@@ -269,4 +284,21 @@ export const fetchBetResult = async (bet: Address, config: Config): Promise<bigi
 
 export const animateNewBet = (stone: number, strength: number, queryClient: QueryClient, round: number) => {
 	queryClient.setQueryData(['stones', 'round', round, 'newBet'], { stone, strength: 0 });
+};
+
+export const fetchBetsResults = async (bets: StonesBet[], config: Config): Promise<StonesBet[]> => {
+	logger.start('fetching bets results', bets);
+	const data = await multicall(config, {
+		contracts: bets.map((bet) => ({
+			address: bet.address,
+			abi: StonesBetABI,
+			functionName: 'getResult',
+			args: [],
+		})),
+	});
+
+	return data.map((item, i) => ({
+		...bets[i],
+		result: item.result as bigint,
+	}));
 };
