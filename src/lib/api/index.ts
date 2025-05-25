@@ -17,13 +17,14 @@ export const fetchCurrentRound = async (config: Config): Promise<number> => {
 		}),
 	);
 };
+
 export const fetchRoundBank = async (round: number, config: Config): Promise<bigint> => {
 	if (!config) throw new Error('Config is required');
 	return (await readContract(config, {
 		abi: StonesABI,
 		address: STONES,
-		functionName: 'roundBankBySide',
-		args: [BigInt(round), BigInt(0)],
+		functionName: 'getRoundBank',
+		args: [BigInt(round)],
 	})) as bigint;
 };
 export const fetchRoundSideBank = async (round: number, config: Config): Promise<bigint[]> => {
