@@ -21,7 +21,10 @@ export const usePlaceBet = () => {
 			logger.success('transaction submitted');
 
 			const promise = async () => {
-				await waitForTransactionReceipt(config.getClient(), { hash: data });
+				const result = await waitForTransactionReceipt(config.getClient(), { hash: data });
+				if (result.status !== 'success') {
+					throw new Error('Transaction failed');
+				}
 			};
 
 			toast.promise(promise, {
