@@ -49,10 +49,12 @@ export function StonesPage() {
 		onLogs: async (logs) => {
 			logger.warn('Request detected', logs[0]);
 			const round = Number(logs[0].args.round);
-			const bet = logs[0]?.args?.bet as Address;
 			if (round !== currentRound) return;
+
+			const bet = logs[0]?.args?.bet as Address;
 			const betInfo = await fetchBetInfo(bet, config);
 			animateNewBet(Number(betInfo.side), 0, queryClient, round);
+
 			queryClient.invalidateQueries({ queryKey: ['stones'] });
 		},
 	});

@@ -11,6 +11,7 @@ import { StonesABI, ZeroAddress, arrayFrom } from '@betfinio/abi';
 import { Bet } from '@betfinio/components/icons';
 import { BetValue } from '@betfinio/components/shared';
 import { useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
 import { AnimatePresence, motion, useAnimation } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { useAccount, useWatchContractEvent } from 'wagmi';
@@ -97,8 +98,20 @@ const Wheel = () => {
 
 	const { data: status = 0 } = useRoundStatus(currentRound);
 	const [_, end] = getRoundTimes(currentRound);
+
+	const navigate = useNavigate();
+
+	const jumpToCurrentRound = () => {
+		navigate({ to: '/games/stones', search: { round: actualRound } });
+		queryClient.invalidateQueries({ queryKey: ['stones', 'currentRound'] });
+	};
+
 	useEffect(() => {
 		if (status > 0 || end < Date.now() / 1000) {
+			if (bank === 0n) {
+				jumpToCurrentRound();
+				return;
+			}
 			setShowWinnerMessage(true);
 			setShowCountdown(false);
 			if (winner) {
