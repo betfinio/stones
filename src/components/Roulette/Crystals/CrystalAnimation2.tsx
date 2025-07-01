@@ -28,7 +28,7 @@ const CrystalAnimation2 = () => {
 			xmlns="http://www.w3.org/2000/svg"
 			className="w-full h-full"
 		>
-			<title className="hidden">Crystal Animation 2</title>
+			<title className="hidden">{}</title>
 			<motion.g clipPath="url(#clip0_1_1264)">
 				<motion.path
 					variants={pathVariants}
