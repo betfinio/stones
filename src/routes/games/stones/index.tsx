@@ -1,14 +1,3 @@
-import BetAmount from '@/src/components/BetAmount/BetAmount.tsx';
-import BetHistory from '@/src/components/BetHistory/BetHistory.tsx';
-import BetSummary from '@/src/components/BetSummary/BetSummary.tsx';
-import CardList from '@/src/components/CardList/CardList.tsx';
-import Roulette from '@/src/components/Roulette/Roulette.tsx';
-import TableBet from '@/src/components/TableBet/TableBet.tsx';
-import { VersionValidation } from '@/src/components/VersionValidation.tsx';
-import logger from '@/src/config/logger.ts';
-import { animateNewBet, fetchBetInfo } from '@/src/lib/api';
-import { STONES, TOKEN } from '@/src/lib/global.ts';
-import { useCurrentRound } from '@/src/lib/query';
 import { StonesABI, TokenABI } from '@betfinio/abi';
 import { SonnerToaster, TooltipProvider } from '@betfinio/components/ui';
 import { useQueryClient } from '@tanstack/react-query';
@@ -17,6 +6,16 @@ import { AnimatePresence } from 'motion/react';
 import { useEffect } from 'react';
 import type { Address } from 'viem';
 import { useConfig, useWatchContractEvent } from 'wagmi';
+import BetAmount from '@/src/components/BetAmount/BetAmount.tsx';
+import BetHistory from '@/src/components/BetHistory/BetHistory.tsx';
+import BetSummary from '@/src/components/BetSummary/BetSummary.tsx';
+import CardList from '@/src/components/CardList/CardList.tsx';
+import Roulette from '@/src/components/Roulette/Roulette.tsx';
+import TableBet from '@/src/components/TableBet/TableBet.tsx';
+import logger from '@/src/config/logger.ts';
+import { animateNewBet, fetchBetInfo } from '@/src/lib/api';
+import { STONES, TOKEN } from '@/src/lib/global.ts';
+import { useCurrentRound } from '@/src/lib/query';
 
 export const Route = createFileRoute('/games/stones/')({
 	component: () => <StonesPage />,
@@ -99,7 +98,6 @@ export function StonesPage() {
 				</div>
 			</div>
 			<SonnerToaster />
-			<VersionValidation repository={'stones'} branch={import.meta.env.PUBLIC_BRANCH} current={import.meta.env.PUBLIC_DEPLOYED} />
 		</TooltipProvider>
 	);
 }

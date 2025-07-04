@@ -1,3 +1,11 @@
+import { ZeroAddress } from '@betfinio/abi';
+import { BetValue, DataTable } from '@betfinio/components/shared';
+import { useNavigate } from '@tanstack/react-router';
+import { type ColumnDef, createColumnHelper, type Table } from '@tanstack/react-table';
+import { DateTime } from 'luxon';
+import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAccount } from 'wagmi';
 import BetResult from '@/src/components/TableBet/columns/BetResult.tsx';
 import BetsAmountCell from '@/src/components/TableBet/columns/BetsAmountCell.tsx';
 import RoundCell from '@/src/components/TableBet/columns/RoundCell.tsx';
@@ -5,15 +13,6 @@ import WinnerCell from '@/src/components/TableBet/columns/WinnerCell.tsx';
 import { useCurrentRound, usePlayerBets } from '@/src/lib/query';
 import type { StonesBet } from '@/src/lib/types.ts';
 import { getStoneImage } from '@/src/lib/utils.ts';
-import { ZeroAddress } from '@betfinio/abi';
-import { BetValue } from '@betfinio/components/shared';
-import { DataTable } from '@betfinio/components/shared';
-import { useNavigate } from '@tanstack/react-router';
-import { type ColumnDef, type Table, createColumnHelper } from '@tanstack/react-table';
-import { DateTime } from 'luxon';
-import { useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useAccount } from 'wagmi';
 
 const columnHelper = createColumnHelper<StonesBet>();
 
@@ -27,7 +26,7 @@ const MyBetsTable = () => {
 
 	const { data: currentRound = 0 } = useCurrentRound();
 
-	const columns: ColumnDef<StonesBet, never>[] = [
+	const columns = [
 		columnHelper.accessor('round', {
 			header: t('round'),
 			meta: {
@@ -69,7 +68,7 @@ const MyBetsTable = () => {
 			header: t('winner'),
 			cell: (props) => <WinnerCell round={props.getValue()} />,
 		}),
-	];
+	] as ColumnDef<StonesBet>[];
 
 	const handleClick = (row: { round: number }) => {
 		navigate({ to: '/games/stones', search: { round: row.round } });

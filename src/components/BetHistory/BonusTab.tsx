@@ -1,11 +1,11 @@
-import BonusItem from '@/src/components/BetHistory/BonusItem';
-import { useRoundBank, useRoundBets } from '@/src/lib/query';
-import type { StonesBet } from '@/src/lib/types.ts';
 import type { CSSProperties, FC } from 'react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMediaQuery } from 'react-responsive';
 import { List } from 'react-virtualized';
+import BonusItem from '@/src/components/BetHistory/BonusItem';
+import { useRoundBank, useRoundBets } from '@/src/lib/query';
+import type { StonesBet } from '@/src/lib/types.ts';
 
 const BONUS_PERCENTAGE = 5n;
 const PERCENTAGE_BASE = 100n;

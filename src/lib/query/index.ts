@@ -1,3 +1,7 @@
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import type { Address } from 'viem';
+import { useConfig } from 'wagmi';
 import {
 	fetchBetResult,
 	fetchCurrentRound,
@@ -13,10 +17,7 @@ import {
 } from '@/src/lib/api';
 import { fetchBetsByPlayer, fetchRoundBetsByPlayer, fetchRounds } from '@/src/lib/gql';
 import type { StoneInfo, StonesBet } from '@/src/lib/types';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
-import type { Address } from 'viem';
-import { useConfig } from 'wagmi';
+import { ROUND_DURATION } from '../global';
 
 export const useCurrentRound = () => {
 	const config = useConfig();
@@ -29,7 +30,7 @@ export const useCurrentRound = () => {
 export const useActualRound = () => {
 	const queryClient = useQueryClient();
 	const getRound = () => {
-		return Math.floor(Date.now() / 1000 / 60 / 5);
+		return Math.floor(Date.now() / 1000 / 60 / ROUND_DURATION);
 	};
 	useEffect(() => {
 		const interval = setInterval(() => {

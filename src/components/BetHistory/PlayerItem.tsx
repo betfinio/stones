@@ -1,16 +1,16 @@
-import { ETHSCAN } from '@/src/lib/global';
-import { useRoundBank, useRoundBets } from '@/src/lib/query';
-import type { StonesBet } from '@/src/lib/types';
 import { cn } from '@betfinio/components';
 import { Fox } from '@betfinio/components/icons';
 import { BetValue } from '@betfinio/components/shared';
 import { useUsername } from 'betfinio_context/lib/query';
 import { cx } from 'class-variance-authority';
-import { ArrowRightFromLineIcon, MoveRightIcon } from 'lucide-react';
+import { MoveRightIcon } from 'lucide-react';
 import { motion } from 'motion/react';
 import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
+import { ETHSCAN } from '@/src/lib/global';
+import { useRoundBank, useRoundBets } from '@/src/lib/query';
+import type { StonesBet } from '@/src/lib/types';
 
 const PlayerItem: FC<{ bet: StonesBet; round: number; className?: string }> = ({ bet, round, className }) => {
 	const { t } = useTranslation('stones', { keyPrefix: 'history' });
