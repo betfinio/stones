@@ -3,7 +3,7 @@
 	"private": true,
 	"version": "1.0.0",
 	"scripts": {
-		"prebuild": " graphclient build",
+		"prebuild": "graphclient build",
 		"build": "rsbuild build",
 		"check": "biome check --write",
 		"dev": "bun run build:schema:dev && rsbuild dev --open",
