@@ -187,7 +187,6 @@ export const placeBet = async (params: PlaceBetParams, config: Config) => {
 		BigInt(params.side),
 		BigInt(params.round),
 	]);
-	console.log(params, 'params');
 	await simulateContract(config, {
 		address: PARTNER,
 		abi: PartnerABI,

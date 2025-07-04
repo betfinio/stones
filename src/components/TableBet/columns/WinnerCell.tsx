@@ -14,7 +14,6 @@ const WinnerCell: FC<{ round: number }> = ({ round }) => {
 	const handleRequestCalculate = () => {
 		spin({ round });
 	};
-	console.log(status, 'status');
 	return (
 		<div className={'text-tertiary-foreground'} onClick={handleRequestCalculate}>
 			{status === 2 ? (
