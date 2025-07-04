@@ -1,5 +1,5 @@
-import CardItem from '@/src/components/CardList/CardItem.tsx';
 import { arrayFrom } from '@betfinio/abi';
+import CardItem from '@/src/components/CardList/CardItem.tsx';
 
 export const MobileStoneSelect = () => {
 	return (

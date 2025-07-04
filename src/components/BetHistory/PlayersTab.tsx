@@ -1,11 +1,11 @@
-import PlayerItem from '@/src/components/BetHistory/PlayerItem';
-import { useRoundBets } from '@/src/lib/query';
-import { mapBetsToAuthors } from '@/src/lib/utils.ts';
 import type { CSSProperties, FC } from 'react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMediaQuery } from 'react-responsive';
 import { List } from 'react-virtualized';
+import PlayerItem from '@/src/components/BetHistory/PlayerItem';
+import { useRoundBets } from '@/src/lib/query';
+import { mapBetsToAuthors } from '@/src/lib/utils.ts';
 
 const PlayersTab: FC<{ round: number }> = ({ round }) => {
 	const { t } = useTranslation('stones', { keyPrefix: 'history.tabs' });

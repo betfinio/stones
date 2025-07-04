@@ -1,11 +1,11 @@
-import CardItem from '@/src/components/CardList/CardItem.tsx';
-import { useActualRound, useCurrentRound } from '@/src/lib/query';
 import { arrayFrom } from '@betfinio/abi';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@betfinio/components/ui';
 import { cx } from 'class-variance-authority';
 import { motion } from 'motion/react';
 import { FaArrowLeftLong, FaArrowRightLong } from 'react-icons/fa6';
 import { useMediaQuery } from 'react-responsive';
+import CardItem from '@/src/components/CardList/CardItem.tsx';
+import { useActualRound, useCurrentRound } from '@/src/lib/query';
 
 export const CardList = () => {
 	const { data: actualRound = 0 } = useActualRound();

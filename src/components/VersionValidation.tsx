@@ -1,7 +1,7 @@
-import logger from '@/src/config/logger.ts';
 import { Button, toast } from '@betfinio/components/ui';
 import { useLatestVersion } from 'betfinio_context/lib/query';
 import { type FC, useEffect } from 'react';
+import logger from '@/src/config/logger.ts';
 
 interface VersionValidationProps {
 	repository: string;

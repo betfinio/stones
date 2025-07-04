@@ -1,12 +1,4 @@
-import { MobileStoneSelect } from '@/src/components/BetAmount/MobileStoneSelect.tsx';
-import ProbabilitiesChart from '@/src/components/BetAmount/ProbabilitiesChart.tsx';
-import BetRanking from '@/src/components/BetRanking/BetRanking.tsx';
-import { getRoundTimes } from '@/src/lib/api';
-import { usePotentialWinWithBonus } from '@/src/lib/gql';
-import { useActualRound, useBetAmount, useCurrentRound, useRoundBank, useRoundStatus, useSideBank } from '@/src/lib/query';
-import { usePlaceBet, useSetBetAmount } from '@/src/lib/query/mutations';
-import { useSelectedStone } from '@/src/lib/query/state';
-import { ZeroAddress, arrayFrom, valueToNumber } from '@betfinio/abi';
+import { arrayFrom, valueToNumber, ZeroAddress } from '@betfinio/abi';
 import { BetValue } from '@betfinio/components/shared';
 import { Button, Slider } from '@betfinio/components/ui';
 import { useQueryClient } from '@tanstack/react-query';
@@ -23,6 +15,14 @@ import { NumericFormat } from 'react-number-format';
 import type { NumberFormatValues } from 'react-number-format/types';
 import { useMediaQuery } from 'react-responsive';
 import { useAccount } from 'wagmi';
+import { MobileStoneSelect } from '@/src/components/BetAmount/MobileStoneSelect.tsx';
+import ProbabilitiesChart from '@/src/components/BetAmount/ProbabilitiesChart.tsx';
+import BetRanking from '@/src/components/BetRanking/BetRanking.tsx';
+import { getRoundTimes } from '@/src/lib/api';
+import { usePotentialWinWithBonus } from '@/src/lib/gql';
+import { useActualRound, useBetAmount, useCurrentRound, useRoundBank, useRoundStatus, useSideBank } from '@/src/lib/query';
+import { usePlaceBet, useSetBetAmount } from '@/src/lib/query/mutations';
+import { useSelectedStone } from '@/src/lib/query/state';
 import crystal1 from '../../assets/Roulette/crystal1.svg';
 import crystal2 from '../../assets/Roulette/crystal2.svg';
 import crystal3 from '../../assets/Roulette/crystal3.svg';
@@ -52,7 +52,6 @@ const BetAmount = () => {
 	const { data: amount = 10000 } = useBetAmount();
 	const { mutate: setAmount } = useSetBetAmount();
 	const [_, end] = getRoundTimes(round);
-
 	const { win, bonus } = usePotentialWinWithBonus(amount, selected);
 
 	const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
@@ -264,17 +263,17 @@ const BetAmount = () => {
 						{/* Crystal List below Bet Amount Section */}
 						<div className="grid grid-cols-5 gap-3 w-full ">
 							{pie.map((item, index) => (
-								<div
+								<button
 									key={index}
 									className={`relative flex items-center justify-center px-2 py-1.5 bg-card rounded-md cursor-pointer ${
 										selected === item.id ? 'border-2 border-border' : ''
 									}`}
 									onClick={() => handleCrystalClick(item.id)}
 									tabIndex={0}
-									role="button"
+									type="button"
 								>
 									<img src={images[`crystal${item.id}`]} alt={`crystal-${index}`} className="h-[15px] z-20" />
-								</div>
+								</button>
 							))}
 						</div>
 					</div>

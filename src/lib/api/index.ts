@@ -1,14 +1,15 @@
-import logger from '@/src/config/logger';
-import { PARTNER, STONES } from '@/src/lib/global';
-import type { StoneInfo, StonesBet } from '@/src/lib/types';
-import { PartnerABI, StonesABI, StonesBetABI, arrayFrom } from '@betfinio/abi';
+import { arrayFrom, PartnerABI, StonesABI, StonesBetABI } from '@betfinio/abi';
 import type { QueryClient } from '@tanstack/react-query';
 import { type Config, multicall, readContract, simulateContract, writeContract } from '@wagmi/core';
 import { type Address, encodeAbiParameters, parseAbiParameters } from 'viem';
+import logger from '@/src/config/logger';
+import { PARTNER, ROUND_DURATION, STONES } from '@/src/lib/global';
+import type { StoneInfo, StonesBet } from '@/src/lib/types';
 
 export const fetchCurrentRound = async (config: Config): Promise<number> => {
 	if (!config) throw new Error('Config is required');
-	return Number(
+
+	const number = Number(
 		await readContract(config, {
 			abi: StonesABI,
 			address: STONES,
@@ -16,6 +17,8 @@ export const fetchCurrentRound = async (config: Config): Promise<number> => {
 			args: [],
 		}),
 	);
+
+	return number;
 };
 
 export const fetchRoundBank = async (round: number, config: Config): Promise<bigint> => {
@@ -144,8 +147,7 @@ export const fetchDistributedInRound = async (round: number, config: Config): Pr
 
 export const fetchRoundStones = async (round: number, config: Config): Promise<StoneInfo[]> => {
 	if (round === 0) return [];
-	// biome-ignore lint/style/noNonNullAssertion: <explanation>
-	const probabilities = await multicall(config!, {
+	const probabilities = await multicall(config, {
 		contracts: arrayFrom(6).map((_, i) => ({
 			abi: StonesABI,
 			address: STONES,
@@ -153,8 +155,7 @@ export const fetchRoundStones = async (round: number, config: Config): Promise<S
 			args: [BigInt(round), BigInt(i)],
 		})),
 	});
-	// biome-ignore lint/style/noNonNullAssertion: <explanation>
-	const banks = await multicall(config!, {
+	const banks = await multicall(config, {
 		contracts: arrayFrom(6).map((_, i) => ({
 			abi: StonesABI,
 			address: STONES,
@@ -186,6 +187,7 @@ export const placeBet = async (params: PlaceBetParams, config: Config) => {
 		BigInt(params.side),
 		BigInt(params.round),
 	]);
+	console.log(params, 'params');
 	await simulateContract(config, {
 		address: PARTNER,
 		abi: PartnerABI,
@@ -253,8 +255,8 @@ export const distribute = async (params: DistributeParams, config: Config) => {
 };
 
 export const getRoundTimes = (round: number): number[] => {
-	const start = round * 60 * 5;
-	const end = start + 60 * 5;
+	const start = round * 60 * ROUND_DURATION;
+	const end = start + 60 * ROUND_DURATION;
 	return [start, end];
 };
 
@@ -283,7 +285,7 @@ export const fetchBetResult = async (bet: Address, config: Config): Promise<bigi
 	return data;
 };
 
-export const animateNewBet = (stone: number, strength: number, queryClient: QueryClient, round: number) => {
+export const animateNewBet = (stone: number, _strength: number, queryClient: QueryClient, round: number) => {
 	queryClient.setQueryData(['stones', 'round', round, 'newBet'], { stone, strength: 0 });
 };
 
