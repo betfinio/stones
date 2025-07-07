@@ -1,9 +1,9 @@
-import BetItem from '@/src/components/BetHistory/BetItem';
-import { useRoundBets } from '@/src/lib/query';
 import type { CSSProperties, FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMediaQuery } from 'react-responsive';
 import { List } from 'react-virtualized';
+import BetItem from '@/src/components/BetHistory/BetItem';
+import { useRoundBets } from '@/src/lib/query';
 
 const BetsTab: FC<{ round: number }> = ({ round }) => {
 	const { t } = useTranslation('stones', { keyPrefix: 'history.tabs' });

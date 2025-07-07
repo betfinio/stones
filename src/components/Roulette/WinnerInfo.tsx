@@ -1,4 +1,3 @@
-import { useRoundBank, useRoundBets, useRoundBetsByPlayer, useRoundStatus, useRoundWinner, useSideBank, useSideBonusShares } from '@/src/lib/query';
 import { ZeroAddress } from '@betfinio/abi';
 import { BetValue } from '@betfinio/components/shared';
 import { cx } from 'class-variance-authority';
@@ -6,6 +5,7 @@ import { motion } from 'motion/react';
 import { type FC, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
+import { useRoundBank, useRoundBets, useRoundBetsByPlayer, useRoundStatus, useRoundWinner, useSideBank, useSideBonusShares } from '@/src/lib/query';
 
 const WinnerInfo: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 	const { data: status, isLoading: isStatusLoading } = useRoundStatus(round);

@@ -1,7 +1,4 @@
-import { useBetAmount } from '@/src/lib/query';
-import { usePlaceBet, useSetBetAmount } from '@/src/lib/query/mutations';
-import { valueToNumber } from '@betfinio/abi';
-import { ZeroAddress } from '@betfinio/abi';
+import { valueToNumber, ZeroAddress } from '@betfinio/abi';
 import { Slider } from '@betfinio/components/ui';
 import { useBalance } from 'betfinio_context/lib/query';
 import { cx } from 'class-variance-authority';
@@ -10,6 +7,8 @@ import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import type { NumberFormatValues } from 'react-number-format/types';
 import { useAccount } from 'wagmi';
+import { useBetAmount } from '@/src/lib/query';
+import { usePlaceBet, useSetBetAmount } from '@/src/lib/query/mutations';
 
 const BetAmountInput: FC<{ isMobile?: boolean }> = ({ isMobile = false }) => {
 	const { t } = useTranslation('stones', { keyPrefix: 'controls' });

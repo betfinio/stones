@@ -1,10 +1,10 @@
-import { AnimatePresence, motion } from 'motion/react';
-import React, { useState } from 'react';
+import { AnimatePresence, motion, type Variants } from 'motion/react';
+import { useState } from 'react';
 
 const ExplosionAnimation = () => {
 	const [explode, setExplode] = useState(false);
 
-	const pathVariants = {
+	const pathVariants: Variants = {
 		initial: {
 			x: 0,
 			y: 0,

@@ -1,7 +1,3 @@
-import { usePotentialWinWithBonus } from '@/src/lib/gql';
-import { useBetAmount, useCurrentRound } from '@/src/lib/query';
-import { usePlaceBet } from '@/src/lib/query/mutations';
-import { useSelectedStone } from '@/src/lib/query/state';
 import { ZeroAddress } from '@betfinio/abi';
 import { BetValue } from '@betfinio/components/shared';
 import { Button } from '@betfinio/components/ui';
@@ -11,6 +7,10 @@ import { LoaderIcon } from 'lucide-react';
 import { type FC, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
+import { usePotentialWinWithBonus } from '@/src/lib/gql';
+import { useBetAmount, useCurrentRound } from '@/src/lib/query';
+import { usePlaceBet } from '@/src/lib/query/mutations';
+import { useSelectedStone } from '@/src/lib/query/state';
 
 const PlaceBetButton: FC<{ isMobile?: boolean }> = ({ isMobile = false }) => {
 	const { t } = useTranslation('stones', { keyPrefix: 'controls' });

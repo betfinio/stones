@@ -1,6 +1,6 @@
-import { useSelectedStone } from '@/src/lib/query/state';
 import { arrayFrom } from '@betfinio/abi';
 import type { FC } from 'react';
+import { useSelectedStone } from '@/src/lib/query/state';
 import crystal1 from '../../../assets/Roulette/crystal1.svg';
 import crystal2 from '../../../assets/Roulette/crystal2.svg';
 import crystal3 from '../../../assets/Roulette/crystal3.svg';

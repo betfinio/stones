@@ -1,8 +1,8 @@
-import { getRoundTimes } from '@/src/lib/api';
 import { cx } from 'class-variance-authority';
 import { motion } from 'motion/react';
 import { type FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { getRoundTimes } from '@/src/lib/api';
 
 const Time: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 	const [_, end] = getRoundTimes(round);

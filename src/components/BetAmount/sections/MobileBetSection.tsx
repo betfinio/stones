@@ -1,5 +1,5 @@
-import CardItem from '@/src/components/CardList/CardItem.tsx';
 import { arrayFrom } from '@betfinio/abi';
+import CardItem from '@/src/components/CardList/CardItem.tsx';
 import BetAmountInput from '../components/BetAmountInput';
 import CrystalSelector from '../components/CrystalSelector';
 import PlaceBetButton from '../components/PlaceBetButton';

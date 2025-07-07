@@ -1,11 +1,11 @@
-import BetRanking from '@/src/components/BetRanking/BetRanking';
-import { getRoundTimes } from '@/src/lib/api';
-import { useActualRound, useCurrentRound, useRoundStatus } from '@/src/lib/query';
 import { Button } from '@betfinio/components/ui';
 import { useNavigate } from '@tanstack/react-router';
 import { DateTime } from 'luxon';
 import { motion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
+import BetRanking from '@/src/components/BetRanking/BetRanking';
+import { getRoundTimes } from '@/src/lib/api';
+import { useActualRound, useCurrentRound, useRoundStatus } from '@/src/lib/query';
 
 const OldRound = () => {
 	const { data: round = 0 } = useCurrentRound();
