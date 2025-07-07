@@ -17,9 +17,9 @@
 	},
 	"dependencies": {
 		"@betfinio/abi": "^2.9.0",
-		"@betfinio/components": "^2.4.0",
-		"@nivo/core": "0.88.0",
-		"@nivo/pie": "0.88.0",
+		"@betfinio/components": "^2.4.0-dev.4",
+		"@nivo/core": "^0.99.0",
+		"@nivo/pie": "^0.99.0",
 		"@tailwindcss/postcss": "^4.1.11",
 		"@tanstack/react-query": "5.66.10",
 		"@tanstack/react-router": "^1.124.0",

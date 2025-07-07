@@ -72,7 +72,7 @@ export function StonesPage() {
 	});
 	return (
 		<TooltipProvider>
-			<div className={'w-full h-full stones'}>
+			<div className={'w-full h-full max-w-screen-2xl mx-auto'}>
 				<div className="w-full p-2 md:py-3 lg:py-4 rounded-md text-foreground h-full 2xl:px-0 overflow-hidden grid grid-cols-12 gap-2">
 					<div className={'col-span-12 lg:col-span-8'}>
 						<Roulette />

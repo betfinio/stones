@@ -9,6 +9,9 @@ const PORT = 4002;
 export default defineConfig({
 	server: {
 		port: PORT,
+		cors: {
+			origin: '*',
+		},
 	},
 	dev: {
 		assetPrefix: `http://localhost:${PORT}`,
