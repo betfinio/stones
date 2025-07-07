@@ -253,9 +253,13 @@ export const distribute = async (params: DistributeParams, config: Config) => {
 };
 
 export const getRoundTimes = (round: number): number[] => {
-	const start = round * 60 * 5;
-	const end = start + 60 * 5;
+	const start = round * 60;
+	const end = start + 60;
 	return [start, end];
+};
+
+export const getActualRound = () => {
+	return Math.floor(Date.now() / 1000 / 60);
 };
 
 export const fetchRoundWinner = async (round: number, config: Config): Promise<number> => {

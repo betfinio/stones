@@ -4,7 +4,6 @@ import BetSummary from '@/src/components/BetSummary/BetSummary.tsx';
 import CardList from '@/src/components/CardList/CardList.tsx';
 import Roulette from '@/src/components/Roulette/Roulette.tsx';
 import TableBet from '@/src/components/TableBet/TableBet.tsx';
-import { VersionValidation } from '@/src/components/VersionValidation.tsx';
 import logger from '@/src/config/logger.ts';
 import { animateNewBet, fetchBetInfo } from '@/src/lib/api';
 import { STONES, TOKEN } from '@/src/lib/global.ts';
@@ -38,7 +37,7 @@ export function StonesPage() {
 		} else {
 			queryClient.setQueryData(['stones', 'currentRound'], search.round);
 		}
-	}, [search, currentRound]);
+	}, [search]);
 	const config = useConfig();
 
 	useWatchContractEvent({
@@ -99,7 +98,6 @@ export function StonesPage() {
 				</div>
 			</div>
 			<SonnerToaster />
-			<VersionValidation repository={'stones'} branch={import.meta.env.PUBLIC_BRANCH} current={import.meta.env.PUBLIC_DEPLOYED} />
 		</TooltipProvider>
 	);
 }

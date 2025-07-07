@@ -27,19 +27,10 @@ export const useCurrentRound = () => {
 };
 
 export const useActualRound = () => {
-	const queryClient = useQueryClient();
-	const getRound = () => {
-		return Math.floor(Date.now() / 1000 / 60 / 5);
-	};
-	useEffect(() => {
-		const interval = setInterval(() => {
-			queryClient.setQueryData(['stones', 'actualRound'], getRound());
-		}, 1000);
-		return () => clearInterval(interval);
-	}, []);
 	return useQuery<number>({
 		queryKey: ['stones', 'actualRound'],
-		queryFn: getRound,
+		queryFn: () => Math.floor(Date.now() / 1000 / 60),
+		refetchInterval: 1000,
 	});
 };
 
