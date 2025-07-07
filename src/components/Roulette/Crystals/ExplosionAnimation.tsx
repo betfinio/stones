@@ -44,7 +44,7 @@ const ExplosionAnimation = () => {
 					initial="initial"
 					animate={explode ? 'exploded' : 'initial'}
 				>
-					<title className="hidden">Crystal Explosion Animation</title>
+					<title className="hidden">{}</title>
 					<motion.path
 						variants={pathVariants}
 						custom={0}

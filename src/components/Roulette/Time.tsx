@@ -6,23 +6,28 @@ import { getRoundTimes } from '@/src/lib/api';
 
 const Time: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 	const [_, end] = getRoundTimes(round);
-	const [remaining, setRemaining] = useState('05:00');
+	const [remaining, setRemaining] = useState('01:00');
 	const [loaded, setLoaded] = useState(false);
+
 	useEffect(() => {
 		if (round === 0) return;
+
 		const interval = setInterval(() => {
 			const now = Math.floor(Date.now() / 1000);
 			const diff = end - now;
+
 			if (diff < 0) {
 				setRemaining('00:00');
 				setLoaded(true);
 				return;
 			}
+
 			setLoaded(true);
 			const minutes = Math.floor(diff / 60);
 			const seconds = diff % 60;
 			setRemaining(`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
 		}, 300);
+
 		return () => clearInterval(interval);
 	}, [round]);
 

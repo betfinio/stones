@@ -28,7 +28,7 @@ const CrystalAnimation4 = () => {
 			animate="visible"
 			className="w-full h-full"
 		>
-			<title className="hidden">Crystal Animation 4</title>
+			<title className="hidden">{}</title>
 			<motion.g clipPath="url(#clip0_1_1855)">
 				<motion.path
 					variants={pathVariants}

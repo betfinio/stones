@@ -1,5 +1,4 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
 import type { Address } from 'viem';
 import { useConfig } from 'wagmi';
 import {
@@ -28,19 +27,10 @@ export const useCurrentRound = () => {
 };
 
 export const useActualRound = () => {
-	const queryClient = useQueryClient();
-	const getRound = () => {
-		return Math.floor(Date.now() / 1000 / 60 / ROUND_DURATION);
-	};
-	useEffect(() => {
-		const interval = setInterval(() => {
-			queryClient.setQueryData(['stones', 'actualRound'], getRound());
-		}, 1000);
-		return () => clearInterval(interval);
-	}, []);
 	return useQuery<number>({
 		queryKey: ['stones', 'actualRound'],
-		queryFn: getRound,
+		queryFn: () => Math.floor(Date.now() / 1000 / (ROUND_DURATION * 60)),
+		refetchInterval: 1000,
 	});
 };
 

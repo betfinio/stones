@@ -15,6 +15,7 @@ const images: { [key: string]: string } = {
 	crystal4,
 	crystal5,
 };
+
 const ProbabilitiesChart: FC<{ round: number; pie: any[] }> = ({ round, pie }) => {
 	const { data: bank = 0n } = useRoundBank(round);
 	const isEmpty = bank === 0n;

@@ -37,7 +37,7 @@ export function StonesPage() {
 		} else {
 			queryClient.setQueryData(['stones', 'currentRound'], search.round);
 		}
-	}, [search, currentRound]);
+	}, [search]);
 	const config = useConfig();
 
 	useWatchContractEvent({

@@ -38,7 +38,8 @@
 				"noSvgWithoutTitle": "off",
 				"useKeyWithMouseEvents": "off",
 				"useMediaCaption": "off",
-				"noStaticElementInteractions": "off"
+				"noStaticElementInteractions": "off",
+				"useSemanticElements": "off"
 			},
 			"correctness": {
 				"useExhaustiveDependencies": "off"

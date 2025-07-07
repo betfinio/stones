@@ -259,6 +259,10 @@ export const getRoundTimes = (round: number): number[] => {
 	return [start, end];
 };
 
+export const getActualRound = () => {
+	return Math.floor(Date.now() / 1000 / 60);
+};
+
 export const fetchRoundWinner = async (round: number, config: Config): Promise<number> => {
 	logger.start('fetching round winner', round);
 	const data = await readContract(config, {

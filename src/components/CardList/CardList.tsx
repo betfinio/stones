@@ -1,19 +1,17 @@
 import { arrayFrom } from '@betfinio/abi';
+import { useMediaQuery } from '@betfinio/components/hooks';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@betfinio/components/ui';
 import { cx } from 'class-variance-authority';
 import { motion } from 'motion/react';
 import { FaArrowLeftLong, FaArrowRightLong } from 'react-icons/fa6';
-import { useMediaQuery } from 'react-responsive';
-import CardItem from '@/src/components/CardList/CardItem.tsx';
 import { useActualRound, useCurrentRound } from '@/src/lib/query';
+import CardItem from './CardItem';
 
 export const CardList = () => {
 	const { data: actualRound = 0 } = useActualRound();
-	const { data: currentRound = 0 } = useCurrentRound();
-	const isXl = useMediaQuery({ minWidth: 1440 });
-	const isDesktop = useMediaQuery({ minWidth: 1220 });
-	const isTablet = useMediaQuery({ minWidth: 769 });
-	const isMobile = useMediaQuery({ maxWidth: 768 });
+	const { data: currentRound = 0, isLoading, isFetching } = useCurrentRound();
+	const { isTablet, isMobile, isCustom: isXl } = useMediaQuery('(min-width: 1440px)');
+	const isDesktop = !isTablet && !isMobile;
 
 	let itemBasis: string;
 	if (isXl) {
@@ -27,7 +25,9 @@ export const CardList = () => {
 	}
 
 	return (
-		<motion.div className={cx('relative w-full hidden md:flex mb-8', actualRound !== currentRound && 'h-0 w-0 overflow-hidden')}>
+		<motion.div
+			className={cx('relative w-full hidden md:flex mb-8', (isLoading || (!isFetching && actualRound !== currentRound)) && 'h-0 w-0 overflow-hidden')}
+		>
 			<Carousel className={cx('w-full', isMobile && 'mb-8')}>
 				<CarouselContent className="py-6 ml-0.5">
 					{arrayFrom(5).map((card) => (

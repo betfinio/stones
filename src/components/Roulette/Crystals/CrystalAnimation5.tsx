@@ -28,7 +28,7 @@ const CrystalAnimation5 = () => {
 			animate="visible"
 			className="w-full h-full"
 		>
-			<title className="hidden">Crystal Animation 5</title>
+			<title className="hidden">{}</title>
 			<motion.path
 				variants={pathVariants}
 				custom={0}
