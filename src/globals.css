@@ -2,8 +2,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-
-
 @theme inline {
 	--breakpoint-2xl: 1440px;
 }
