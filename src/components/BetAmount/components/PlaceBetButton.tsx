@@ -46,7 +46,12 @@ const PlaceBetButton: FC<{ isMobile?: boolean }> = ({ isMobile = false }) => {
 	};
 
 	return (
-		<Button className={`hover:scale-105 duration-200 transition-all flex gap-1 w-full ${!isMobile ? 'max-w-[320px]' : ''}`} type="button" onClick={handleSpin}>
+		<Button
+			className={`hover:scale-105 duration-200 transition-all flex gap-1 w-full ${!isMobile ? 'max-w-[320px]' : ''}`}
+			disabled={isPending || amount <= 0n}
+			type="button"
+			onClick={handleSpin}
+		>
 			{isPending ? (
 				<LoaderIcon className={'animate-spin'} />
 			) : (
