@@ -1,3 +1,11 @@
+import { arrayFrom, StonesABI, ZeroAddress } from '@betfinio/abi';
+import { Bet } from '@betfinio/components/icons';
+import { BetValue } from '@betfinio/components/shared';
+import { useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
+import { AnimatePresence, motion, useAnimation } from 'motion/react';
+import { type FC, useEffect, useRef, useState } from 'react';
+import { useAccount, useWatchContractEvent } from 'wagmi';
 import { EffectsLayer } from '@/src/components/Roulette/EffectsLayer.tsx';
 import Time from '@/src/components/Roulette/Time';
 import WinnerInfo from '@/src/components/Roulette/WinnerInfo.tsx';
@@ -7,13 +15,6 @@ import { STONES } from '@/src/lib/global.ts';
 import { useActualRound, useCurrentRound, useRoundBank, useRoundBets, useRoundStatus, useRoundWinner, useSideBank } from '@/src/lib/query';
 import { useSelectedStone } from '@/src/lib/query/state.ts';
 import { shootConfetti } from '@/src/lib/utils.ts';
-import { StonesABI, ZeroAddress, arrayFrom } from '@betfinio/abi';
-import { Bet } from '@betfinio/components/icons';
-import { BetValue } from '@betfinio/components/shared';
-import { useQueryClient } from '@tanstack/react-query';
-import { AnimatePresence, motion, useAnimation } from 'motion/react';
-import { useEffect, useRef, useState } from 'react';
-import { useAccount, useWatchContractEvent } from 'wagmi';
 import arrowdown from '../../assets/Roulette/arrow-down.svg';
 import neonImage from '../../assets/Roulette/neon-glow.png';
 import ComplexRoulette from './ComplexRoulette';
@@ -23,41 +24,6 @@ import CrystalAnimation3 from './Crystals/CrystalAnimation3';
 import CrystalAnimation4 from './Crystals/CrystalAnimation4';
 import CrystalAnimation5 from './Crystals/CrystalAnimation5';
 
-const arrowRotations = [
-	0,
-	10,
-	0,
-	15,
-	0,
-	20,
-	0,
-	30,
-	0,
-	40,
-	0,
-	45,
-	...[...arrayFrom(90).map(() => [0, 45])].flat(),
-	0,
-	30,
-	0,
-	30,
-	0,
-	20,
-	0,
-	10,
-	0,
-	10,
-	0,
-	5,
-	0,
-	5,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-];
 const crystals = [
 	{ name: 1, image: CrystalAnimation1, angle: 180 },
 	{ name: 1, image: CrystalAnimation1, angle: 0 },
@@ -74,31 +40,45 @@ const crystals = [
 const baseSize = 1000;
 
 const Wheel = () => {
+	// Animation controls
 	const controls = useAnimation();
 	const arrowControls = useAnimation();
-
 	const queryClient = useQueryClient();
+	const navigate = useNavigate();
 
+	// Data hooks
 	const { address = ZeroAddress } = useAccount();
 	const { data: currentRound = 0 } = useCurrentRound();
 	const { data: actualRound = 0 } = useActualRound();
 	const { data: selectedStone, setSelectedStone } = useSelectedStone();
-	const { data: sideBank = [0n, 0n, 0n, 0n, 0n] } = useSideBank(currentRound);
 	const { data: bank = 0n } = useRoundBank(currentRound);
 	const { data: bets = [] } = useRoundBets(currentRound);
 	const { data: winner = 0 } = useRoundWinner(currentRound);
+	const { data: status = 0 } = useRoundStatus(currentRound);
 
+	// State
 	const [scale, setScale] = useState(1);
-
-	const containerRef = useRef<HTMLDivElement>(null);
-
 	const [showWinnerMessage, setShowWinnerMessage] = useState(false);
 	const [showCountdown, setShowCountdown] = useState(true);
+	const containerRef = useRef<HTMLDivElement>(null);
 
-	const { data: status = 0 } = useRoundStatus(currentRound);
 	const [_, end] = getRoundTimes(currentRound);
+
+	// Navigation helper
+	const jumpToCurrentRound = () => {
+		queryClient.setQueryData(['stones', 'currentRound'], actualRound);
+		const updatedRound = queryClient.getQueryData<number>(['stones', 'currentRound']) || actualRound;
+		navigate({ to: '/games/stones', search: { round: updatedRound } });
+		// queryClient.invalidateQueries({ queryKey: ['stones', 'currentRound'] });
+	};
+
+	// Effects
 	useEffect(() => {
 		if (status > 0 || end < Date.now() / 1000) {
+			if (bank === 0n) {
+				jumpToCurrentRound();
+				return;
+			}
 			setShowWinnerMessage(true);
 			setShowCountdown(false);
 			if (winner) {
@@ -115,6 +95,7 @@ const Wheel = () => {
 		rotateWheel(-angle);
 	}, [selectedStone]);
 
+	// Event watchers
 	useWatchContractEvent({
 		abi: StonesABI,
 		address: STONES,
@@ -151,24 +132,47 @@ const Wheel = () => {
 		},
 	});
 
+	// Animation functions
 	const startSpin = () => {
-		arrowControls
+		arrowControls.start({
+			rotate: [0, 5, 0, 25, 0, 40, ...[...arrayFrom(5).map(() => [0, 45])].flat()],
+			transition: {
+				duration: 2,
+				ease: [0.2, 0, 1, 1],
+			},
+		});
+
+		controls
 			.start({
-				rotate: arrowRotations,
+				rotate: 360 * 3,
 				transition: {
-					duration: 26,
-					ease: [0.2, 0, 0.8, 1],
+					duration: 2,
+					ease: [0.99, 0, 1, 1],
 				},
 			})
-			.then();
-		return controls.start({
-			rotate: 360 * 30,
+			.then(() => linearSpin());
+	};
+
+	const linearSpin = () => {
+		arrowControls.start({
+			rotate: [...arrayFrom(10).map(() => [0, 45])].flat(),
 			transition: {
-				duration: 26,
+				duration: 3,
 				ease: [0.2, 0, 0.8, 1],
+				repeat: Number.POSITIVE_INFINITY,
+			},
+		});
+
+		controls.start({
+			rotate: [-360, 0],
+			transition: {
+				duration: 0.5,
+				ease: 'linear',
+				repeat: Number.POSITIVE_INFINITY,
 			},
 		});
 	};
+
 	const stopSpin = async (angle: number) => {
 		controls.stop();
 		controls.set({ rotate: 0 });
@@ -220,6 +224,7 @@ const Wheel = () => {
 		};
 	}, []);
 
+	// Main render
 	return (
 		<div
 			key={'container'}
@@ -242,124 +247,22 @@ const Wheel = () => {
 						overflow: 'hidden',
 					}}
 				>
-					<motion.img
-						src={neonImage}
-						alt="Neon Glow"
-						className="absolute top-0 w-full h-full opacity-100 scale-[1.03]"
-						style={{
-							objectFit: 'contain',
-							zIndex: -1, // Mantém o glow atrás da roleta
-						}}
-						initial={{ scale: 0, opacity: 0 }} // Início com a imagem bem pequena e invisível
-						animate={{ scale: [0, 1.04, 1.03], opacity: [0, 1, 1] }} // Escala da imagem aumenta até o tamanho final
-						transition={{
-							duration: 1.5, // Tempo total da animação
-							ease: 'easeInOut', // Suavidade para a entrada e saída
-							times: [0, 0.5, 1], // Define os momentos das transições
-						}}
-					/>
+					<NeonGlow />
 					<motion.div animate={controls}>
 						<ComplexRoulette />
 					</motion.div>
 
 					<motion.div className="absolute inset-0 flex justify-center items-center" animate={controls}>
 						{crystals.map((crystal, index) => (
-							<div
-								key={index}
-								className="absolute text-center"
-								style={{
-									transform: `rotate(${crystal.angle}deg) translate(0, ${-310 * scale * 1.13}px) rotate(${crystal.angle}deg)`,
-								}}
-							>
-								<div
-									style={{
-										transform: `rotate(${-crystal.angle}deg)`,
-									}}
-									onClick={() => setSelectedStone(crystal.name)}
-									className="relative flex flex-col items-center justify-center space-y-2"
-								>
-									<div className="text-xs text-foreground transform -scale-y-100 -scale-x-100 space-x-[3%]">
-										<motion.div
-											className="absolute rounded-full bg-bonus opacity-[0.85] blur-xl"
-											style={{
-												width: `${70 * scale}px`, // Escala o tamanho do brilho conforme a escala geral
-												height: `${70 * scale}px`, // Escala o tamanho do brilho conforme a escala geral
-												top: `${-46 * scale}px`, // Ajusta a posição vertical conforme a escala
-												left: `${22 * scale}px`, // Ajusta a posição horizontal conforme a escala
-												transform: 'translate(-50%, -50%)',
-											}}
-											initial={{ opacity: 0 }}
-											animate={{ opacity: 1 }}
-											transition={{
-												duration: 3, // Tempo total da animação
-												ease: 'easeInOut', // Suavidade para a entrada e saída
-												times: [0, 0.5, 1], // Define os momentos das transições
-											}}
-										/>
-										<div className={'flex items-center gap-1 justify-center'}>
-											<Bet className="z-20 aspect-square md:w-4 md:h-4 h-3 w-3 text-secondary-foreground" />
-											<motion.span
-												initial={{ opacity: 0 }}
-												animate={{ opacity: [0, 1, 1] }}
-												transition={{
-													duration: 3, // Tempo total da animação
-													ease: 'easeInOut', // Suavidade para a entrada e saída
-													times: [0, 0.5, 1], // Define os momentos das transições
-												}}
-												className="z-20"
-											>
-												<BetValue value={sideBank[crystal.name - 1] || 0n} className={'text-xs md:text-lg'} />
-											</motion.span>
-										</div>
-
-										<div>
-											<span className="text-xs opacity-60">{(Number((sideBank[crystal.name - 1] ?? 0n) * 100n) / Number(bank) || 0).toFixed(2)}%</span>
-										</div>
-									</div>
-
-									<motion.div
-										style={{
-											height: `${85 * scale}px`, // Aumentei o tamanho das pedras
-											objectFit: 'cover',
-											marginBottom: '1px',
-											transform: 'scaleY(-1) scaleX(-1)',
-										}}
-									>
-										<crystal.image />
-									</motion.div>
-								</div>
-							</div>
+							<Crystal key={index} crystal={crystal} index={index} scale={scale} onCrystalClick={setSelectedStone} />
 						))}
 					</motion.div>
 				</motion.div>
 
 				<AnimatePresence mode="sync">
-					{showCountdown && <Time round={currentRound} scale={scale} />}
-					<motion.div
-						key="arrow"
-						className="absolute w-full flex justify-center items-center"
-						style={{
-							top: `-${268 * scale}px`,
-							zIndex: 5,
-						}}
-						initial={{ opacity: 0, scale: 0.8 }}
-						animate={{ opacity: 1, scale: 1 }}
-						exit={{ opacity: 0, scale: 0.8 }}
-						transition={{ duration: 0.3 }}
-					>
-						<motion.img
-							src={arrowdown}
-							alt="arrow-down"
-							className="absolute"
-							style={{
-								width: `${25 * scale}px`,
-								height: `${25 * scale}px`,
-								transformOrigin: 'top center',
-							}}
-							animate={arrowControls}
-						/>
-					</motion.div>
-					{showWinnerMessage && <WinnerInfo round={currentRound} scale={scale} />}
+					{showCountdown && <Time key="time" round={currentRound} scale={scale} />}
+					<Arrow key="arrow" scale={scale} arrowControls={arrowControls} />
+					{showWinnerMessage && <WinnerInfo key="winner" round={currentRound} scale={scale} />}
 				</AnimatePresence>
 			</div>
 		</div>
@@ -367,3 +270,129 @@ const Wheel = () => {
 };
 
 export default Wheel;
+
+const NeonGlow = () => (
+	<motion.img
+		src={neonImage}
+		alt="Neon Glow"
+		className="absolute top-0 w-full h-full opacity-100 scale-[1.03]"
+		style={{
+			objectFit: 'contain',
+			zIndex: -1,
+		}}
+		initial={{ scale: 0, opacity: 0 }}
+		animate={{ scale: [0, 1.04, 1.03], opacity: [0, 1, 1] }}
+		transition={{
+			duration: 1.5,
+			ease: 'easeInOut',
+			times: [0, 0.5, 1],
+		}}
+	/>
+);
+
+interface CrystalProps {
+	crystal: (typeof crystals)[0];
+	index: number;
+	scale: number;
+	onCrystalClick: (name: number) => void;
+}
+const Crystal: FC<CrystalProps> = ({ crystal, index, scale, onCrystalClick }) => {
+	const { data: currentRound = 0 } = useCurrentRound();
+	const { data: sideBank = [0n, 0n, 0n, 0n, 0n] } = useSideBank(currentRound);
+	const { data: bank = 0n } = useRoundBank(currentRound);
+
+	return (
+		<div
+			key={index}
+			className="absolute text-center"
+			style={{
+				transform: `rotate(${crystal.angle}deg) translate(0, ${-310 * scale * 1.13}px) rotate(${crystal.angle}deg)`,
+			}}
+		>
+			<div
+				style={{
+					transform: `rotate(${-crystal.angle}deg)`,
+				}}
+				onClick={() => onCrystalClick(crystal.name)}
+				className="relative flex flex-col items-center justify-center space-y-2"
+			>
+				<div className="text-xs text-foreground transform -scale-y-100 -scale-x-100 space-x-[3%]">
+					<motion.div
+						className="absolute rounded-full bg-bonus opacity-[0.85] blur-xl"
+						style={{
+							width: `${70 * scale}px`,
+							height: `${70 * scale}px`,
+							top: `${-46 * scale}px`,
+							left: `${22 * scale}px`,
+							transform: 'translate(-50%, -50%)',
+						}}
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						transition={{
+							duration: 3,
+							ease: 'easeInOut',
+							times: [0, 0.5, 1],
+						}}
+					/>
+					<div className={'flex items-center gap-1 justify-center'}>
+						<Bet className="z-20 aspect-square md:w-4 md:h-4 h-3 w-3 text-secondary-foreground" />
+						<motion.span
+							initial={{ opacity: 0 }}
+							animate={{ opacity: [0, 1, 1] }}
+							transition={{
+								duration: 3,
+								ease: 'easeInOut',
+								times: [0, 0.5, 1],
+							}}
+							className="z-20"
+						>
+							<BetValue value={sideBank[crystal.name - 1] || 0n} className={'text-xs md:text-lg'} />
+						</motion.span>
+					</div>
+
+					<div>
+						<span className="text-xs opacity-60">{(Number((sideBank[crystal.name - 1] ?? 0n) * 100n) / Number(bank) || 0).toFixed(2)}%</span>
+					</div>
+				</div>
+
+				<motion.div
+					style={{
+						height: `${85 * scale}px`,
+						objectFit: 'cover',
+						marginBottom: '1px',
+						transform: 'scaleY(-1) scaleX(-1)',
+					}}
+				>
+					<crystal.image />
+				</motion.div>
+			</div>
+		</div>
+	);
+};
+
+const Arrow: FC<{ scale: number; arrowControls: any }> = ({ scale, arrowControls }) => (
+	<motion.div
+		key="arrow"
+		className="absolute w-full flex justify-center items-center"
+		style={{
+			top: `-${268 * scale}px`,
+			zIndex: 5,
+		}}
+		initial={{ opacity: 0, scale: 0.8 }}
+		animate={{ opacity: 1, scale: 1 }}
+		exit={{ opacity: 0, scale: 0.8 }}
+		transition={{ duration: 0.3 }}
+	>
+		<motion.img
+			src={arrowdown}
+			alt="arrow-down"
+			className="absolute"
+			style={{
+				width: `${25 * scale}px`,
+				height: `${25 * scale}px`,
+				transformOrigin: 'top center',
+			}}
+			animate={arrowControls}
+		/>
+	</motion.div>
+);

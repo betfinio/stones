@@ -1,12 +1,12 @@
-import logger from '@/src/config/logger';
-import { type DistributeParams, type PlaceBetParams, type SpinParams, distribute, placeBet, spin } from '@/src/lib/api';
 import { toast } from '@betfinio/components/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { getTransactionLink } from 'betfinio_context/lib/helpers';
+import { getTransactionLink, handleError } from 'betfinio_context/lib/helpers';
 import { useTranslation } from 'react-i18next';
 import type { WriteContractErrorType, WriteContractReturnType } from 'viem';
-import { getTransaction, waitForTransactionReceipt } from 'viem/actions';
+import { waitForTransactionReceipt } from 'viem/actions';
 import { useConfig } from 'wagmi';
+import logger from '@/src/config/logger';
+import { type DistributeParams, distribute, type PlaceBetParams, placeBet, type SpinParams, spin } from '@/src/lib/api';
 
 export const usePlaceBet = () => {
 	const config = useConfig();
@@ -21,7 +21,10 @@ export const usePlaceBet = () => {
 			logger.success('transaction submitted');
 
 			const promise = async () => {
-				await waitForTransactionReceipt(config.getClient(), { hash: data });
+				const result = await waitForTransactionReceipt(config.getClient(), { hash: data });
+				if (result.status !== 'success') {
+					throw new Error('Transaction failed');
+				}
 			};
 
 			toast.promise(promise, {
@@ -34,19 +37,11 @@ export const usePlaceBet = () => {
 			queryClient.invalidateQueries({ queryKey: ['stones'] });
 		},
 		onError: (error) => {
-			//@ts-ignore
 			const errorData = JSON.parse(JSON.stringify(error.cause));
-			if (errorData.reason) {
-				toast.error(tErrors('default'), {
-					description: tErrors(errorData.reason, { defaultValue: tLocalError(errorData.reason) }),
-				});
-			} else if (errorData.signature) {
-				toast.error(tErrors('default'), {
-					description: tErrors(errorData.signature, { defaultValue: tLocalError(errorData.signature) }),
-				});
-			} else {
-				toast.error(tErrors('unknown'));
-			}
+
+			if (errorData.reason) toast.error(handleError(errorData.reason, tErrors, tLocalError));
+			else if (errorData.signature) toast.error(handleError(errorData.signature, tErrors, tLocalError));
+			else toast.error(tErrors('unknown'));
 		},
 		onMutate: () => {
 			logger.start('placing bet');

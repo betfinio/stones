@@ -1,10 +1,10 @@
+import confetti from 'canvas-confetti';
 import Stone1 from '@/src/assets/Roulette/crystal1.svg';
 import Stone2 from '@/src/assets/Roulette/crystal2.svg';
 import Stone3 from '@/src/assets/Roulette/crystal3.svg';
 import Stone4 from '@/src/assets/Roulette/crystal4.svg';
 import Stone5 from '@/src/assets/Roulette/crystal5.svg';
 import type { StonesAuthor, StonesBet } from '@/src/lib/types.ts';
-import confetti from 'canvas-confetti';
 
 export const shootConfetti = () => {
 	confetti({
@@ -50,11 +50,12 @@ export const mapBetsToAuthors = (bets: StonesBet[]): StonesAuthor[] => {
 	return [...bets].reduce((acc: StonesAuthor[], val) => {
 		const author = acc.findIndex((bet) => bet.player === val.player);
 		if (author === -1) {
-			acc.push({ ...val, betsNumber: 1 });
+			acc.push({ ...val, betsNumber: 1, result: val.result ?? 0n });
 			return acc;
 		}
 		acc[author].amount += val.amount;
 		acc[author].betsNumber += 1;
+		acc[author].result += val.result ?? 0n;
 		return acc;
 	}, []);
 };

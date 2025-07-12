@@ -1,7 +1,7 @@
-import AllRoundsTable from '@/src/components/TableBet/AllRoundsTable.tsx';
-import MyBetsTable from '@/src/components/TableBet/MyBetsTable.tsx';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@betfinio/components/ui';
 import { useTranslation } from 'react-i18next';
+import AllRoundsTable from '@/src/components/TableBet/AllRoundsTable.tsx';
+import MyBetsTable from '@/src/components/TableBet/MyBetsTable.tsx';
 
 const TableBet = () => {
 	const { t } = useTranslation('stones', { keyPrefix: 'table' });

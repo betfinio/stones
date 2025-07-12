@@ -1,9 +1,4 @@
-import { ETHSCAN } from '@/src/lib/global.ts';
-import { useBetsWithPossibleWinAndBonus } from '@/src/lib/gql';
-import { useDistributedInRound, useRoundBank, useRoundBets, useRoundWinner } from '@/src/lib/query';
-import { useDistribute } from '@/src/lib/query/mutations.ts';
-import type { StonesBet } from '@/src/lib/types.ts';
-import { ZeroAddress, valueToNumber } from '@betfinio/abi';
+import { valueToNumber, ZeroAddress } from '@betfinio/abi';
 import { Bet } from '@betfinio/components/icons';
 import { BetValue } from '@betfinio/components/shared';
 import { Button } from '@betfinio/components/ui';
@@ -15,6 +10,11 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Address } from 'viem';
 import { useAccount } from 'wagmi';
+import { ETHSCAN } from '@/src/lib/global.ts';
+import { useBetsWithPossibleWinAndBonus } from '@/src/lib/gql';
+import { useDistributedInRound, useRoundBank, useRoundBets, useRoundWinner } from '@/src/lib/query';
+import { useDistribute } from '@/src/lib/query/mutations.ts';
+import type { StonesBet } from '@/src/lib/types.ts';
 import bronzeTrophy from '../../assets/BetHistory/trophy-bronze.svg';
 import goldTrophy from '../../assets/BetHistory/trophy-gold.svg';
 import silverTrophy from '../../assets/BetHistory/trophy-silver.svg';
@@ -30,7 +30,7 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 	const { data: bets = [], isLoading: areBetsLoading } = useRoundBets(round);
 	const { data: winner = 0 } = useRoundWinner(round);
 	const { data: distributed = 0n } = useDistributedInRound(round);
-	const { mutate } = useDistribute();
+	const { mutate: distribute } = useDistribute();
 	const { winBets } = useBetsWithPossibleWinAndBonus(round, winner);
 
 	const topWinners = useMemo(() => {
@@ -55,7 +55,7 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 	const bonusBank = (bank * 5n) / 100n;
 
 	const handleDistribute = () => {
-		mutate({ round });
+		distribute({ round });
 	};
 
 	const userWinBet = useMemo(() => {

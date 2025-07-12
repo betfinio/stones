@@ -1,9 +1,9 @@
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@betfinio/components/ui';
+import { useTranslation } from 'react-i18next';
 import BetsTab from '@/src/components/BetHistory/BetsTab';
 import BonusTab from '@/src/components/BetHistory/BonusTab';
 import PlayersTab from '@/src/components/BetHistory/PlayersTab';
 import { useCurrentRound } from '@/src/lib/query';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@betfinio/components/ui';
-import { useTranslation } from 'react-i18next';
 
 const BetHistory = () => {
 	const { t } = useTranslation('stones', { keyPrefix: 'history.tabs' });

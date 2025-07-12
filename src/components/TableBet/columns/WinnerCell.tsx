@@ -1,9 +1,9 @@
-import { useRoundStatus, useRoundWinner } from '@/src/lib/query';
-import { useSpin } from '@/src/lib/query/mutations.ts';
-import { getStoneImage } from '@/src/lib/utils.ts';
 import { LoaderIcon } from 'lucide-react';
 import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useRoundStatus, useRoundWinner } from '@/src/lib/query';
+import { useSpin } from '@/src/lib/query/mutations.ts';
+import { getStoneImage } from '@/src/lib/utils.ts';
 
 const WinnerCell: FC<{ round: number }> = ({ round }) => {
 	const { t } = useTranslation('stones', { keyPrefix: 'status' });
@@ -14,7 +14,6 @@ const WinnerCell: FC<{ round: number }> = ({ round }) => {
 	const handleRequestCalculate = () => {
 		spin({ round });
 	};
-
 	return (
 		<div className={'text-tertiary-foreground'} onClick={handleRequestCalculate}>
 			{status === 2 ? (

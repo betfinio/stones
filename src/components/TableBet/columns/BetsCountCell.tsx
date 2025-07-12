@@ -1,5 +1,5 @@
-import { useRoundBets } from '@/src/lib/query';
 import type { FC } from 'react';
+import { useRoundBets } from '@/src/lib/query';
 
 const BetsCountCell: FC<{ round: number }> = ({ round }) => {
 	const { data: bets = [] } = useRoundBets(round);
