@@ -1,7 +1,3 @@
-import { ETHSCAN } from '@/src/lib/global';
-import { useRoundBank } from '@/src/lib/query';
-import type { StonesBet } from '@/src/lib/types';
-import { getStoneImage } from '@/src/lib/utils';
 import { truncateEthAddress } from '@betfinio/abi';
 import { BetValue } from '@betfinio/components/shared';
 import { useUsername } from 'betfinio_context/lib/query';
@@ -9,6 +5,10 @@ import { cx } from 'class-variance-authority';
 import { motion } from 'motion/react';
 import type { FC } from 'react';
 import { useAccount } from 'wagmi';
+import { ETHSCAN } from '@/src/lib/global';
+import { useRoundBank } from '@/src/lib/query';
+import type { StonesBet } from '@/src/lib/types';
+import { getStoneImage } from '@/src/lib/utils';
 
 const BetItem: FC<{ bet: StonesBet; round: number; className?: string }> = ({ bet, round, className }) => {
 	const { data: bank = 0n } = useRoundBank(round);

@@ -1,8 +1,10 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Quicksand:wght@300..700&display=swap");
+
+@import "@betfinio/components/globals.css";
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "@betfinio/components/globals.css";
 
-@config '../tailwind.config.ts';
+@config "../tailwind.config.ts";
 
 @theme inline {
 	--breakpoint-2xl: 1440px;
@@ -36,6 +38,12 @@
 	::file-selector-button {
 		border-color: var(--color-gray-200, currentcolor);
 	}
+}
+
+html,
+body {
+	font-family: "Quicksand", sans-serif;
+	overscroll-behavior: none;
 }
 
 @layer base {

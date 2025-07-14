@@ -1,7 +1,7 @@
-import { motion } from 'motion/react';
+import { motion, type Variants } from 'motion/react';
 
 const CrystalAnimation3 = () => {
-	const pathVariants = {
+	const pathVariants: Variants = {
 		hidden: { opacity: 0, pathLength: 0, scale: 0.8, x: '0%', y: '-50%' },
 		visible: (i: number) => ({
 			opacity: 1,
@@ -28,7 +28,7 @@ const CrystalAnimation3 = () => {
 			xmlns="http://www.w3.org/2000/svg"
 			className="w-full h-full"
 		>
-			<title className="hidden">Crystal Animation 3</title>
+			<title className="hidden">{}</title>
 			<motion.g clipPath="url(#clip0_1_1645)">
 				<motion.path
 					variants={pathVariants}

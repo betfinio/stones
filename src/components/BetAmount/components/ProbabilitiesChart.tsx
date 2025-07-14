@@ -1,12 +1,12 @@
+import { ResponsivePie } from '@nivo/pie';
+import { motion } from 'motion/react';
+import type { FC } from 'react';
 import crystal1 from '@/src/assets/Roulette/crystal1.svg';
 import crystal2 from '@/src/assets/Roulette/crystal2.svg';
 import crystal3 from '@/src/assets/Roulette/crystal3.svg';
 import crystal4 from '@/src/assets/Roulette/crystal4.svg';
 import crystal5 from '@/src/assets/Roulette/crystal5.svg';
 import { useRoundBank } from '@/src/lib/query';
-import { ResponsivePie } from '@nivo/pie';
-import { motion } from 'motion/react';
-import type { FC } from 'react';
 
 const images: { [key: string]: string } = {
 	crystal1,
@@ -15,6 +15,7 @@ const images: { [key: string]: string } = {
 	crystal4,
 	crystal5,
 };
+
 const ProbabilitiesChart: FC<{ round: number; pie: any[] }> = ({ round, pie }) => {
 	const { data: bank = 0n } = useRoundBank(round);
 	const isEmpty = bank === 0n;
@@ -23,17 +24,11 @@ const ProbabilitiesChart: FC<{ round: number; pie: any[] }> = ({ round, pie }) =
 		if (isEmpty) return null;
 		return (
 			<div
-				className="flex items-center justify-center space-x-2 p-2 rounded-lg text-foreground"
-				style={{
-					border: `2px solid ${datum.data.borderColor}`,
-					backgroundColor: 'hsl(var(--popover))',
-				}}
+				className="flex items-center justify-center space-x-2 p-2 rounded-lg text-foreground  bg-popover rounded px-2 py-1"
+				style={{ border: `1px solid ${datum.data.borderColor}` }}
 			>
 				<img src={images[`crystal${pie.findIndex((item) => item.id === datum.id) + 1}`]} alt={datum.id} className="h-5" />
 				<div className="flex flex-col items-center justify-center tabular-nums">
-					<span>
-						<strong>{datum.id}</strong>:
-					</span>
 					<span>{datum.value.toFixed(2)}%</span>
 				</div>
 			</div>

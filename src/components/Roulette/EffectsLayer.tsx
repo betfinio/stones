@@ -1,8 +1,8 @@
-import { useObserveBet } from '@/src/lib/query';
-import { getStoneImage } from '@/src/lib/utils.ts';
 import { AnimatePresence, motion } from 'motion/react';
 import type { FC } from 'react';
 import { useEffect, useRef, useState } from 'react';
+import { useObserveBet } from '@/src/lib/query';
+import { getStoneImage } from '@/src/lib/utils.ts';
 
 export const EffectsLayer: FC<{ round: number }> = ({ round }) => {
 	const {

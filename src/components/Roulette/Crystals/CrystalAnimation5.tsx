@@ -1,7 +1,7 @@
-import { motion } from 'motion/react';
+import { motion, type Variants } from 'motion/react';
 
 const CrystalAnimation5 = () => {
-	const pathVariants = {
+	const pathVariants: Variants = {
 		hidden: { opacity: 0, pathLength: 0, scale: 0.8, x: '0%', y: '-50%' },
 		visible: (i: number) => ({
 			opacity: 1,
@@ -28,7 +28,7 @@ const CrystalAnimation5 = () => {
 			animate="visible"
 			className="w-full h-full"
 		>
-			<title className="hidden">Crystal Animation 5</title>
+			<title className="hidden">{}</title>
 			<motion.path
 				variants={pathVariants}
 				custom={0}

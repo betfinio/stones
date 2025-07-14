@@ -1,7 +1,3 @@
-import { usePotentialWinWithBonus } from '@/src/lib/gql';
-import { useBetAmount, useCurrentRound, useSideBank } from '@/src/lib/query';
-import { useSelectedStone } from '@/src/lib/query/state.ts';
-import { getStoneImage } from '@/src/lib/utils';
 import { BetValue } from '@betfinio/components/shared';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@betfinio/components/ui';
 import { cx } from 'class-variance-authority';
@@ -9,6 +5,10 @@ import { CircleAlert } from 'lucide-react';
 import type { FC } from 'react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { usePotentialWinWithBonus } from '@/src/lib/gql';
+import { useBetAmount, useCurrentRound, useSideBank } from '@/src/lib/query';
+import { useSelectedStone } from '@/src/lib/query/state.ts';
+import { getStoneImage } from '@/src/lib/utils';
 
 const colors = [
 	{
