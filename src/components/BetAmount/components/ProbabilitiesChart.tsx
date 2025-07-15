@@ -1,12 +1,12 @@
+import { ResponsivePie } from '@nivo/pie';
+import { motion } from 'motion/react';
+import type { FC } from 'react';
 import crystal1 from '@/src/assets/Roulette/crystal1.svg';
 import crystal2 from '@/src/assets/Roulette/crystal2.svg';
 import crystal3 from '@/src/assets/Roulette/crystal3.svg';
 import crystal4 from '@/src/assets/Roulette/crystal4.svg';
 import crystal5 from '@/src/assets/Roulette/crystal5.svg';
 import { useRoundBank } from '@/src/lib/query';
-import { ResponsivePie } from '@nivo/pie';
-import { motion } from 'motion/react';
-import type { FC } from 'react';
 
 const images: { [key: string]: string } = {
 	crystal1,
@@ -15,6 +15,7 @@ const images: { [key: string]: string } = {
 	crystal4,
 	crystal5,
 };
+
 const ProbabilitiesChart: FC<{ round: number; pie: any[] }> = ({ round, pie }) => {
 	const { data: bank = 0n } = useRoundBank(round);
 	const isEmpty = bank === 0n;

@@ -1,6 +1,3 @@
-import { ETHSCAN } from '@/src/lib/global';
-import type { StonesBetWithBonus } from '@/src/lib/types';
-import { getStoneImage } from '@/src/lib/utils.ts';
 import { truncateEthAddress } from '@betfinio/abi';
 import { BetValue } from '@betfinio/components/shared';
 import { useUsername } from 'betfinio_context/lib/query';
@@ -8,6 +5,9 @@ import { cx } from 'class-variance-authority';
 import { motion } from 'motion/react';
 import type { FC } from 'react';
 import { useAccount } from 'wagmi';
+import { ETHSCAN } from '@/src/lib/global';
+import type { StonesBetWithBonus } from '@/src/lib/types';
+import { getStoneImage } from '@/src/lib/utils.ts';
 
 const BonusItem: FC<{ bet: StonesBetWithBonus; round: number; className?: string }> = ({ bet, className }) => {
 	const { address } = useAccount();
