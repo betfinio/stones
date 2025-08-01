@@ -35,6 +35,7 @@ export function StonesPage() {
 		if (search.round === 0 && currentRound > 0) {
 			navigate({ to: '/games/stones', search: { round: currentRound } });
 		} else {
+			queryClient.cancelQueries({ queryKey: ['stones', 'currentRound'] });
 			queryClient.setQueryData(['stones', 'currentRound'], search.round);
 		}
 	}, [search]);
@@ -53,7 +54,6 @@ export function StonesPage() {
 			const bet = logs[0]?.args?.bet as Address;
 			const betInfo = await fetchBetInfo(bet, config);
 			animateNewBet(Number(betInfo.side), 0, queryClient, round);
-
 			queryClient.invalidateQueries({ queryKey: ['stones'] });
 		},
 	});
@@ -66,8 +66,7 @@ export function StonesPage() {
 		args: { from: STONES },
 		onLogs: async (logs) => {
 			logger.warn('Transfer detected', logs[0]);
-
-			queryClient.invalidateQueries({ queryKey: ['stones'] });
+			queryClient.invalidateQueries({ queryKey: ['stones', 'rounds'] });
 		},
 	});
 	return (
