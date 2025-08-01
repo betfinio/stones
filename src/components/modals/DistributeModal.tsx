@@ -3,7 +3,7 @@ import { cn as cx } from '@betfinio/components/lib';
 import { Button, Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle, Separator } from '@betfinio/components/ui';
 import { getTransactionLink } from 'betfinio_context/lib/helpers';
 import { Calculator, CircleCheck, Coins, Loader, X } from 'lucide-react';
-import { createContext, type FC, type PropsWithChildren, useContext, useEffect, useState } from 'react';
+import { createContext, type FC, type PropsWithChildren, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Address } from 'viem';
 import { useExecuteResult, useSettleLostBets } from '@/src/lib/query/mutations';
@@ -99,16 +99,7 @@ interface DistributeModalProps {
 	onSettleBetsComplete: (tx: Address) => void;
 }
 
-function DistributeModal({
-	open,
-	onClose,
-	onStateChange,
-	executeResultTx,
-	settleBetsTx,
-	onRequested,
-	onExecuteResultComplete,
-	onSettleBetsComplete,
-}: DistributeModalProps) {
+function DistributeModal({ open, onClose, executeResultTx, settleBetsTx, onRequested, onExecuteResultComplete, onSettleBetsComplete }: DistributeModalProps) {
 	const { state, round = 0 } = useDistributeModal();
 	const { t } = useTranslation('stones', { keyPrefix: 'distributeModal' });
 
