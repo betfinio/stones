@@ -6,6 +6,12 @@ on:
       - prod/*
       - dev
 
+permissions:
+  contents: write
+  pull-requests: write
+  packages: read
+  id-token: write
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
