@@ -1,0 +1,95 @@
+{
+	"CallerReference": "${DISTRIBUTION_NAME}-${TIMESTAMP}",
+	"DefaultRootObject": "index.html",
+	"Origins": {
+		"Quantity": 1,
+		"Items": [
+			{
+				"Id": "${BUCKET}",
+				"DomainName": "${BUCKET}.s3-website.${REGION}.amazonaws.com",
+				"OriginPath": "",
+				"CustomHeaders": {
+					"Quantity": 0
+				},
+				"CustomOriginConfig": {
+					"HTTPPort": 80,
+					"HTTPSPort": 443,
+					"OriginProtocolPolicy": "http-only",
+					"OriginSslProtocols": {
+						"Quantity": 4,
+						"Items": ["SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2"]
+					},
+					"OriginReadTimeout": 30,
+					"OriginKeepaliveTimeout": 5
+				},
+				"ConnectionAttempts": 3,
+				"ConnectionTimeout": 10,
+				"OriginShield": {
+					"Enabled": false
+				}
+			}
+		]
+	},
+	"DefaultCacheBehavior": {
+		"ResponseHeadersPolicyId": "f059f493-310d-4f02-aaac-a67658712b0b",
+		"TargetOriginId": "${BUCKET}",
+		"TrustedSigners": {
+			"Enabled": false,
+			"Quantity": 0
+		},
+		"TrustedKeyGroups": {
+			"Enabled": false,
+			"Quantity": 0
+		},
+		"ViewerProtocolPolicy": "redirect-to-https",
+		"AllowedMethods": {
+			"Quantity": 7,
+			"Items": ["HEAD", "DELETE", "POST", "GET", "OPTIONS", "PUT", "PATCH"],
+			"CachedMethods": {
+				"Quantity": 2,
+				"Items": ["HEAD", "GET"]
+			}
+		},
+		"Compress": true,
+		"ForwardedValues": {
+			"QueryString": false,
+			"Cookies": {
+				"Forward": "none"
+			},
+			"Headers": {
+				"Quantity": 0
+			},
+			"QueryStringCacheKeys": {
+				"Quantity": 0
+			}
+		},
+		"MinTTL": 0,
+		"DefaultTTL": 0,
+		"MaxTTL": 0
+	},
+	"CacheBehaviors": {
+		"Quantity": 0
+	},
+	"CustomErrorResponses": {
+		"Quantity": 1,
+		"Items": [
+			{
+				"ErrorCode": 404,
+				"ResponsePagePath": "/index.html",
+				"ResponseCode": "200",
+				"ErrorCachingMinTTL": 300
+			}
+		]
+	},
+	"Comment": "${DISTRIBUTION_NAME}",
+	"PriceClass": "PriceClass_All",
+	"Enabled": true,
+	"ViewerCertificate": {
+		"CloudFrontDefaultCertificate": true,
+		"SSLSupportMethod": "vip",
+		"MinimumProtocolVersion": "TLSv1"
+	},
+	"HttpVersion": "http2and3",
+	"IsIPV6Enabled": true,
+	"Staging": false
+}

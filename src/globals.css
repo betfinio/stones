@@ -1,11 +1,19 @@
-@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Quicksand:wght@300..700&display=swap");
+@layer components, theme, base, utilities;
 
-@import "@betfinio/components/globals.css";
-@import "tailwindcss";
+@import "@betfinio/components/globals.css" layer(components);
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
 @import "tw-animate-css";
 
-@config "../tailwind.config.ts";
-
+@layer utilities {
+	.stones {
+		@tailwind utilities;
+		@import "@betfinio/components/globals.css" layer(components);
+		--privy-color-accent: var(--color-primary);
+		--privy-color-foreground-accent: var(--color-primary-foreground);
+		--privy-color-accent-dark: var(--color-primary);
+	}
+}
 @theme inline {
 	--breakpoint-2xl: 1440px;
 }
