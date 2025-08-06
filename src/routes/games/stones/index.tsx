@@ -35,10 +35,9 @@ export function StonesPage() {
 		if (search.round === 0 && currentRound > 0) {
 			navigate({ to: '/games/stones', search: { round: currentRound } });
 		} else {
-			queryClient.cancelQueries({ queryKey: ['stones', 'currentRound'] });
 			queryClient.setQueryData(['stones', 'currentRound'], search.round);
 		}
-	}, [search]);
+	}, [search, currentRound]);
 	const config = useConfig();
 
 	useWatchContractEvent({

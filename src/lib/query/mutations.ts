@@ -107,7 +107,8 @@ export const useDistribute = () => {
 	});
 };
 
-export const useExecuteResult = () => {
+export const useExecuteResult = (round: number) => {
+	const queryClient = useQueryClient();
 	const config = useConfig();
 	return useMutation<WriteContractReturnType, WriteContractErrorType, DistributeParams>({
 		mutationKey: ['stones', 'executeResult'],
@@ -121,7 +122,10 @@ export const useExecuteResult = () => {
 
 			toast.promise(promise, {
 				loading: 'Executing result...',
-				success: 'Result executed',
+				success: () => {
+					queryClient.invalidateQueries({ queryKey: ['stones', 'round', round, 'distributed'] });
+					return 'Result executed';
+				},
 				action: getTransactionLink(data),
 			});
 			logger.success('executeResult finished');

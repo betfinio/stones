@@ -2,8 +2,9 @@ import { Bet } from '@betfinio/components/icons';
 import { cn as cx } from '@betfinio/components/lib';
 import { Button, Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle, Separator } from '@betfinio/components/ui';
 import { getTransactionLink } from 'betfinio_context/lib/helpers';
+import { useLocalStorage } from 'betfinio_context/lib/query';
 import { Calculator, CircleCheck, Coins, Loader, X } from 'lucide-react';
-import { createContext, type FC, type PropsWithChildren, useContext } from 'react';
+import { createContext, type FC, type PropsWithChildren, useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Address } from 'viem';
 import { useExecuteResult, useSettleLostBets } from '@/src/lib/query/mutations';
@@ -14,43 +15,27 @@ interface DistributeContextProps {
 	requestDistribute: (round: number) => void;
 	state: DistributeState;
 	round?: number;
-	requested: boolean;
-	setResult?: (executeResultTx: Address, settleBetsTx: Address) => void;
 }
 
 const DistributeContext = createContext<DistributeContextProps>({
 	requestDistribute: () => {},
 	state: 'settleLostBets',
-	requested: false,
 });
 
 export const DistributeProvider: FC<PropsWithChildren> = ({ children }) => {
-	const [state, setState] = useState<DistributeState>('settleLostBets');
 	const [open, setOpen] = useState(false);
-	const [requested, setRequested] = useState(false);
 	const [round, setRound] = useState<number | undefined>();
 	const [executeResultTx, setExecuteResultTx] = useState<Address | undefined>();
 	const [settleBetsTx, setSettleBetsTx] = useState<Address | undefined>();
 
+	// Используем localStorage только когда round определен
+	const { value: state, setValue: setState } = useLocalStorage<DistributeState>(`distribute-${round ?? 'temp'}`, { defaultValue: 'settleLostBets' });
+
 	const requestDistribute = (round: number) => {
-		setState('settleLostBets');
 		setOpen(true);
-		setRequested(false);
 		setRound(round);
 		setExecuteResultTx(undefined);
 		setSettleBetsTx(undefined);
-	};
-
-	const handleRequested = () => {
-		open && setRequested(true);
-	};
-
-	const setResult = (executeResultTx: Address, settleBetsTx: Address) => {
-		setExecuteResultTx(executeResultTx);
-		setSettleBetsTx(settleBetsTx);
-		setState('result');
-		setRequested(false);
-		setOpen(false);
 	};
 
 	return (
@@ -59,18 +44,14 @@ export const DistributeProvider: FC<PropsWithChildren> = ({ children }) => {
 				requestDistribute,
 				state,
 				round,
-				requested,
-				setResult,
 			}}
 		>
 			{children}
 			<DistributeModal
 				open={open}
 				onClose={() => setOpen(false)}
-				onStateChange={setState}
 				executeResultTx={executeResultTx}
 				settleBetsTx={settleBetsTx}
-				onRequested={handleRequested}
 				onExecuteResultComplete={(tx) => {
 					setExecuteResultTx(tx);
 					setState('result');
@@ -91,42 +72,25 @@ export const useDistributeModal = () => {
 interface DistributeModalProps {
 	open: boolean;
 	onClose: () => void;
-	onStateChange: (state: DistributeState) => void;
 	executeResultTx?: Address;
 	settleBetsTx?: Address;
-	onRequested: () => void;
 	onExecuteResultComplete: (tx: Address) => void;
 	onSettleBetsComplete: (tx: Address) => void;
 }
 
-function DistributeModal({ open, onClose, executeResultTx, settleBetsTx, onRequested, onExecuteResultComplete, onSettleBetsComplete }: DistributeModalProps) {
+function DistributeModal({ open, onClose, executeResultTx, settleBetsTx, onExecuteResultComplete, onSettleBetsComplete }: DistributeModalProps) {
 	const { state, round = 0 } = useDistributeModal();
 	const { t } = useTranslation('stones', { keyPrefix: 'distributeModal' });
 
-	const { mutate: executeResult, isPending: isExecutingResult } = useExecuteResult();
+	const { mutate: executeResult, isPending: isExecutingResult } = useExecuteResult(round ?? 0);
 	const { mutate: settleLostBets, isPending: isSettlingBets } = useSettleLostBets();
 
 	const handleExecuteResult = () => {
-		executeResult(
-			{ round },
-			{
-				onSuccess: (tx) => {
-					onExecuteResultComplete(tx);
-					onRequested();
-				},
-			},
-		);
+		executeResult({ round }, { onSuccess: (tx) => onExecuteResultComplete(tx) });
 	};
 
 	const handleSettleLostBets = () => {
-		settleLostBets(
-			{ round },
-			{
-				onSuccess: (tx) => {
-					onSettleBetsComplete(tx);
-				},
-			},
-		);
+		settleLostBets({ round }, { onSuccess: (tx) => onSettleBetsComplete(tx) });
 	};
 
 	return (
@@ -155,10 +119,10 @@ function DistributeModal({ open, onClose, executeResultTx, settleBetsTx, onReque
 									<div className={'flex flex-col'}>
 										{isSettlingBets ? (
 											<Loader className={'w-6 h-6 animate-spin'} />
-										) : settleBetsTx ? (
-											<CircleCheck className={'w-6 h-6 text-green-500'} />
-										) : (
+										) : state === 'settleLostBets' ? (
 											<Coins className={'w-6 h-6'} />
+										) : (
+											<CircleCheck className={'w-6 h-6 text-green-500'} />
 										)}
 									</div>
 								</div>
@@ -184,10 +148,10 @@ function DistributeModal({ open, onClose, executeResultTx, settleBetsTx, onReque
 									<div className={'flex flex-col'}>
 										{isExecutingResult ? (
 											<Loader className={'w-6 h-6 animate-spin'} />
-										) : executeResultTx ? (
-											<CircleCheck className={'w-6 h-6 text-green-500'} />
-										) : (
+										) : state === 'executeResult' || state === 'settleLostBets' ? (
 											<Calculator className={'w-6 h-6'} />
+										) : (
+											<CircleCheck className={'w-6 h-6 text-green-500'} />
 										)}
 									</div>
 								</div>
