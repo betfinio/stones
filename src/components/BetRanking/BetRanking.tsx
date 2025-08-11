@@ -61,7 +61,6 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 	const userWinBet = useMemo(() => {
 		return winBets.find((bet) => bet.player === address);
 	}, [winBets, address]);
-	console.log('distributed', distributed);
 	return (
 		<>
 			<div className="flex flex-col md:flex-row w-full space-x-2 items-center justify-around my-8 px-2 gap-8 lg:gap-2 xl:gap-8">

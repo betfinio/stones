@@ -10,9 +10,11 @@ export const Route = createRootRoute({
 		<GlobalContextProvider>
 			<I18nextProvider i18n={i18n}>
 				<DistributeProvider>
-					<MockRoot>
-						<Outlet />
-					</MockRoot>
+					<div className="stones max-w-screen-2xl mx-auto">
+						<MockRoot>
+							<Outlet />
+						</MockRoot>
+					</div>
 				</DistributeProvider>
 			</I18nextProvider>
 		</GlobalContextProvider>

@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap");
+
 @layer components, theme, base, utilities;
 
 @import "@betfinio/components/globals.css" layer(components);
@@ -9,9 +11,6 @@
 	.stones {
 		@tailwind utilities;
 		@import "@betfinio/components/globals.css" layer(components);
-		--privy-color-accent: var(--color-primary);
-		--privy-color-foreground-accent: var(--color-primary-foreground);
-		--privy-color-accent-dark: var(--color-primary);
 	}
 }
 @theme inline {
