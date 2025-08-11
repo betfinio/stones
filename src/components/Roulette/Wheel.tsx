@@ -51,7 +51,7 @@ const Wheel = () => {
 	const { data: currentRound = 0 } = useCurrentRound();
 	const { data: actualRound = 0 } = useActualRound();
 	const { data: selectedStone, setSelectedStone } = useSelectedStone();
-	const { data: bank = 0n } = useRoundBank(currentRound);
+	const { data: bank = 0n, isLoading } = useRoundBank(currentRound);
 	const { data: bets = [] } = useRoundBets(currentRound);
 	const { data: winner = 0 } = useRoundWinner(currentRound);
 	const { data: status = 0 } = useRoundStatus(currentRound);
@@ -74,8 +74,10 @@ const Wheel = () => {
 
 	// Effects
 	useEffect(() => {
+		if (currentRound === 0) return;
+
 		if (status > 0 || end < Date.now() / 1000) {
-			if (bank === 0n) {
+			if (bank === 0n && !isLoading) {
 				jumpToCurrentRound();
 				return;
 			}

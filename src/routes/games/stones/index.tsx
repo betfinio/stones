@@ -37,7 +37,7 @@ export function StonesPage() {
 		} else {
 			queryClient.setQueryData(['stones', 'currentRound'], search.round);
 		}
-	}, [search]);
+	}, [search, currentRound]);
 	const config = useConfig();
 
 	useWatchContractEvent({
@@ -53,7 +53,6 @@ export function StonesPage() {
 			const bet = logs[0]?.args?.bet as Address;
 			const betInfo = await fetchBetInfo(bet, config);
 			animateNewBet(Number(betInfo.side), 0, queryClient, round);
-
 			queryClient.invalidateQueries({ queryKey: ['stones'] });
 		},
 	});
@@ -66,8 +65,7 @@ export function StonesPage() {
 		args: { from: STONES },
 		onLogs: async (logs) => {
 			logger.warn('Transfer detected', logs[0]);
-
-			queryClient.invalidateQueries({ queryKey: ['stones'] });
+			queryClient.invalidateQueries({ queryKey: ['stones', 'rounds'] });
 		},
 	});
 	return (

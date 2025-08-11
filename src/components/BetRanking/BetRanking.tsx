@@ -10,10 +10,10 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Address } from 'viem';
 import { useAccount } from 'wagmi';
+import { useDistributeModal } from '@/src/components/modals/DistributeModal';
 import { ETHSCAN } from '@/src/lib/global.ts';
 import { useBetsWithPossibleWinAndBonus } from '@/src/lib/gql';
 import { useDistributedInRound, useRoundBank, useRoundBets, useRoundWinner } from '@/src/lib/query';
-import { useDistribute } from '@/src/lib/query/mutations.ts';
 import type { StonesBet } from '@/src/lib/types.ts';
 import bronzeTrophy from '../../assets/BetHistory/trophy-bronze.svg';
 import goldTrophy from '../../assets/BetHistory/trophy-gold.svg';
@@ -30,7 +30,7 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 	const { data: bets = [], isLoading: areBetsLoading } = useRoundBets(round);
 	const { data: winner = 0 } = useRoundWinner(round);
 	const { data: distributed = 0n } = useDistributedInRound(round);
-	const { mutate: distribute } = useDistribute();
+	const { requestDistribute } = useDistributeModal();
 	const { winBets } = useBetsWithPossibleWinAndBonus(round, winner);
 
 	const topWinners = useMemo(() => {
@@ -55,13 +55,13 @@ const BetRanking: FC<{ round: number }> = ({ round }) => {
 	const bonusBank = (bank * 5n) / 100n;
 
 	const handleDistribute = () => {
-		distribute({ round });
+		requestDistribute(round);
 	};
 
 	const userWinBet = useMemo(() => {
 		return winBets.find((bet) => bet.player === address);
 	}, [winBets, address]);
-
+	console.log('distributed', distributed);
 	return (
 		<>
 			<div className="flex flex-col md:flex-row w-full space-x-2 items-center justify-around my-8 px-2 gap-8 lg:gap-2 xl:gap-8">

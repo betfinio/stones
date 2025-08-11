@@ -223,7 +223,7 @@ export interface DistributeParams {
 	round: number;
 }
 
-export const distribute = async (params: DistributeParams, config: Config) => {
+export const executeResult = async (params: DistributeParams, config: Config) => {
 	if (!config) throw new Error('Config is required');
 
 	await simulateContract(config, {
@@ -233,10 +233,46 @@ export const distribute = async (params: DistributeParams, config: Config) => {
 		args: [BigInt(params.round), 0n, 100n],
 	});
 
+	return writeContract(config, {
+		abi: StonesABI,
+		address: STONES,
+		functionName: 'executeResult',
+		args: [BigInt(params.round), 0n, 100n],
+	});
+};
+
+export const settleLostBets = async (params: DistributeParams, config: Config) => {
+	if (!config) throw new Error('Config is required');
+
 	await simulateContract(config, {
 		address: STONES,
 		abi: StonesABI,
 		functionName: 'settleLostBets',
+		args: [BigInt(params.round), 0n, 100n],
+	});
+
+	return writeContract(config, {
+		abi: StonesABI,
+		address: STONES,
+		functionName: 'settleLostBets',
+		args: [BigInt(params.round), 0n, 100n],
+	});
+};
+
+export const distribute = async (params: DistributeParams, config: Config) => {
+	if (!config) throw new Error('Config is required');
+
+	await simulateContract(config, {
+		address: STONES,
+		abi: StonesABI,
+		functionName: 'settleLostBets',
+		args: [BigInt(params.round), 0n, 100n],
+	});
+
+	await simulateContract(config, {
+		address: STONES,
+		abi: StonesABI,
+		functionName: 'executeResult',
 		args: [BigInt(params.round), 0n, 100n],
 	});
 	await writeContract(config, {
