@@ -1,11 +1,9 @@
 import { valueToNumber, ZeroAddress } from '@betfinio/abi';
-import { Slider } from '@betfinio/components/ui';
+import { type NumberFormatValues, NumericInput, Slider } from '@betfinio/components/ui';
 import { useBalance } from 'betfinio_context/lib/query';
 import { cx } from 'class-variance-authority';
 import { type FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NumericFormat } from 'react-number-format';
-import type { NumberFormatValues } from 'react-number-format/types';
 import { useAccount } from 'wagmi';
 import { useBetAmount } from '@/src/lib/query';
 import { usePlaceBet, useSetBetAmount } from '@/src/lib/query/mutations';
@@ -41,17 +39,13 @@ const BetAmountInput: FC<{ isMobile?: boolean }> = ({ isMobile = false }) => {
 		<div className={cx('w-full', isMobile ? '' : 'flex flex-col h-[110px] w-full max-w-[200px]', balance <= 0n && 'pointer-events-none grayscale')}>
 			<span className="text-foreground font-semibold mb-2 block">{t('betAmount')}</span>
 			<div>
-				<NumericFormat
+				<NumericInput
 					className={cx(
 						'text-center bg-background py-3 font-semibold text-sm text-foreground disabled:cursor-not-allowed duration-300 px-4 border border-border rounded-lg p-2 w-full',
 						isMobile ? 'h-10' : 'h-[40px]',
 						valueToNumber(balance) < Number(amount) && 'text-destructive',
 					)}
-					thousandSeparator={','}
-					min={1}
-					allowNegative={false}
-					maxLength={15}
-					disabled={isPending || balance <= 0n}
+					disabled={isPending}
 					placeholder={valueToNumber(balance) < Number(amount) ? t('placeholder.balance') : t('placeholder.Amount')}
 					value={amount}
 					onValueChange={handleAmountChange}
