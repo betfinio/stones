@@ -40,13 +40,9 @@ const BetAmountInput: FC<{ isMobile?: boolean }> = ({ isMobile = false }) => {
 			<span className="text-foreground font-semibold mb-2 block">{t('betAmount')}</span>
 			<div>
 				<NumericInput
-					className={cx(
-						'text-center bg-background py-3 font-semibold text-sm text-foreground disabled:cursor-not-allowed duration-300 px-4 border border-border rounded-lg p-2 w-full',
-						isMobile ? 'h-10' : 'h-[40px]',
-						valueToNumber(balance) < Number(amount) && 'text-destructive',
-					)}
-					disabled={isPending}
 					placeholder={valueToNumber(balance) < Number(amount) ? t('placeholder.balance') : t('placeholder.Amount')}
+					hasError={valueToNumber(balance) < Number(amount)}
+					disabled={isPending || balance <= 0n}
 					value={amount}
 					onValueChange={handleAmountChange}
 				/>
