@@ -17,7 +17,7 @@
 	},
 	"dependencies": {
 		"@betfinio/abi": "^2.12.0",
-		"@betfinio/components": "^2.6.0",
+		"@betfinio/components": "^2.7.0-dev.1",
 		"@nivo/core": "^0.99.0",
 		"@nivo/pie": "^0.99.0",
 		"@tailwindcss/postcss": "^4.1.11",
