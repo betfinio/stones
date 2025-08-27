@@ -10,6 +10,7 @@ import BetAmount from '@/src/components/BetAmount/BetAmount.tsx';
 import BetHistory from '@/src/components/BetHistory/BetHistory.tsx';
 import BetSummary from '@/src/components/BetSummary/BetSummary.tsx';
 import CardList from '@/src/components/CardList/CardList.tsx';
+import { DistributeProvider } from '@/src/components/modals/DistributeModal';
 import Roulette from '@/src/components/Roulette/Roulette.tsx';
 import TableBet from '@/src/components/TableBet/TableBet.tsx';
 import logger from '@/src/config/logger.ts';
@@ -69,34 +70,36 @@ export function StonesPage() {
 		},
 	});
 	return (
-		<TooltipProvider>
-			<div className={'stones w-full h-full max-w-screen-2xl mx-auto'}>
-				<div className="w-full p-2 md:py-3 lg:py-4 rounded-md text-foreground h-full 2xl:px-0 overflow-hidden grid grid-cols-12 gap-2">
-					<div className={'col-span-12 lg:col-span-8'}>
-						<Roulette />
+		<DistributeProvider>
+			<TooltipProvider>
+				<div className={'stones w-full h-full max-w-screen-2xl mx-auto'}>
+					<div className="w-full p-2 md:py-3 lg:py-4 rounded-md text-foreground h-full 2xl:px-0 overflow-hidden grid grid-cols-12 gap-2">
+						<div className={'col-span-12 lg:col-span-8'}>
+							<Roulette />
+						</div>
+						<AnimatePresence>
+							<div key={'amount'} className={'col-span-12 lg:col-span-8 lg:mb-0 md:mb-10'}>
+								<BetAmount />
+							</div>
+							<div key={'cards'} className={'col-span-12 md:col-span-8 overflow-hidden'}>
+								<CardList />
+							</div>
+							<div key={'history'} className={'col-span-12 md:col-span-4 flex flex-col gap-2 lg:col-span-4 lg:row-start-1 lg:col-start-9 lg:row-span-3'}>
+								<BetHistory />
+								<BetSummary />
+							</div>
+							<div key={'table'} className={'col-span-12 w-full'}>
+								<TableBet />
+							</div>
+							<a target={'_blank'} rel={'noreferrer '} href="https://chain.link/vrf" className={'w-full max-w-[200px] col-span-12 lg:col-span-4'}>
+								<img src="https://chain.link/badge-randomness-black" alt="randomness secured with chainlink" />
+							</a>
+						</AnimatePresence>
 					</div>
-					<AnimatePresence>
-						<div key={'amount'} className={'col-span-12 lg:col-span-8 lg:mb-0 md:mb-10'}>
-							<BetAmount />
-						</div>
-						<div key={'cards'} className={'col-span-12 md:col-span-8 overflow-hidden'}>
-							<CardList />
-						</div>
-						<div key={'history'} className={'col-span-12 md:col-span-4 flex flex-col gap-2 lg:col-span-4 lg:row-start-1 lg:col-start-9 lg:row-span-3'}>
-							<BetHistory />
-							<BetSummary />
-						</div>
-						<div key={'table'} className={'col-span-12 w-full'}>
-							<TableBet />
-						</div>
-						<a target={'_blank'} rel={'noreferrer '} href="https://chain.link/vrf" className={'w-full max-w-[200px] col-span-12 lg:col-span-4'}>
-							<img src="https://chain.link/badge-randomness-black" alt="randomness secured with chainlink" />
-						</a>
-					</AnimatePresence>
 				</div>
-			</div>
-			<SonnerToaster />
-		</TooltipProvider>
+				<SonnerToaster />
+			</TooltipProvider>
+		</DistributeProvider>
 	);
 }
 
