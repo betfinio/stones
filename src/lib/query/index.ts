@@ -135,7 +135,7 @@ export const useBetResult = (bet: Address) => {
 };
 
 export const useBetAmount = () => {
-	return useQuery<number>({
+	return useQuery<string>({
 		queryKey: ['betAmount'],
 		staleTime: Number.POSITIVE_INFINITY,
 	});

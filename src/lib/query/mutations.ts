@@ -172,7 +172,7 @@ export const useSettleLostBets = () => {
 export const useSetBetAmount = () => {
 	const queryClient = useQueryClient();
 
-	return useMutation<unknown, number, number>({
+	return useMutation<unknown, string, string>({
 		mutationKey: ['spin'],
 		mutationFn: async (newValue) => {
 			queryClient.setQueryData(['betAmount'], newValue);
