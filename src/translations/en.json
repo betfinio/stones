@@ -28,7 +28,6 @@
 	"controls": {
 		"betAmount": "Bet amount",
 		"placeholder": {
-			"balance": "Please top-up balance",
 			"Amount": "Amount"
 		},
 		"placeBet": "Bet and win",
