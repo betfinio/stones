@@ -17,12 +17,12 @@ const PlaceBetButton: FC<{ isMobile?: boolean }> = ({ isMobile = false }) => {
 	const { address = ZeroAddress } = useAccount();
 	const { data: selected } = useSelectedStone();
 	const { data: round = 0 } = useCurrentRound();
-	const { data: amount = 10000 } = useBetAmount();
+	const { data: amount = '10000' } = useBetAmount();
 	const { requestAllowance, setResult, requested } = useAllowanceModal();
 	const { mutate: placeBet, isPending, data, isSuccess } = usePlaceBet();
 	const { data: allowance = 0n } = useAllowance(address);
 
-	const { win, bonus } = usePotentialWinWithBonus(amount, selected);
+	const { win, bonus } = usePotentialWinWithBonus(Number(amount), selected);
 	const winAmount = Number(win + bonus);
 
 	useEffect(() => {
