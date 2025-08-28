@@ -1,6 +1,5 @@
 import { valueToNumber, ZeroAddress } from '@betfinio/abi';
 import { type NumberFormatValues, NumericInput, Slider } from '@betfinio/components/ui';
-import { flattenBy } from '@tanstack/react-table';
 import { useBalance } from 'betfinio_context/lib/query';
 import { cx } from 'class-variance-authority';
 import { type FC, useEffect, useMemo, useState } from 'react';
