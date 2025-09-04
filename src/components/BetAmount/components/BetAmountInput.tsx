@@ -56,6 +56,11 @@ const BetAmountInput: FC<{ isMobile?: boolean }> = ({ isMobile = false }) => {
 			setBetPercentage(0);
 		}
 	};
+	// const handleAmountChange = (valueObj: NumberFormatValues) => {
+	// 	const { floatValue = 0 } = valueObj;
+	// 	setAmount(floatValue);
+	// 	setBetPercentage(Math.min(Number((BigInt(floatValue) * 100n * 10n ** 18n) / balance), 100));
+	// };
 
 	return (
 		<div className={cx('w-full', isMobile ? '' : 'flex flex-col h-[110px] w-full max-w-[200px]')}>
