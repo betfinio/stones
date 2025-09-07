@@ -44,17 +44,16 @@ const CardItem: FC<{ stone: number }> = ({ stone }) => {
 	const { data: round = 0 } = useCurrentRound();
 	const { data: selectedStone = 1, setSelectedStone } = useSelectedStone();
 	const { data: sideBank = [0n, 0n, 0n, 0n, 0n] } = useSideBank(round);
-	const { data: amount = 10000 } = useBetAmount();
+	const { data: amount = '10000' } = useBetAmount();
 
-	// Convert string amount to number
-	const amountNumber = useMemo(() => Number(amount), [amount]);
+	const amountNum = Number(amount);
 
-	const { win, bonus } = usePotentialWinWithBonus(amountNumber, stone);
+	const { win, bonus } = usePotentialWinWithBonus(amountNum, stone);
 
 	const multiplier = useMemo(() => {
-		if (amountNumber === 0) return 0;
-		return (win + bonus) / amountNumber;
-	}, [amountNumber, win, bonus]);
+		if (amountNum === 0) return 0;
+		return (win + bonus) / amountNum;
+	}, [amount, win, bonus]);
 
 	const handleClick = () => {
 		setSelectedStone(stone);
