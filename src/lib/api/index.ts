@@ -1,7 +1,7 @@
 import { arrayFrom, PartnerABI, StonesABI, StonesBetABI } from '@betfinio/abi';
 import type { QueryClient } from '@tanstack/react-query';
 import { type Config, multicall, readContract, simulateContract, writeContract } from '@wagmi/core';
-import { type Address, encodeAbiParameters, parseAbiParameters } from 'viem';
+import { type Address, encodeAbiParameters, parseAbiParameters, parseEther } from 'viem';
 import logger from '@/src/config/logger';
 import { PARTNER, ROUND_DURATION, STONES } from '@/src/lib/global';
 import type { StoneInfo, StonesBet } from '@/src/lib/types';
@@ -191,13 +191,13 @@ export const placeBet = async (params: PlaceBetParams, config: Config) => {
 		address: PARTNER,
 		abi: PartnerABI,
 		functionName: 'placeBet',
-		args: [STONES, BigInt(params.amount) * 10n ** 18n, data],
+		args: [STONES, parseEther(params.amount.toString()), data],
 	});
 	return writeContract(config, {
 		address: PARTNER,
 		abi: PartnerABI,
 		functionName: 'placeBet',
-		args: [STONES, BigInt(params.amount) * 10n ** 18n, data],
+		args: [STONES, parseEther(params.amount.toString()), data],
 	});
 };
 export interface SpinParams {
