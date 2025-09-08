@@ -4,6 +4,7 @@ import { useBalance } from 'betfinio_context/lib/query';
 import { cx } from 'class-variance-authority';
 import { type FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { parseEther } from 'viem';
 import { useAccount } from 'wagmi';
 import { useBetAmount } from '@/src/lib/query';
 import { usePlaceBet, useSetBetAmount } from '@/src/lib/query/mutations';
@@ -19,7 +20,7 @@ const BetAmountInput: FC<{ isMobile?: boolean }> = ({ isMobile = false }) => {
 
 	useEffect(() => {
 		if (balance > 0n) {
-			setBetPercentage(Math.min(Number((BigInt(amount) * 100n * 10n ** 18n) / balance), 100));
+			setBetPercentage(Math.min(Number((parseEther(amount.toString()) * 100n) / balance), 100));
 		}
 	}, [amount, balance]);
 
@@ -51,7 +52,7 @@ const BetAmountInput: FC<{ isMobile?: boolean }> = ({ isMobile = false }) => {
 		setAmount(value);
 
 		if (balance > 0n) {
-			setBetPercentage(Math.min(Number((BigInt(Number(value)) * 100n * 10n ** 18n) / balance), 100));
+			setBetPercentage(Math.min(Number((parseEther(value) * 100n) / balance), 100));
 		} else {
 			setBetPercentage(0);
 		}
