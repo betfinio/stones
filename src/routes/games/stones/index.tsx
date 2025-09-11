@@ -2,10 +2,11 @@ import { StonesABI, TokenABI } from '@betfinio/abi';
 import { SonnerToaster, TooltipProvider } from '@betfinio/components/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { wagmiConfig } from 'betfinio_context/config';
 import { AnimatePresence } from 'motion/react';
 import { useEffect } from 'react';
 import type { Address } from 'viem';
-import { useConfig, useWatchContractEvent } from 'wagmi';
+import { useWatchContractEvent } from 'wagmi';
 import BetAmount from '@/src/components/BetAmount/BetAmount.tsx';
 import BetHistory from '@/src/components/BetHistory/BetHistory.tsx';
 import BetSummary from '@/src/components/BetSummary/BetSummary.tsx';
@@ -39,7 +40,6 @@ export function StonesPage() {
 			queryClient.setQueryData(['stones', 'currentRound'], search.round);
 		}
 	}, [search, currentRound]);
-	const config = useConfig();
 
 	useWatchContractEvent({
 		abi: StonesABI,
@@ -52,7 +52,7 @@ export function StonesPage() {
 			if (round !== currentRound) return;
 
 			const bet = logs[0]?.args?.bet as Address;
-			const betInfo = await fetchBetInfo(bet, config);
+			const betInfo = await fetchBetInfo(bet, wagmiConfig);
 			animateNewBet(Number(betInfo.side), 0, queryClient, round);
 			queryClient.invalidateQueries({ queryKey: ['stones'] });
 		},

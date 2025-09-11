@@ -1,4 +1,5 @@
 import { valueToNumber } from '@betfinio/abi';
+import { wagmiConfig } from 'betfinio_context/config';
 import type { ExecutionResult } from 'graphql/execution';
 import { useMemo } from 'react';
 import type { Address } from 'viem';
@@ -26,22 +27,22 @@ export const fetchRounds = async (): Promise<{ round: number }[]> => {
 	return data.data.roundStarts.map((round) => ({ round: Number(round.round) }));
 };
 
-export const fetchRoundBetsByPlayer = async (round: number, player: Address, config: Config): Promise<StonesBet[]> => {
+export const fetchRoundBetsByPlayer = async (round: number, player: Address, _config: Config): Promise<StonesBet[]> => {
 	logger.start('fetching round bets by player', round, player);
 	const data: ExecutionResult<PlayerBetsByRoundQuery> = await execute(PlayerBetsByRoundDocument, { round, player });
 	logger.success('round bets by player', data.data?.betCreateds.length);
 	if (!data.data) return [];
 	const bets = populateStonesBet(data.data);
-	return fetchBetsResults(bets, config);
+	return fetchBetsResults(bets, wagmiConfig);
 };
 
-export const fetchBetsByPlayer = async (player: Address, config: Config): Promise<StonesBet[]> => {
+export const fetchBetsByPlayer = async (player: Address, _config: Config): Promise<StonesBet[]> => {
 	logger.start('fetching bets by player', player);
 	const data: ExecutionResult<PlayerBetsQuery> = await execute(PlayerBetsDocument, { player });
 	logger.success('bets by player', data.data?.betCreateds.length);
 	if (!data.data) return [];
 	const bets = populateStonesBet(data.data);
-	return fetchBetsResults(bets, config);
+	return fetchBetsResults(bets, wagmiConfig);
 };
 
 export const usePotentialWinWithBonus = (amount: number, selected: number) => {
