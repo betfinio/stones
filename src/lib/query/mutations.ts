@@ -1,5 +1,6 @@
 import { toast } from '@betfinio/components/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { wagmiConfig } from 'betfinio_context/config';
 import { getTransactionLink, handleError } from 'betfinio_context/lib/helpers';
 import { useTranslation } from 'react-i18next';
 import type { WriteContractErrorType, WriteContractReturnType } from 'viem';
@@ -16,7 +17,7 @@ export const usePlaceBet = () => {
 	const queryClient = useQueryClient();
 	return useMutation<WriteContractReturnType, WriteContractErrorType, PlaceBetParams>({
 		mutationKey: ['stones', 'placeBet'],
-		mutationFn: (params) => placeBet(params, config),
+		mutationFn: (params) => placeBet(params, wagmiConfig),
 		onSuccess: async (data) => {
 			logger.success('transaction submitted');
 
@@ -53,7 +54,7 @@ export const useSpin = () => {
 	const config = useConfig();
 	return useMutation<WriteContractReturnType, WriteContractErrorType, SpinParams>({
 		mutationKey: ['stones', 'spin'],
-		mutationFn: (params) => spin(params, config),
+		mutationFn: (params) => spin(params, wagmiConfig),
 		onSuccess: async (data) => {
 			logger.success('transaction submitted');
 
@@ -82,7 +83,7 @@ export const useDistribute = () => {
 	const config = useConfig();
 	return useMutation<WriteContractReturnType, WriteContractReturnType, DistributeParams>({
 		mutationKey: ['stones', 'spin'],
-		mutationFn: (params) => distribute(params, config),
+		mutationFn: (params) => distribute(params, wagmiConfig),
 		onSuccess: async (data) => {
 			logger.success('transaction submitted');
 
@@ -112,7 +113,7 @@ export const useExecuteResult = (round: number) => {
 	const config = useConfig();
 	return useMutation<WriteContractReturnType, WriteContractErrorType, DistributeParams>({
 		mutationKey: ['stones', 'executeResult'],
-		mutationFn: (params) => executeResult(params, config),
+		mutationFn: (params) => executeResult(params, wagmiConfig),
 		onSuccess: async (data) => {
 			logger.success('executeResult transaction submitted');
 
@@ -144,7 +145,7 @@ export const useSettleLostBets = () => {
 	const config = useConfig();
 	return useMutation<WriteContractReturnType, WriteContractErrorType, DistributeParams>({
 		mutationKey: ['stones', 'settleLostBets'],
-		mutationFn: (params) => settleLostBets(params, config),
+		mutationFn: (params) => settleLostBets(params, wagmiConfig),
 		onSuccess: async (data) => {
 			logger.success('settleLostBets transaction submitted');
 
