@@ -1,0 +1,74 @@
+name: Build and Deploy to IPFS
+
+on:
+  push:
+    branches:
+      - prod/*
+      - dev
+
+permissions:
+  actions: read
+  repository-projects: read
+  contents: write
+  pull-requests: write
+  packages: read
+  id-token: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: 20
+
+jobs:
+  setup:
+    name: Setup and Build
+    environment: ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      
+      - name: Fetch variables
+        uses: aws-actions/aws-secretsmanager-get-secrets@v2
+        with:
+          secret-ids: |
+            ,${{ secrets.AWS_ENVIRONMENT }}
+            ,${{ github.ref_name }}
+          parse-json-secrets: true
+      
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          registry-url: "https://npm.pkg.github.com"
+          scope: '@betfinio'
+          bun-version: latest
+      
+      - name: Install dependencies
+        run: bun install
+        env:
+          BUN_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Build
+        env:
+          PUBLIC_OUTPUT_URL: https://${{ vars.IPFS_FOLDER_NAME }}
+        run: bun run build --env-mode ${{ vars.ENVIRONMENT }}
+      
+      - name: Deploy to IPFS and IPNS
+        uses: betfinio/ipfs-deploy-action@v1.0.2
+        with:
+          folder_path: './dist'
+          folder_name: '${{ vars.IPFS_FOLDER_NAME }}'
+          ipns_private_key: ${{ secrets.IPNS_PRIVATE_KEY }}
+          pinata_gateway: ${{ secrets.PINATA_GATEWAY }}
+          pinata_jwt: ${{ secrets.PINATA_JWT }}
+          quicknode_api_key: ${{ secrets.QUICKNODE_API_KEY }}
+        
