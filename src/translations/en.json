@@ -28,7 +28,6 @@
 	"controls": {
 		"betAmount": "Bet amount",
 		"placeholder": {
-			"balance": "Please top-up balance",
 			"Amount": "Amount"
 		},
 		"placeBet": "Bet and win",
@@ -69,6 +68,16 @@
 		"distribute": "Distribute",
 		"payoutNotDistributed": "Payout was not distributed",
 		"topWinners": "Top winners"
+	},
+	"distributeModal": {
+		"roundDistribution": "Round Distribution",
+		"executeResult": "Execute round result",
+		"executingResult": "Executing result...",
+		"settleLostBets": "Settle lost bets",
+		"settlingBets": "Settling lost bets...",
+		"execute": "Execute",
+		"settle": "Settle",
+		"result": "Distribution completed"
 	},
 	"table": {
 		"tabs": {

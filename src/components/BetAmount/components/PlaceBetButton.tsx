@@ -6,6 +6,7 @@ import { useAllowance } from 'betfinio_context/lib/query';
 import { LoaderIcon } from 'lucide-react';
 import { type FC, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { parseEther } from 'viem';
 import { useAccount } from 'wagmi';
 import { usePotentialWinWithBonus } from '@/src/lib/gql';
 import { useBetAmount, useCurrentRound } from '@/src/lib/query';
@@ -17,12 +18,12 @@ const PlaceBetButton: FC<{ isMobile?: boolean }> = ({ isMobile = false }) => {
 	const { address = ZeroAddress } = useAccount();
 	const { data: selected } = useSelectedStone();
 	const { data: round = 0 } = useCurrentRound();
-	const { data: amount = 10000 } = useBetAmount();
+	const { data: amount = '10000' } = useBetAmount();
 	const { requestAllowance, setResult, requested } = useAllowanceModal();
 	const { mutate: placeBet, isPending, data, isSuccess } = usePlaceBet();
 	const { data: allowance = 0n } = useAllowance(address);
 
-	const { win, bonus } = usePotentialWinWithBonus(amount, selected);
+	const { win, bonus } = usePotentialWinWithBonus(Number(amount), selected);
 	const winAmount = Number(win + bonus);
 
 	useEffect(() => {
@@ -38,8 +39,8 @@ const PlaceBetButton: FC<{ isMobile?: boolean }> = ({ isMobile = false }) => {
 	}, [requested]);
 
 	const handleSpin = () => {
-		if (allowance < BigInt(amount)) {
-			requestAllowance?.('bet', BigInt(amount) * 10n ** 18n);
+		if (allowance < parseEther(amount)) {
+			requestAllowance?.('bet', parseEther(amount));
 			return;
 		}
 		placeBet({ amount: Number(amount), side: selected, round: round });
@@ -48,7 +49,7 @@ const PlaceBetButton: FC<{ isMobile?: boolean }> = ({ isMobile = false }) => {
 	return (
 		<Button
 			className={`hover:scale-105 duration-200 transition-all flex gap-1 w-full ${!isMobile ? 'max-w-[320px]' : ''}`}
-			disabled={isPending || amount <= 0n}
+			disabled={isPending || Number(amount) <= 0}
 			type="button"
 			onClick={handleSpin}
 		>

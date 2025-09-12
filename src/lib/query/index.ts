@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { wagmiConfig } from 'betfinio_context/config';
 import type { Address } from 'viem';
-import { useConfig } from 'wagmi';
 import {
 	fetchBetResult,
 	fetchCurrentRound,
@@ -19,10 +19,9 @@ import type { StoneInfo, StonesBet } from '@/src/lib/types';
 import { ROUND_DURATION } from '../global';
 
 export const useCurrentRound = () => {
-	const config = useConfig();
 	return useQuery<number>({
 		queryKey: ['stones', 'currentRound'],
-		queryFn: () => fetchCurrentRound(config),
+		queryFn: () => fetchCurrentRound(wagmiConfig),
 	});
 };
 
@@ -35,79 +34,69 @@ export const useActualRound = () => {
 };
 
 export const useRoundBank = (round: number) => {
-	const config = useConfig();
 	return useQuery<bigint>({
 		queryKey: ['stones', 'round', round, 'bank'],
-		queryFn: () => fetchRoundBank(round, config),
+		queryFn: () => fetchRoundBank(round, wagmiConfig),
 	});
 };
 
 export const useRoundStatus = (round: number) => {
-	const config = useConfig();
 	return useQuery<number>({
 		queryKey: ['stones', 'round', round, 'status'],
-		queryFn: () => fetchRoundStatus(round, config),
+		queryFn: () => fetchRoundStatus(round, wagmiConfig),
 	});
 };
 
 export const useDistributedInRound = (round: number) => {
-	const config = useConfig();
 	return useQuery<bigint>({
 		queryKey: ['stones', 'round', round, 'distributed'],
-		queryFn: () => fetchDistributedInRound(round, config),
+		queryFn: () => fetchDistributedInRound(round, wagmiConfig),
 	});
 };
 
 export const useSideBank = (round: number) => {
-	const config = useConfig();
 	return useQuery<bigint[]>({
 		queryKey: ['stones', 'round', round, 'sideBank'],
-		queryFn: () => fetchRoundSideBank(round, config),
+		queryFn: () => fetchRoundSideBank(round, wagmiConfig),
 	});
 };
 export const useSideBonusShares = (round: number) => {
-	const config = useConfig();
 	return useQuery<bigint[]>({
 		queryKey: ['stones', 'round', round, 'sideBonusShares'],
-		queryFn: () => fetchRoundSideBonusShares(round, config),
+		queryFn: () => fetchRoundSideBonusShares(round, wagmiConfig),
 	});
 };
 export const useSideBetsCount = (round: number) => {
-	const config = useConfig();
 	return useQuery<bigint[]>({
 		queryKey: ['stones', 'round', round, 'sideBetsCount'],
-		queryFn: () => fetchRoundSideBetsCount(round, config),
+		queryFn: () => fetchRoundSideBetsCount(round, wagmiConfig),
 	});
 };
 
 export const useRoundBets = (round: number) => {
-	const config = useConfig();
 	return useQuery<StonesBet[]>({
 		queryKey: ['stones', 'round', round, 'bets'],
-		queryFn: () => fetchRoundBets(round, config),
+		queryFn: () => fetchRoundBets(round, wagmiConfig),
 	});
 };
 export const useRoundBetsByPlayer = (round: number, player: Address) => {
-	const config = useConfig();
 	return useQuery<StonesBet[]>({
 		queryKey: ['stones', 'round', round, 'bets', player],
-		queryFn: () => fetchRoundBetsByPlayer(round, player, config),
+		queryFn: () => fetchRoundBetsByPlayer(round, player, wagmiConfig),
 	});
 };
 
 export const useStonesInfo = (round: number) => {
-	const config = useConfig();
 	return useQuery<StoneInfo[]>({
 		queryKey: ['stones', 'round', round, 'stones'],
-		queryFn: () => fetchRoundStones(round, config),
+		queryFn: () => fetchRoundStones(round, wagmiConfig),
 	});
 };
 
 export const usePlayerBets = (player: Address) => {
-	const config = useConfig();
 	return useQuery<StonesBet[]>({
 		queryKey: ['stones', 'player', player, 'bets'],
-		queryFn: () => fetchBetsByPlayer(player, config),
+		queryFn: () => fetchBetsByPlayer(player, wagmiConfig),
 	});
 };
 
@@ -119,23 +108,21 @@ export const useRounds = () => {
 };
 
 export const useRoundWinner = (round: number) => {
-	const config = useConfig();
 	return useQuery<number>({
 		queryKey: ['stones', 'round', round, 'winner'],
-		queryFn: () => fetchRoundWinner(round, config),
+		queryFn: () => fetchRoundWinner(round, wagmiConfig),
 	});
 };
 
 export const useBetResult = (bet: Address) => {
-	const config = useConfig();
 	return useQuery<bigint>({
 		queryKey: ['stones', 'bet', bet, 'result'],
-		queryFn: () => fetchBetResult(bet, config),
+		queryFn: () => fetchBetResult(bet, wagmiConfig),
 	});
 };
 
 export const useBetAmount = () => {
-	return useQuery<number>({
+	return useQuery<string>({
 		queryKey: ['betAmount'],
 		staleTime: Number.POSITIVE_INFINITY,
 	});

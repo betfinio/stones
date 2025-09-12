@@ -1,0 +1,6 @@
+@layer utilities {
+	body {
+		@tailwind utilities;
+		@import "@betfinio/components/globals.css";
+	}
+}

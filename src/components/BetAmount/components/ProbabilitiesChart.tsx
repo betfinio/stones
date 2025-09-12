@@ -24,7 +24,7 @@ const ProbabilitiesChart: FC<{ round: number; pie: any[] }> = ({ round, pie }) =
 		if (isEmpty) return null;
 		return (
 			<div
-				className="flex items-center justify-center space-x-2 p-2 rounded-lg text-foreground  bg-popover rounded px-2 py-1"
+				className="flex items-center justify-center space-x-2 p-2 rounded-lg text-foreground  bg-popover rounded px-4 py-1"
 				style={{ border: `1px solid ${datum.data.borderColor}` }}
 			>
 				<img src={images[`crystal${pie.findIndex((item) => item.id === datum.id) + 1}`]} alt={datum.id} className="h-5" />
