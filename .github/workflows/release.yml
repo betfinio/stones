@@ -23,7 +23,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          for branch in io games network bet; do
+          for branch in games bet; do
             echo "Creating PR for prod/$branch"
             gh pr create -B prod/$branch -H dev \
               --title "Release to prod/$branch" \
