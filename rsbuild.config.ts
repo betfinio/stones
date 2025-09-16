@@ -43,7 +43,11 @@ export default defineConfig({
 				},
 				shareStrategy: 'loaded-first',
 				manifest: true,
-				dts: true,
+				dts: {
+					consumeTypes: {
+						typesOnBuild: true,
+					},
+				},
 				shared: ['react', 'react-dom', '@tanstack/react-router', '@tanstack/react-query', '@tanstack/react-table', 'i18next', 'react-i18next', 'wagmi'],
 			},
 			{},
