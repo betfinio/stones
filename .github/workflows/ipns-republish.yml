@@ -1,0 +1,44 @@
+name: IPNS Republish
+permissions:
+  contents: read
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  check-ipfs-enabled:
+    environment: ${{ github.ref_name }}
+    name: Check if IPFS is enabled
+    runs-on: ubuntu-latest
+    outputs:
+      ipfs-enabled: ${{ steps.check.outputs.enabled }}
+    steps:
+      - name: Check IPFS variable
+        id: check
+        run: |
+          if [ "${{ vars.IPFS }}" = "true" ]; then
+            echo "enabled=true" >> $GITHUB_OUTPUT
+            echo "IPFS is enabled, proceeding with IPNS republish"
+          else
+            echo "enabled=false" >> $GITHUB_OUTPUT
+            echo "IPFS is disabled, skipping IPNS republish"
+          fi
+
+  republish:
+    name: Republish IPNS
+    environment: ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    needs: check-ipfs-enabled
+    if: ${{ needs.check-ipfs-enabled.outputs.ipfs-enabled == 'true' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Republish IPNS record
+        uses: betfinio/apps-republish-action@v1.0.0
+        with:
+          folder_name: '${{ vars.IPFS_FOLDER_NAME }}'
+          ipns_private_key: ${{ secrets.IPNS_PRIVATE_KEY }}
+          quicknode_api_key: ${{ secrets.QUICKNODE_API_KEY }}
