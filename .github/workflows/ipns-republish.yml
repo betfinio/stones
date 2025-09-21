@@ -8,35 +8,31 @@ on:
   workflow_dispatch:
 
 jobs:
-  check-ipfs-enabled:
-    environment: ${{ github.ref_name }}
-    name: Check if IPFS is enabled
+  republish:
+    strategy:
+      fail-fast: false 
+      matrix:
+        environment: [dev, prod/bet, prod/network, prod/games, prod/io]
+    name: Republish IPNS - ${{ matrix.environment }}
+    environment: ${{ matrix.environment }}
     runs-on: ubuntu-latest
-    outputs:
-      ipfs-enabled: ${{ steps.check.outputs.enabled }}
     steps:
       - name: Check IPFS variable
         id: check
         run: |
           if [ "${{ vars.IPFS }}" = "true" ]; then
-            echo "enabled=true" >> $GITHUB_OUTPUT
-            echo "IPFS is enabled, proceeding with IPNS republish"
+            echo "IPFS is enabled for ${{ matrix.environment }}, proceeding with IPNS republish"
           else
-            echo "enabled=false" >> $GITHUB_OUTPUT
-            echo "IPFS is disabled, skipping IPNS republish"
+            echo "IPFS is disabled for ${{ matrix.environment }}, skipping IPNS republish"
+            exit 0
           fi
 
-  republish:
-    name: Republish IPNS
-    environment: ${{ github.ref_name }}
-    runs-on: ubuntu-latest
-    needs: check-ipfs-enabled
-    if: ${{ needs.check-ipfs-enabled.outputs.ipfs-enabled == 'true' }}
-    steps:
       - name: Checkout
+        if: ${{ vars.IPFS == 'true' }}
         uses: actions/checkout@v4
 
       - name: Republish IPNS record
+        if: ${{ vars.IPFS == 'true' }}
         uses: betfinio/apps-republish-action@v1.0.0
         with:
           folder_name: '${{ vars.IPFS_FOLDER_NAME }}'
