@@ -41,10 +41,7 @@ const CrystalSelector: FC<{
 							}
 						}}
 					>
-						<img src={images[`crystal${crystal + 1}`]} alt={`crystal-${index}`} className="h-[15px] z-20" />
-						{index === 0 && (
-							<div className="absolute top-[2px] w-[20px] h-[20px] rounded-full bg-bonus opacity-70 blur-xs z-10 hover:scale-110 transition-all ease-linear" />
-						)}
+						<img src={images[`crystal${crystal + 1}`]} alt={`crystal-${index}`} className="h-[15px] z-[0]" />
 					</div>
 				))}
 			</div>
@@ -52,7 +49,7 @@ const CrystalSelector: FC<{
 	}
 
 	return (
-		<div className="grid grid-cols-5 gap-3 w-full">
+		<div className="grid grid-cols-5 gap-3 w-full z-[0]">
 			{pie?.map((item, index) => (
 				<div
 					key={index}
@@ -63,7 +60,7 @@ const CrystalSelector: FC<{
 					tabIndex={0}
 					role="button"
 				>
-					<img src={images[`crystal${item.id}`]} alt={`crystal-${index}`} className="h-[15px] z-20" />
+					<img src={images[`crystal${item.id}`]} alt={`crystal-${index}`} className="h-[15px] z-[0]" />
 				</div>
 			))}
 		</div>

@@ -231,7 +231,7 @@ const Wheel = () => {
 		<div
 			key={'container'}
 			ref={containerRef}
-			className="relative mx-auto overflow-hidden"
+			className="relative mx-auto overflow-hidden z-0"
 			style={{
 				width: '100%',
 				height: `${500 * scale}px`,
