@@ -90,6 +90,11 @@ const Wheel = () => {
 			setShowCountdown(true);
 			setShowWinnerMessage(false);
 		}
+
+		return () => {
+			controls.stop();
+			arrowControls.stop();
+		};
 	}, [status, currentRound, end, actualRound, winner]);
 
 	useEffect(() => {
