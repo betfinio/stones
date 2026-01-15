@@ -17,7 +17,5 @@ dist/
 
 bun.lockb
 
-.npmrc
-
 .graphclient/
 .husky/
