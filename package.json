@@ -1,5 +1,6 @@
 {
 	"name": "@betfinio/stones",
+	"type": "module",
 	"private": true,
 	"version": "1.0.0",
 	"scripts": {
@@ -13,9 +14,8 @@
 		"preview": "rsbuild preview",
 		"build:schema:dev": "dotenv -e .env.development.local -- graphclient build",
 		"build:schema:prod": "dotenv -e .env.production.local -- graphclient build",
-		"secret:dev": "./scripts/fetch-secrets.sh  development dev",
-		"secret:prod": "./scripts/fetch-secrets.sh  production prod-bet",
-		"secret:cleanup": "./scripts/cleanup-1password.sh"
+		"secret:dev": "bun scripts/op-secret.ts development dev",
+		"secret:prod": "bun scripts/op-secret.ts production prod-bet"
 	},
 	"dependencies": {
 		"@betfinio/abi": "2.14.0",
@@ -28,7 +28,7 @@
 		"@wagmi/core": "2.22.1",
 		"canvas-confetti": "1.9.4",
 		"consola": "3.4.2",
-		"hono": "4.11.4",
+		"hono": "4.11.7",
 		"i18next": "25.5.2",
 		"i18next-browser-languagedetector": "8.2.0",
 		"i18next-icu": "2.4.0",
