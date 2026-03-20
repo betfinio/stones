@@ -1,91 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap");
 
-@layer components, theme, base, utilities;
-
-@import "@betfinio/components/globals.css" layer(components);
-@import "tailwindcss/theme.css" layer(theme);
-@import "tailwindcss/preflight.css" layer(base);
+@import "@betfinio/components/globals.css";
 @import "tw-animate-css";
+@import "tailwindcss";
+@import "./local.css";
 
-@layer utilities {
-	.stones {
-		@tailwind utilities;
-		@import "@betfinio/components/globals.css" layer(components);
-	}
-}
-@theme inline {
-	--breakpoint-2xl: 1440px;
-}
+@source "../@mf-types/source";
 
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
 
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
-
-@theme {
-	--breakpoint-2xl: 1440px;
-	--color-border: var(--border);
-	--color-bonus: var(--bonus);
-	--color-success: var(--success);
-	--color-destructive: var(--destructive);
-	--color-primary: var(--primary);
-	--color-primary-foreground: var(--primary-foreground);
-	--color-secondary-foreground: var(--secondary-foreground);
-}
-
-@layer base {
-	*,
-	::after,
-	::before,
-	::backdrop,
-	::file-selector-button {
-		border-color: var(--color-gray-200, currentcolor);
-	}
-}
-
-html,
-body {
-	font-family: "Quicksand", sans-serif;
-	overscroll-behavior: none;
-}
-
-@layer base {
-	:root {
-		--zircon-bg: 258, 33%, 29%; /* Zircon (background) */
-		--zircon-border: 273, 64%, 71%, 1; /* Zircon (border) */
-
-		--topaz-bg: 291, 11%, 24%; /* Topaz (background) */
-		--topaz-border: 41, 51%, 56%; /* Topaz (border) */
-
-		--citrine-bg: 333, 22%, 25%; /* Citrine (background) */
-		--citrine-border: 25, 96%, 59%; /* Citrine (border) */
-
-		--emerald-bg: 194, 29%, 17%; /* Emerald (background) */
-		--emerald-border: 123, 68%, 34%; /* Emerald (border) */
-
-		--ruby-bg: 304, 33%, 18%; /* Ruby (background) */
-		--ruby-border: 360, 60%, 45%; /* Ruby (border) */
-	}
-}
-
-@layer base {
-	* {
-		@apply border-border;
-		user-select: none;
-	}
-}
-/* Chrome, Safari, Edge, Opera */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-	-webkit-appearance: none;
-	margin: 0;
-}
-
-/* Firefox */
-input[type="number"] {
-	-moz-appearance: textfield;
-}
