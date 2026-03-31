@@ -1,33 +1,70 @@
-query AllRounds($count: Int) {
-	roundStarts: rounds(first: $count, orderBy: started, orderDirection: desc) {
+query StonesRounds($address: Bytes) {
+	rounds(where: { address: $address, status_not: "cancelled" }, orderBy: round, orderDirection: desc, first: 1000) {
 		round
+		address
+		betsAmount
+		betsCount
+		totalReceived
+		status
+		winnerSide
 	}
 }
 
-query PlayerBetsByRound($round: BigInt, $player: Bytes) {
-	betCreateds: bets(where: { round_: { round: $round }, player: $player }, orderBy: blockTimestamp, orderDirection: desc) {
+query StonesRoundBets($address: Bytes, $round: BigInt) {
+	bets(where: { address: $address, round_: { round: $round } }, first: 1000, orderBy: blockTimestamp, orderDirection: asc) {
 		player
-		round {
-			round
-		}
 		amount
-		bet
+		amountReceived
+		betAddress
 		side
-		order
 		blockTimestamp
 	}
 }
 
-query PlayerBets($player: Bytes) {
-	betCreateds: bets(where: { player: $player }, orderBy: blockTimestamp, orderDirection: desc) {
+query StonesPlayerBetsByRound($address: Bytes, $round: BigInt, $player: Bytes) {
+	bets(where: { address: $address, round_: { round: $round }, player: $player }, orderBy: blockTimestamp, orderDirection: desc) {
 		player
+		amount
+		amountReceived
+		betAddress
+		side
+		blockTimestamp
 		round {
 			round
 		}
+	}
+}
+
+query StonesPlayerBets($address: Bytes, $player: Bytes) {
+	bets(where: { address: $address, player: $player }, orderBy: blockTimestamp, orderDirection: desc) {
+		player
 		amount
-		bet
+		amountReceived
+		betAddress
 		side
-		order
 		blockTimestamp
+		round {
+			round
+		}
+	}
+}
+
+query StonesRoundsByPlayer($address: Bytes, $player: Bytes) {
+	rounds(where: { address: $address, bets_: { player: $player } }, orderBy: round, orderDirection: desc) {
+		round
+		address
+		betsAmount
+		betsCount
+		totalReceived
+		status
+		winnerSide
+	}
+}
+
+query StonesWinner($address: Bytes, $round: BigInt) {
+	winnerCalculateds(where: { address: $address, round: $round }) {
+		side
+		round
+		transactionHash
 	}
 }

@@ -4,11 +4,11 @@ import { useChatbot } from 'betfinio_context/lib/context';
 import { CircleHelp, TriangleAlert } from 'lucide-react';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useCurrentRound, useRoundBank } from '@/src/lib/query';
+import { useCurrentRound, useTotalProbability } from '@/src/lib/query';
 
 const Header = () => {
 	const { data: round = 0 } = useCurrentRound();
-	const { data: bank = 0n } = useRoundBank(round);
+	const { data: totalProbability = 0n } = useTotalProbability(round);
 	const { t } = useTranslation('stones', { keyPrefix: 'header' });
 	const { maximize } = useChatbot();
 
@@ -26,14 +26,7 @@ const Header = () => {
 				<div className="flex flex-col items-start">
 					<span className=" font-semibold text-secondary-foreground text-sm lg:text-base">{t('winningPool')}</span>
 					<span className="text-sm font-semibold">
-						<BetValue value={bank} withIcon iconClassName={'w-3 h-3'} />
-					</span>
-				</div>
-				<Separator orientation={'vertical'} className={'h-8'} />
-				<div className="flex-col items-start hidden md:flex">
-					<span className=" font-semibold text-bonus">{t('bonusPool')}</span>
-					<span className="text-sm  font-semibold">
-						<BetValue value={(bank * 5n) / 100n} withIcon iconClassName={'w-3 h-3'} />
+						<BetValue value={totalProbability} withIcon iconClassName={'w-3 h-3'} />
 					</span>
 				</div>
 			</div>

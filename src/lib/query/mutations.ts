@@ -7,7 +7,7 @@ import type { WriteContractErrorType, WriteContractReturnType } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
 import { useConfig } from 'wagmi';
 import logger from '@/src/config/logger';
-import { type DistributeParams, distribute, executeResult, type PlaceBetParams, placeBet, type SpinParams, settleLostBets, spin } from '@/src/lib/api';
+import { type PlaceBetParams, placeBet, type SpinParams, spin } from '@/src/lib/api';
 
 export const usePlaceBet = () => {
 	const config = useConfig();
@@ -74,98 +74,7 @@ export const useSpin = () => {
 			logger.error(error);
 		},
 		onMutate: () => {
-			logger.start('placing bet');
-		},
-	});
-};
-
-export const useDistribute = () => {
-	const config = useConfig();
-	return useMutation<WriteContractReturnType, WriteContractReturnType, DistributeParams>({
-		mutationKey: ['stones', 'spin'],
-		mutationFn: (params) => distribute(params, wagmiConfig),
-		onSuccess: async (data) => {
-			logger.success('transaction submitted');
-
-			const promise = async () => {
-				await waitForTransactionReceipt(config.getClient(), { hash: data });
-			};
-
-			toast.promise(promise, {
-				loading: 'Distributing',
-				success: 'Distributed',
-				action: getTransactionLink(data),
-			});
-			logger.success('finished');
-		},
-		onError: (error) => {
-			toast.error('Distribution failed');
-			logger.error(error);
-		},
-		onMutate: () => {
-			logger.start('placing bet');
-		},
-	});
-};
-
-export const useExecuteResult = (round: number) => {
-	const queryClient = useQueryClient();
-	const config = useConfig();
-	return useMutation<WriteContractReturnType, WriteContractErrorType, DistributeParams>({
-		mutationKey: ['stones', 'executeResult'],
-		mutationFn: (params) => executeResult(params, wagmiConfig),
-		onSuccess: async (data) => {
-			logger.success('executeResult transaction submitted');
-
-			const promise = async () => {
-				await waitForTransactionReceipt(config.getClient(), { hash: data });
-			};
-
-			toast.promise(promise, {
-				loading: 'Executing result...',
-				success: () => {
-					queryClient.invalidateQueries({ queryKey: ['stones', 'round', round, 'distributed'] });
-					return 'Result executed';
-				},
-				action: getTransactionLink(data),
-			});
-			logger.success('executeResult finished');
-		},
-		onError: (error) => {
-			toast.error('Execute result failed');
-			logger.error(error);
-		},
-		onMutate: () => {
-			logger.start('executing result');
-		},
-	});
-};
-
-export const useSettleLostBets = () => {
-	const config = useConfig();
-	return useMutation<WriteContractReturnType, WriteContractErrorType, DistributeParams>({
-		mutationKey: ['stones', 'settleLostBets'],
-		mutationFn: (params) => settleLostBets(params, wagmiConfig),
-		onSuccess: async (data) => {
-			logger.success('settleLostBets transaction submitted');
-
-			const promise = async () => {
-				await waitForTransactionReceipt(config.getClient(), { hash: data });
-			};
-
-			toast.promise(promise, {
-				loading: 'Settling lost bets...',
-				success: 'Lost bets settled',
-				action: getTransactionLink(data),
-			});
-			logger.success('settleLostBets finished');
-		},
-		onError: (error) => {
-			toast.error('Settle lost bets failed');
-			logger.error(error);
-		},
-		onMutate: () => {
-			logger.start('settling lost bets');
+			logger.start('spinning');
 		},
 	});
 };

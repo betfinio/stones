@@ -4,11 +4,11 @@ import { Button } from '@betfinio/components/ui';
 import { useAllowanceModal } from 'betfinio_context/lib/context';
 import { useAllowance } from 'betfinio_context/lib/query';
 import { LoaderIcon } from 'lucide-react';
-import { type FC, useEffect } from 'react';
+import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { parseEther } from 'viem';
 import { useAccount } from 'wagmi';
-import { usePotentialWinWithBonus } from '@/src/lib/gql';
+import { usePotentialWin } from '@/src/lib/gql';
 import { useBetAmount, useCurrentRound } from '@/src/lib/query';
 import { usePlaceBet } from '@/src/lib/query/mutations';
 import { useSelectedStone } from '@/src/lib/query/state';
@@ -19,31 +19,21 @@ const PlaceBetButton: FC<{ isMobile?: boolean }> = ({ isMobile = false }) => {
 	const { data: selected } = useSelectedStone();
 	const { data: round = 0 } = useCurrentRound();
 	const { data: amount = '10000' } = useBetAmount();
-	const { requestAllowance, setResult, requested } = useAllowanceModal();
-	const { mutate: placeBet, isPending, data, isSuccess } = usePlaceBet();
+	const { requestAllowance } = useAllowanceModal();
+	const { mutateAsync: placeBetAsync, isPending } = usePlaceBet();
 	const { data: allowance = 0n } = useAllowance(address);
 
-	const { win, bonus } = usePotentialWinWithBonus(Number(amount), selected);
-	const winAmount = Number(win + bonus);
-
-	useEffect(() => {
-		if (data && isSuccess) {
-			setResult?.(data);
-		}
-	}, [isSuccess, data]);
-
-	useEffect(() => {
-		if (requested) {
-			handleSpin();
-		}
-	}, [requested]);
+	const winAmount = usePotentialWin(Number(amount), selected);
 
 	const handleSpin = () => {
-		if (allowance < parseEther(amount)) {
-			requestAllowance?.('bet', parseEther(amount));
+		const amountWei = parseEther(amount);
+		const execute = () => placeBetAsync({ amount: Number(amount), side: selected, round: round, player: address });
+
+		if (allowance < amountWei) {
+			requestAllowance?.({ type: 'bet', amount: amountWei, execute });
 			return;
 		}
-		placeBet({ amount: Number(amount), side: selected, round: round });
+		execute();
 	};
 
 	return (

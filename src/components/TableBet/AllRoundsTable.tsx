@@ -5,9 +5,7 @@ import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import BetsAmountCell from '@/src/components/TableBet/columns/BetsAmountCell.tsx';
 import BetsCountCell from '@/src/components/TableBet/columns/BetsCountCell.tsx';
-import BonusAmountCell from '@/src/components/TableBet/columns/BonusAmountCell.tsx';
 import RoundCell from '@/src/components/TableBet/columns/RoundCell.tsx';
-import StakingEarningCell from '@/src/components/TableBet/columns/StakingEarningCell.tsx';
 import WinnerCell from '@/src/components/TableBet/columns/WinnerCell.tsx';
 import { useCurrentRound, useRounds } from '@/src/lib/query';
 
@@ -38,22 +36,6 @@ const AllRoundsTable = () => {
 			id: 'betsAmount',
 			header: t('betsAmount'),
 			cell: (props) => <BetsAmountCell round={props.getValue()} />,
-		}),
-		columnHelper.accessor('round', {
-			id: 'bonus',
-			header: t('bonus'),
-			meta: {
-				className: 'md:table-cell hidden',
-			},
-			cell: (props) => <BonusAmountCell round={props.getValue()} />,
-		}),
-		columnHelper.accessor('round', {
-			id: 'staking',
-			header: t('staking'),
-			meta: {
-				className: 'md:table-cell hidden',
-			},
-			cell: (props) => <StakingEarningCell round={props.getValue()} />,
 		}),
 		columnHelper.accessor('round', {
 			id: 'winner',

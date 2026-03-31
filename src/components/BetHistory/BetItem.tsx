@@ -6,13 +6,13 @@ import { motion } from 'motion/react';
 import type { FC } from 'react';
 import { useAccount } from 'wagmi';
 import { ETHSCAN } from '@/src/lib/global';
-import { useRoundBank } from '@/src/lib/query';
+import { useTotalProbability } from '@/src/lib/query';
 import type { StonesBet } from '@/src/lib/types';
 import { getStoneImage } from '@/src/lib/utils';
 
 const BetItem: FC<{ bet: StonesBet; round: number; className?: string }> = ({ bet, round, className }) => {
-	const { data: bank = 0n } = useRoundBank(round);
-	const share = Number(bet.amount * 100n) / Number(bank);
+	const { data: totalProbability = 0n } = useTotalProbability(round);
+	const share = totalProbability === 0n ? 0 : Number(bet.amount * 100n) / Number(totalProbability);
 	const { address } = useAccount();
 	const image = getStoneImage(bet.side);
 	const { data: username } = useUsername(bet.player, address);

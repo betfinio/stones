@@ -5,11 +5,13 @@ import { motion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import BetRanking from '@/src/components/BetRanking/BetRanking';
 import { getRoundTimes } from '@/src/lib/api';
-import { useActualRound, useCurrentRound, useRoundStatus } from '@/src/lib/query';
+import { useActualRound, useCurrentRound, useInterval, useRoundStatus } from '@/src/lib/query';
+import { RoundStatusEnum } from '@/src/lib/types';
 
 const OldRound = () => {
 	const { data: round = 0 } = useCurrentRound();
-	const [_, end] = getRoundTimes(round);
+	const { data: interval = 300 } = useInterval();
+	const [_, end] = getRoundTimes(round, interval);
 	const { data: actualRound = 0 } = useActualRound();
 	const navigate = useNavigate();
 	const { data: status = 0 } = useRoundStatus(round);
@@ -25,7 +27,7 @@ const OldRound = () => {
 				<div>Round ended {DateTime.fromSeconds(end).toFormat('MM/dd T')}</div>
 				<Button onClick={handleClick}>{t('goToCurrentRound')}</Button>
 			</div>
-			{status > 0 && <BetRanking round={round} />}
+			{status === RoundStatusEnum.Settled && <BetRanking round={round} />}
 		</motion.div>
 	);
 };

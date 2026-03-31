@@ -1,7 +1,7 @@
 import { ZeroAddress } from '@betfinio/abi';
 import { BetValue, DataTable } from '@betfinio/components/shared';
 import { useNavigate } from '@tanstack/react-router';
-import { type ColumnDef, createColumnHelper, type Table } from '@tanstack/react-table';
+import { createColumnHelper, type Table } from '@tanstack/react-table';
 import { DateTime } from 'luxon';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -22,56 +22,53 @@ const MyBetsTable = () => {
 	const { t } = useTranslation('stones', { keyPrefix: 'table.columns' });
 	const { t: tShared } = useTranslation('shared', { keyPrefix: 'tables' });
 	const navigate = useNavigate();
-	const tableRef = useRef<Table<{ round: number }>>(null);
+	const tableRef = useRef<Table<StonesBet>>(null);
 
 	const { data: currentRound = 0 } = useCurrentRound();
 
 	const columns = [
-		columnHelper.accessor('round', {
+		columnHelper.display({
+			id: 'round',
 			header: t('round'),
-			meta: {
-				className: 'w-[100px]',
-			},
-			cell: (props) => <RoundCell round={props.getValue()} />,
+			meta: { className: 'w-[100px]' },
+			cell: (props) => <RoundCell round={props.row.original.round ?? 0} />,
 		}),
-		columnHelper.accessor('amount', {
+		columnHelper.display({
 			id: 'myBet',
 			header: t('myBet'),
-			cell: (props) => <BetValue value={props.getValue()} withIcon />,
+			cell: (props) => <BetValue value={props.row.original.amount} withIcon />,
 		}),
-		columnHelper.accessor('round', {
+		columnHelper.display({
 			id: 'betsAmount',
-			meta: {
-				className: 'md:table-cell hidden',
-			},
+			meta: { className: 'md:table-cell hidden' },
 			header: t('betsAmount'),
-			cell: (props) => <BetsAmountCell round={props.getValue()} />,
+			cell: (props) => <BetsAmountCell round={props.row.original.round ?? 0} />,
 		}),
-		columnHelper.accessor('created', {
+		columnHelper.display({
 			id: 'created',
 			header: t('created'),
-			meta: {
-				className: 'md:table-cell hidden',
-			},
-			cell: (props) => DateTime.fromSeconds(Number(props.getValue())).toFormat('yyyy-MM-dd HH:mm:ss'),
+			meta: { className: 'md:table-cell hidden' },
+			cell: (props) => DateTime.fromSeconds(Number(props.row.original.created)).toFormat('yyyy-MM-dd HH:mm:ss'),
 		}),
-		columnHelper.accessor('result', {
+		columnHelper.display({
+			id: 'result',
 			header: t('result'),
 			cell: (props) => <BetResult bet={props.row.original.address} />,
 		}),
-		columnHelper.accessor('side', {
+		columnHelper.display({
+			id: 'side',
 			header: t('side'),
-			cell: (props) => <img src={getStoneImage(props.getValue())} alt={'bet'} className={'w-5 h-5'} />,
+			cell: (props) => <img src={getStoneImage(props.row.original.side)} alt={'bet'} className={'w-5 h-5'} />,
 		}),
-		columnHelper.accessor('round', {
+		columnHelper.display({
 			id: 'winner',
 			header: t('winner'),
-			cell: (props) => <WinnerCell round={props.getValue()} />,
+			cell: (props) => <WinnerCell round={props.row.original.round ?? 0} />,
 		}),
-	] as ColumnDef<StonesBet>[];
+	];
 
-	const handleClick = (row: { round: number }) => {
-		navigate({ to: '/games/stones', search: { round: row.round } });
+	const handleClick = (row: StonesBet) => {
+		navigate({ to: '/games/stones', search: { round: row.round ?? 0 } });
 	};
 
 	useEffect(() => {

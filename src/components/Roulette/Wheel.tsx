@@ -1,4 +1,4 @@
-import { arrayFrom, StonesABI, ZeroAddress } from '@betfinio/abi';
+import { arrayFrom, ZeroAddress } from '@betfinio/abi';
 import { Bet } from '@betfinio/components/icons';
 import { BetValue } from '@betfinio/components/shared';
 import { useQueryClient } from '@tanstack/react-query';
@@ -10,10 +10,22 @@ import { EffectsLayer } from '@/src/components/Roulette/EffectsLayer.tsx';
 import Time from '@/src/components/Roulette/Time';
 import WinnerInfo from '@/src/components/Roulette/WinnerInfo.tsx';
 import logger from '@/src/config/logger';
+import { PvPGameABI } from '@/src/lib/abi/PvPGameABI.ts';
 import { getRoundTimes } from '@/src/lib/api';
 import { STONES } from '@/src/lib/global.ts';
-import { useActualRound, useCurrentRound, useRoundBank, useRoundBets, useRoundStatus, useRoundWinner, useSideBank } from '@/src/lib/query';
+import {
+	useActualRound,
+	useCurrentRound,
+	useInterval,
+	useRoundBank,
+	useRoundBets,
+	useRoundStatus,
+	useRoundWinner,
+	useSideBank,
+	useTotalProbability,
+} from '@/src/lib/query';
 import { useSelectedStone } from '@/src/lib/query/state.ts';
+import { RoundStatusEnum } from '@/src/lib/types.ts';
 import { shootConfetti } from '@/src/lib/utils.ts';
 import arrowdown from '../../assets/Roulette/arrow-down.svg';
 import neonImage from '../../assets/Roulette/neon-glow.png';
@@ -52,9 +64,10 @@ const Wheel = () => {
 	const { data: actualRound = 0 } = useActualRound();
 	const { data: selectedStone, setSelectedStone } = useSelectedStone();
 	const { data: bank = 0n, isLoading } = useRoundBank(currentRound);
-	const { data: bets = [] } = useRoundBets(currentRound);
+	const { data: bets = [], isLoading: areBetsLoading } = useRoundBets(currentRound);
 	const { data: winner = 0 } = useRoundWinner(currentRound);
 	const { data: status = 0 } = useRoundStatus(currentRound);
+	const { data: interval = 300 } = useInterval();
 
 	// State
 	const [scale, setScale] = useState(1);
@@ -62,7 +75,7 @@ const Wheel = () => {
 	const [showCountdown, setShowCountdown] = useState(true);
 	const containerRef = useRef<HTMLDivElement>(null);
 
-	const [_, end] = getRoundTimes(currentRound);
+	const [_, end] = getRoundTimes(currentRound, interval);
 
 	// Navigation helper
 	const jumpToCurrentRound = () => {
@@ -76,8 +89,16 @@ const Wheel = () => {
 	useEffect(() => {
 		if (currentRound === 0) return;
 
-		if (status > 0 || end < Date.now() / 1000) {
-			if (bank === 0n && !isLoading) {
+		// Cancelled round — show cancelled message, don't redirect
+		if (status === RoundStatusEnum.Cancelled) {
+			setShowWinnerMessage(true);
+			setShowCountdown(false);
+			return;
+		}
+
+		// In v2: status > Open (1) means round is past betting phase
+		if (status > RoundStatusEnum.Open || end < Date.now() / 1000) {
+			if (bank === 0n && bets.length === 0 && !isLoading && !areBetsLoading) {
 				jumpToCurrentRound();
 				return;
 			}
@@ -90,43 +111,40 @@ const Wheel = () => {
 			setShowCountdown(true);
 			setShowWinnerMessage(false);
 		}
-
-		return () => {
-			controls.stop();
-			arrowControls.stop();
-		};
-	}, [status, currentRound, end, actualRound, winner]);
+	}, [status, currentRound, end, actualRound, winner, bank, bets.length, isLoading, areBetsLoading]);
 
 	useEffect(() => {
 		const angle = crystals.find((crystal) => crystal.name === selectedStone)?.angle || 0;
 		rotateWheel(-angle);
 	}, [selectedStone]);
 
-	// Event watchers
+	// Event watchers — v2 PvPGame events
 	useWatchContractEvent({
-		abi: StonesABI,
+		abi: PvPGameABI,
 		address: STONES,
-		eventName: 'RequestedCalculation',
+		eventName: 'RandomnessRequested',
 		strict: true,
 		onLogs: async (logs) => {
-			logger.warn('Request detected', logs[0]);
-			const round = Number.parseInt(logs[0].topics[1] || '0x0', 16);
-			if (round !== currentRound) return;
+			logger.warn('RandomnessRequested detected', logs[0]);
+			const contextId = Number(logs[0].args.contextId);
+			if (contextId !== currentRound) return;
 			setShowCountdown(false);
 			setShowWinnerMessage(false);
 			startSpin();
 		},
 	});
 	useWatchContractEvent({
-		abi: StonesABI,
+		abi: PvPGameABI,
 		address: STONES,
-		eventName: 'WinnerCalculated',
+		eventName: 'BetResolved',
 		strict: true,
 		onLogs: async (logs) => {
-			logger.warn('Winner detected', logs[0]);
-			const round = Number(logs[0].args.round);
-			const side = Number(logs[0].args.side);
-			if (round !== currentRound) return;
+			logger.warn('BetResolved detected', logs[0]);
+			// result = winning side (1-5) for stones
+			const side = Number(logs[0].args.result);
+			if (side < 1 || side > 5) return;
+			// Set winner in cache immediately so WinnerSettled doesn't wait for subgraph
+			queryClient.setQueryData(['stones', 'round', currentRound, 'winner'], side);
 			const angle = crystals.find((crystal) => crystal.name === side)?.angle || 0;
 			stopSpin(-angle).then(async () => {
 				setSelectedStone(side);
@@ -134,7 +152,7 @@ const Wheel = () => {
 					shootConfetti();
 				}
 				setShowWinnerMessage(true);
-				await queryClient.invalidateQueries({ queryKey: ['stones', 'round', round] });
+				await queryClient.invalidateQueries({ queryKey: ['stones'] });
 			});
 		},
 	});
@@ -306,7 +324,7 @@ interface CrystalProps {
 const Crystal: FC<CrystalProps> = ({ crystal, index, scale, onCrystalClick }) => {
 	const { data: currentRound = 0 } = useCurrentRound();
 	const { data: sideBank = [0n, 0n, 0n, 0n, 0n] } = useSideBank(currentRound);
-	const { data: bank = 0n } = useRoundBank(currentRound);
+	const { data: totalProbability = 0n } = useTotalProbability(currentRound);
 
 	return (
 		<div
@@ -358,7 +376,9 @@ const Crystal: FC<CrystalProps> = ({ crystal, index, scale, onCrystalClick }) =>
 					</div>
 
 					<div>
-						<span className="text-xs opacity-60">{(Number((sideBank[crystal.name - 1] ?? 0n) * 100n) / Number(bank) || 0).toFixed(2)}%</span>
+						<span className="text-xs opacity-60">
+							{(totalProbability === 0n ? 0 : Number((sideBank[crystal.name - 1] ?? 0n) * 100n) / Number(totalProbability)).toFixed(2)}%
+						</span>
 					</div>
 				</div>
 
