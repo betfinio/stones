@@ -9,13 +9,13 @@ import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
 import { ETHSCAN } from '@/src/lib/global';
-import { useRoundBank, useRoundBets } from '@/src/lib/query';
+import { useRoundBets, useTotalProbability } from '@/src/lib/query';
 import type { StonesBet } from '@/src/lib/types';
 
 const PlayerItem: FC<{ bet: StonesBet; round: number; className?: string }> = ({ bet, round, className }) => {
 	const { t } = useTranslation('stones', { keyPrefix: 'history' });
-	const { data: bank = 0n } = useRoundBank(round);
-	const share = Number(bet.amount * 100n) / Number(bank);
+	const { data: totalProbability = 0n } = useTotalProbability(round);
+	const share = totalProbability === 0n ? 0 : Number(bet.amount * 100n) / Number(totalProbability);
 	const { data: bets = [] } = useRoundBets(round);
 	const { address } = useAccount();
 	const betsNumber = bets.filter((b) => b.player === bet.player).length;
@@ -56,23 +56,23 @@ const PlayerItem: FC<{ bet: StonesBet; round: number; className?: string }> = ({
 						</span>
 						<MoveRightIcon
 							className={cn('size-3', {
-								hidden: [0n, 1n].includes(bet.status),
+								hidden: [0, 1].includes(bet.status ?? 0),
 							})}
 						/>
 
 						<span
 							className={cn({
-								hidden: [0n, 1n].includes(bet.status),
+								hidden: [0, 1].includes(bet.status ?? 0),
 							})}
 						>
 							<BetValue
 								iconClassName={'size-3'}
 								precision={2}
-								value={bet.result}
+								value={bet.result ?? 0n}
 								withIcon
 								className={cn({
 									'text-destructive': bet.result === 0n,
-									'text-success': bet.result > 0n,
+									'text-success': bet.result && bet.result > 0n,
 								})}
 							/>
 						</span>

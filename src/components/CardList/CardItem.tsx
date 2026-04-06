@@ -5,7 +5,7 @@ import { CircleAlert } from 'lucide-react';
 import type { FC } from 'react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { usePotentialWinWithBonus } from '@/src/lib/gql';
+import { usePotentialWin } from '@/src/lib/gql';
 import { useBetAmount, useCurrentRound, useSideBank } from '@/src/lib/query';
 import { useSelectedStone } from '@/src/lib/query/state.ts';
 import { getStoneImage } from '@/src/lib/utils';
@@ -48,12 +48,12 @@ const CardItem: FC<{ stone: number }> = ({ stone }) => {
 
 	const amountNum = Number(amount);
 
-	const { win, bonus } = usePotentialWinWithBonus(amountNum, stone);
+	const win = usePotentialWin(amountNum, stone);
 
 	const multiplier = useMemo(() => {
 		if (amountNum === 0) return 0;
-		return (win + bonus) / amountNum;
-	}, [amount, win, bonus]);
+		return win / amountNum;
+	}, [amount, win]);
 
 	const handleClick = () => {
 		setSelectedStone(stone);
@@ -76,8 +76,8 @@ const CardItem: FC<{ stone: number }> = ({ stone }) => {
 			>
 				<img src={getStoneImage(stone) as string} alt={'stone'} className="h-7 mb-1" />
 				<span className="block text-md font-normal tabular-nums">{displayMultiplier}</span>
-				<div className="text-bonus text-xs font-medium whitespace-nowrap flex flex-row flex-nowrap items-center justify-center">
-					+<BetValue prefix={'Bonus:'} value={bonus} className={'text-bonus!'} />
+				<div className="text-secondary-foreground text-xs font-medium whitespace-nowrap flex flex-row flex-nowrap items-center justify-center gap-1">
+					<BetValue prefix={'Win:'} value={win} withIcon />
 				</div>
 			</div>
 
@@ -120,10 +120,6 @@ const CardItem: FC<{ stone: number }> = ({ stone }) => {
 					<div className="flex w-fit items-center mt-4 h-4 mx-auto mb-2 text-sm gap-1">
 						{t('win')}:
 						<BetValue prefix={'Win:'} value={win} withIcon />
-					</div>
-					<div className="text-bonus text-xs md:text-sm font-medium whitespace-nowrap flex items-center gap-1">
-						{t('bonus')}:
-						<BetValue prefix={'Bonus:'} value={bonus} withIcon className={'text-bonus!'} iconClassName={'text-bonus!'} />
 					</div>
 				</div>
 			</div>

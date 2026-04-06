@@ -53,9 +53,12 @@ export const mapBetsToAuthors = (bets: StonesBet[]): StonesAuthor[] => {
 			acc.push({ ...val, betsNumber: 1, result: val.result ?? 0n });
 			return acc;
 		}
-		acc[author].amount += val.amount;
-		acc[author].betsNumber += 1;
-		acc[author].result += val.result ?? 0n;
+		const existing = acc[author];
+		if (existing) {
+			existing.amount += val.amount;
+			existing.betsNumber += 1;
+			existing.result = (existing.result ?? 0n) + (val.result ?? 0n);
+		}
 		return acc;
 	}, []);
 };

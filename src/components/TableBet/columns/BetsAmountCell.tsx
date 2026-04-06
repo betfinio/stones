@@ -1,12 +1,14 @@
 import { BetValue } from '@betfinio/components/shared';
 import type { FC } from 'react';
-import { useRoundBank } from '@/src/lib/query';
+import { useRoundTotalBankFromGame, useTotalProbability } from '@/src/lib/query';
 
 const BetsAmountCell: FC<{ round: number }> = ({ round }) => {
-	const { data: bank = 0n } = useRoundBank(round);
+	const { data: totalProbability = 0n } = useTotalProbability(round);
+	const { data: pvpTotalBank = 0n } = useRoundTotalBankFromGame(round);
+	const displayTotal = totalProbability > 0n ? totalProbability : pvpTotalBank;
 	return (
 		<div>
-			<BetValue value={bank} withIcon />
+			<BetValue value={displayTotal} withIcon />
 		</div>
 	);
 };

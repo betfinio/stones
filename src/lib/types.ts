@@ -1,4 +1,17 @@
-import type { BetInterface } from 'betfinio_context/lib/types';
+import type { Address } from 'viem';
+
+export interface StonesBet {
+	player: Address;
+	address: Address; // bet clone address
+	amount: bigint;
+	side: number; // 1-5
+	created: bigint; // blockTimestamp
+	result?: bigint; // win amount (computed or from contract)
+	payout?: bigint;
+	round?: number;
+	game?: Address;
+	status?: number;
+}
 
 export interface StoneInfo {
 	round: number;
@@ -8,15 +21,13 @@ export interface StoneInfo {
 	totalProbability: bigint;
 }
 
-export interface StonesBet extends BetInterface {
-	side: number;
-	order: number;
-	bonus?: bigint;
-	round: number;
-}
-
-export interface StonesBetWithBonus extends StonesBet {
-	potentialBonus: bigint;
+export enum RoundStatusEnum {
+	None = 0,
+	Open = 1,
+	SpinRequested = 2,
+	ResultReady = 3,
+	Settled = 4,
+	Cancelled = 5,
 }
 
 export type StonesAuthor = StonesBet & {

@@ -3,9 +3,11 @@ import { motion } from 'motion/react';
 import { type FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getRoundTimes } from '@/src/lib/api';
+import { useInterval } from '@/src/lib/query';
 
 const Time: FC<{ round: number; scale: number }> = ({ round, scale }) => {
-	const [_, end] = getRoundTimes(round);
+	const { data: interval = 300 } = useInterval();
+	const [_, end] = getRoundTimes(round, interval);
 	const [remaining, setRemaining] = useState('01:00');
 	const [loaded, setLoaded] = useState(false);
 

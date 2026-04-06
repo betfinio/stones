@@ -3,6 +3,7 @@ import { defineConfig } from '@rsbuild/core';
 import { pluginReact } from '@rsbuild/plugin-react';
 import { pluginSvgr } from '@rsbuild/plugin-svgr';
 import { TanStackRouterRspack } from '@tanstack/router-plugin/rspack';
+import { pluginManifest } from './scripts/plugin-fetch-manifest';
 
 const PORT = 4002;
 
@@ -15,6 +16,7 @@ export default defineConfig({
 	},
 	dev: {
 		assetPrefix: `http://localhost:${PORT}`,
+		lazyCompilation: false,
 	},
 	html: {
 		title: 'Betfin Stones',
@@ -33,7 +35,7 @@ export default defineConfig({
 		pluginSvgr(),
 		pluginModuleFederation(
 			{
-				name: 'betfin_stones',
+				name: 'betfinio_stones',
 				remotes: {
 					betfinio_context: `betfinio_context@${process.env.PUBLIC_CONTEXT_URL}/mf-manifest.json`,
 				},
@@ -53,6 +55,11 @@ export default defineConfig({
 			},
 			{},
 		),
+		pluginManifest({
+			remoteName: 'betfinio_context',
+			manifestUrl: process.env.PUBLIC_CONTEXT_URL || '',
+			outputDir: '@mf-types/source',
+		}),
 	],
 	tools: {
 		rspack: {

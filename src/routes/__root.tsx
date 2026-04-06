@@ -8,7 +8,7 @@ export const Route = createRootRoute({
 	component: () => (
 		<GlobalContextProvider>
 			<I18nextProvider i18n={i18n}>
-				<div className="stones max-w-screen-2xl mx-auto">
+				<div className="max-w-screen-2xl mx-auto">
 					<MockRoot>
 						<Outlet />
 					</MockRoot>

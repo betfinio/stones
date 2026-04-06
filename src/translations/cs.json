@@ -1,4 +1,5 @@
 {
+	"feeStaking": "Všechny sázky podléhají poplatku <b>{{fee}} %</b>, který je distribuován do <pool><b>Liquidity Pool</b></pool>.",
 	"title": "Template",
 
 	"controls": {

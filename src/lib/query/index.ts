@@ -1,22 +1,26 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
+import { readContract } from '@wagmi/core';
 import { wagmiConfig } from 'betfinio_context/config';
 import type { Address } from 'viem';
+import { CoreBetABI } from '@/src/lib/abi/CoreBetABI';
 import {
+	fetchBetPayout,
 	fetchBetResult,
 	fetchCurrentRound,
-	fetchDistributedInRound,
 	fetchRoundBank,
 	fetchRoundBets,
 	fetchRoundSideBank,
-	fetchRoundSideBetsCount,
-	fetchRoundSideBonusShares,
 	fetchRoundStatus,
 	fetchRoundStones,
-	fetchRoundWinner,
+	fetchRoundTotalBankFromGame,
+	fetchTotalProbability,
+	getActualRound,
+	getInterval,
 } from '@/src/lib/api';
-import { fetchBetsByPlayer, fetchRoundBetsByPlayer, fetchRounds } from '@/src/lib/gql';
-import type { StoneInfo, StonesBet } from '@/src/lib/types';
-import { ROUND_DURATION } from '../global';
+import { CORE, STONES } from '@/src/lib/global';
+import { fetchBetsByPlayer, fetchRoundBetsByPlayer, fetchRounds, fetchWinnerSide } from '@/src/lib/gql';
+import { RoundStatusEnum, type StoneInfo, type StonesBet } from '@/src/lib/types';
+import { readVrfWinnerSide } from '@/src/lib/vrf-winner-session';
 
 export const useCurrentRound = () => {
 	return useQuery<number>({
@@ -25,10 +29,35 @@ export const useCurrentRound = () => {
 	});
 };
 
-export const useActualRound = () => {
+export const useInterval = () => {
 	return useQuery<number>({
-		queryKey: ['stones', 'actualRound'],
-		queryFn: () => Math.floor(Date.now() / 1000 / (ROUND_DURATION * 60)),
+		queryKey: ['stones', 'interval'],
+		queryFn: () => getInterval(wagmiConfig),
+		staleTime: Number.POSITIVE_INFINITY,
+	});
+};
+
+export const useStonesFee = () => {
+	return useQuery<{ feeBps: bigint }>({
+		queryKey: ['stones', STONES, 'fee'],
+		queryFn: async () => {
+			const result = await readContract(wagmiConfig, {
+				abi: CoreBetABI,
+				address: CORE,
+				functionName: 'getGameConfig',
+				args: [STONES],
+			});
+			return { feeBps: result.feeBps };
+		},
+		staleTime: Number.POSITIVE_INFINITY,
+	});
+};
+
+export const useActualRound = () => {
+	const { data: interval = 300 } = useInterval();
+	return useQuery<number>({
+		queryKey: ['stones', 'actualRound', interval],
+		queryFn: () => getActualRound(interval),
 		refetchInterval: 1000,
 	});
 };
@@ -47,29 +76,24 @@ export const useRoundStatus = (round: number) => {
 	});
 };
 
-export const useDistributedInRound = (round: number) => {
-	return useQuery<bigint>({
-		queryKey: ['stones', 'round', round, 'distributed'],
-		queryFn: () => fetchDistributedInRound(round, wagmiConfig),
-	});
-};
-
 export const useSideBank = (round: number) => {
 	return useQuery<bigint[]>({
 		queryKey: ['stones', 'round', round, 'sideBank'],
 		queryFn: () => fetchRoundSideBank(round, wagmiConfig),
 	});
 };
-export const useSideBonusShares = (round: number) => {
-	return useQuery<bigint[]>({
-		queryKey: ['stones', 'round', round, 'sideBonusShares'],
-		queryFn: () => fetchRoundSideBonusShares(round, wagmiConfig),
+
+export const useTotalProbability = (round: number) => {
+	return useQuery<bigint>({
+		queryKey: ['stones', 'round', round, 'totalProbability'],
+		queryFn: () => fetchTotalProbability(round, wagmiConfig),
 	});
 };
-export const useSideBetsCount = (round: number) => {
-	return useQuery<bigint[]>({
-		queryKey: ['stones', 'round', round, 'sideBetsCount'],
-		queryFn: () => fetchRoundSideBetsCount(round, wagmiConfig),
+
+export const useRoundTotalBankFromGame = (round: number) => {
+	return useQuery<bigint>({
+		queryKey: ['stones', 'round', round, 'pvpTotalBank'],
+		queryFn: () => fetchRoundTotalBankFromGame(round, wagmiConfig),
 	});
 };
 
@@ -79,10 +103,11 @@ export const useRoundBets = (round: number) => {
 		queryFn: () => fetchRoundBets(round, wagmiConfig),
 	});
 };
+
 export const useRoundBetsByPlayer = (round: number, player: Address) => {
 	return useQuery<StonesBet[]>({
 		queryKey: ['stones', 'round', round, 'bets', player],
-		queryFn: () => fetchRoundBetsByPlayer(round, player, wagmiConfig),
+		queryFn: () => fetchRoundBetsByPlayer(round, player),
 	});
 };
 
@@ -96,7 +121,7 @@ export const useStonesInfo = (round: number) => {
 export const usePlayerBets = (player: Address) => {
 	return useQuery<StonesBet[]>({
 		queryKey: ['stones', 'player', player, 'bets'],
-		queryFn: () => fetchBetsByPlayer(player, wagmiConfig),
+		queryFn: () => fetchBetsByPlayer(player),
 	});
 };
 
@@ -107,10 +132,37 @@ export const useRounds = () => {
 	});
 };
 
+/** Winning side (1–5): subgraph, settled bet clones, React Query cache, sessionStorage (client VRF events). */
 export const useRoundWinner = (round: number) => {
+	const queryClient = useQueryClient();
 	return useQuery<number>({
 		queryKey: ['stones', 'round', round, 'winner'],
-		queryFn: () => fetchRoundWinner(round, wagmiConfig),
+		placeholderData: keepPreviousData,
+		queryFn: async () => {
+			const side = await fetchWinnerSide(round);
+			if (side >= 1 && side <= 5) return side;
+
+			const status = await fetchRoundStatus(round, wagmiConfig);
+			if (status === RoundStatusEnum.Settled) {
+				const bets = await fetchRoundBets(round, wagmiConfig);
+				const withOutcome = bets.find((b) => (b.result ?? 0n) > 0n);
+				if (withOutcome !== undefined) return Number(withOutcome.result);
+			}
+
+			const cached = queryClient.getQueryData<number>(['stones', 'round', round, 'winner']) ?? 0;
+			if (cached >= 1 && cached <= 5 && (status === RoundStatusEnum.ResultReady || status === RoundStatusEnum.SpinRequested || status === RoundStatusEnum.Open))
+				return cached;
+
+			const sessionWinner = readVrfWinnerSide(round);
+			if (
+				sessionWinner >= 1 &&
+				sessionWinner <= 5 &&
+				(status === RoundStatusEnum.ResultReady || status === RoundStatusEnum.SpinRequested || status === RoundStatusEnum.Open)
+			)
+				return sessionWinner;
+
+			return 0;
+		},
 	});
 };
 
@@ -118,6 +170,13 @@ export const useBetResult = (bet: Address) => {
 	return useQuery<bigint>({
 		queryKey: ['stones', 'bet', bet, 'result'],
 		queryFn: () => fetchBetResult(bet, wagmiConfig),
+	});
+};
+
+export const useBetPayout = (bet: Address) => {
+	return useQuery<bigint>({
+		queryKey: ['stones', 'bet', bet, 'payout'],
+		queryFn: () => fetchBetPayout(bet, wagmiConfig),
 	});
 };
 
