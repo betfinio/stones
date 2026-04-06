@@ -91,6 +91,19 @@ export const PvPGameABI = [
 		stateMutability: 'nonpayable',
 	},
 	{
+		type: 'function',
+		name: 'resolveRound',
+		inputs: [
+			{
+				name: 'roundId',
+				type: 'uint256',
+				internalType: 'uint256',
+			},
+		],
+		outputs: [],
+		stateMutability: 'nonpayable',
+	},
+	{
 		type: 'event',
 		name: 'BetPlaced',
 		inputs: [

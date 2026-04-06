@@ -4,6 +4,7 @@ import { BetValue } from '@betfinio/components/shared';
 import { UserIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
+import { FeeNotice } from '@/src/components/FeeNotice';
 import { useCurrentRound, useRoundBank, useRoundBets, useTotalProbability } from '@/src/lib/query';
 
 const BetSummary = () => {
@@ -50,6 +51,10 @@ const BetSummary = () => {
 						<BetValue value={potential} />({xFactor.toFixed(2)}x)
 					</span>
 				</div>
+			</div>
+
+			<div className="mt-3 pt-3 border-t border-border">
+				<FeeNotice className="text-xs text-muted-foreground py-0 leading-snug [&_strong]:text-foreground [&_a]:text-primary" />
 			</div>
 		</div>
 	);

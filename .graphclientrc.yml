@@ -3,6 +3,10 @@ sources:
     handler:
       graphql:
         endpoint: ${PUBLIC_STONES_GRAPH_URL}
+        operationHeaders:
+          Authorization: Bearer ${PUBLIC_THYME_TOKEN}
+        schemaHeaders:
+          Authorization: Bearer ${PUBLIC_THYME_TOKEN}
 
 codegen:
   scalars:

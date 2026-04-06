@@ -47,6 +47,41 @@ export const spin = async (params: SpinParams, config: Config) => {
 	return writeContract(config, request);
 };
 
+export interface ResolveRoundParams {
+	round: number;
+}
+
+export const resolveRound = async (params: ResolveRoundParams, config: Config) => {
+	const { request } = await simulateContract(config, {
+		abi: PvPGameABI,
+		address: STONES,
+		functionName: 'resolveRound',
+		args: [BigInt(params.round)],
+	});
+	return writeContract(config, request);
+};
+
+/** Side probability weights (1–5) + total; mirrors StonesStrategy storage for VRF winner preview. */
+export const fetchStonesRoundProbabilityWeights = async (
+	round: number,
+	config: Config,
+): Promise<{ total: bigint; sides: readonly [bigint, bigint, bigint, bigint, bigint] } | null> => {
+	const total = await fetchTotalProbability(round, config);
+	if (total === 0n) return null;
+
+	const probResults = await multicall(config.getClient(), {
+		contracts: arrayFrom(5).map((_, i) => ({
+			address: STONES_STRATEGY,
+			abi: StonesStrategyABI,
+			functionName: 'sideProbabilities' as const,
+			args: [BigInt(round), BigInt(i + 1)],
+		})),
+	});
+
+	const sides = arrayFrom(5).map((_, i) => (probResults[i].result as bigint) ?? 0n) as [bigint, bigint, bigint, bigint, bigint];
+	return { total, sides };
+};
+
 export interface RefundRoundParams {
 	round: number;
 }
@@ -93,6 +128,17 @@ export const fetchRoundStatus = async (round: number, config: Config): Promise<n
 		args: [BigInt(round)],
 	})) as [Address[], bigint, bigint, bigint, number];
 	return roundInfo[4];
+};
+
+/** Sum of full bet amounts on PvPGame (kept after cancel/refund; strategy weights are cleared). */
+export const fetchRoundTotalBankFromGame = async (round: number, config: Config): Promise<bigint> => {
+	const roundInfo = (await readContract(config, {
+		abi: PvPGameABI,
+		address: STONES,
+		functionName: 'getRound',
+		args: [BigInt(round)],
+	})) as [Address[], bigint, bigint, bigint, number];
+	return roundInfo[1];
 };
 
 export const fetchRoundBets = async (round: number, config: Config): Promise<StonesBet[]> => {

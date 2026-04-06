@@ -3,7 +3,7 @@ import { MoreHorizontal } from 'lucide-react';
 import { type MouseEvent, useMemo } from 'react';
 import { getRoundTimes } from '@/src/lib/api';
 import { useInterval, useRoundStatus } from '@/src/lib/query';
-import { useRefundRound, useSpin } from '@/src/lib/query/mutations';
+import { useRefundRound, useResolveRound, useSpin } from '@/src/lib/query/mutations';
 import { RoundStatusEnum } from '@/src/lib/types';
 
 const REFUND_TIMEOUT = 24 * 60 * 60; // 24 hours in seconds
@@ -15,6 +15,7 @@ interface ActionOption {
 
 function RoundActions({ round }: { round: number }) {
 	const { mutate: spin } = useSpin();
+	const { mutate: settle } = useResolveRound();
 	const { mutate: refund } = useRefundRound();
 	const { data: interval = 300 } = useInterval();
 	const { data: status = 0 } = useRoundStatus(round);
@@ -35,6 +36,14 @@ function RoundActions({ round }: { round: number }) {
 		}
 	};
 
+	const handleSettle = (e: MouseEvent) => {
+		e.stopPropagation();
+		const result = confirm('Settle this round to distribute payouts?');
+		if (result) {
+			settle({ round });
+		}
+	};
+
 	const actions: ActionOption[] = useMemo(() => {
 		const options: ActionOption[] = [];
 		const now = Math.floor(Date.now() / 1000);
@@ -46,6 +55,12 @@ function RoundActions({ round }: { round: number }) {
 			options.push({
 				handler: handleSpin,
 				title: 'Spin',
+			});
+		}
+		if (status === RoundStatusEnum.ResultReady) {
+			options.unshift({
+				handler: handleSettle,
+				title: 'Settle',
 			});
 		}
 		// Refund only available after REFUND_TIMEOUT past round end

@@ -35,7 +35,7 @@ export default defineConfig({
 		pluginSvgr(),
 		pluginModuleFederation(
 			{
-				name: 'betfin_stones',
+				name: 'betfinio_stones',
 				remotes: {
 					betfinio_context: `betfinio_context@${process.env.PUBLIC_CONTEXT_URL}/mf-manifest.json`,
 				},

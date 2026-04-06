@@ -1,3 +1,4 @@
+import { parse } from 'graphql';
 import type { ExecutionResult } from 'graphql/execution';
 import { useMemo } from 'react';
 import type { Address } from 'viem';
@@ -9,15 +10,37 @@ import {
 	type StonesPlayerBetsQuery,
 	StonesRoundBetsDocument,
 	type StonesRoundBetsQuery,
-	StonesRoundsDocument,
-	type StonesRoundsQuery,
-	StonesWinnerDocument,
-	type StonesWinnerQuery,
 } from '@/.graphclient';
 import logger from '@/src/config/logger';
 import { STONES } from '@/src/lib/global';
 import { useCurrentRound, useRoundBank, useRoundBets, useSideBank } from '@/src/lib/query';
 import type { RoundStatusEnum, StonesBet } from '@/src/lib/types';
+
+/** Keep in sync with schema.graphql StonesRounds — includes cancelled / refunded rounds. */
+const StonesRoundsDocument = parse(/* GraphQL */ `
+	query StonesRounds($address: Bytes!) {
+		rounds(where: { address: $address }, orderBy: round, orderDirection: desc, first: 1000) {
+			round
+			address
+			betsAmount
+			betsCount
+			totalReceived
+			status
+			winnerSide
+		}
+	}
+`);
+
+const StonesRoundOutcomeDocument = parse(/* GraphQL */ `
+	query StonesRoundOutcome($address: Bytes!, $round: BigInt!) {
+		rounds(where: { address: $address, round: $round }, first: 1) {
+			winnerSide
+		}
+		winnerCalculateds(where: { address: $address, round: $round }, first: 1) {
+			side
+		}
+	}
+`);
 
 // ═══════════════════════════════════════════════════════════════════════════
 // STATUS MAPPING
@@ -30,6 +53,8 @@ export const mapStatus = (status: string | number): RoundStatusEnum => {
 			return 1;
 		case 'spinning':
 			return 2;
+		case 'result_ready':
+			return 3;
 		case 'settled':
 			return 4;
 		case 'cancelled':
@@ -45,10 +70,11 @@ export const mapStatus = (status: string | number): RoundStatusEnum => {
 
 export const fetchRounds = async (): Promise<{ round: number; winnerSide: number; status: RoundStatusEnum }[]> => {
 	logger.start('fetching rounds');
-	const data: ExecutionResult<StonesRoundsQuery> = await execute(StonesRoundsDocument, { address: STONES });
-	logger.success('rounds', data.data?.rounds.length);
-	if (!data.data) return [];
-	return data.data.rounds.map((round: any) => ({
+	const data = await execute(StonesRoundsDocument, { address: STONES });
+	const rows = (data.data as { rounds?: { round: string | number; winnerSide?: string | number | null; status?: string | number }[] } | undefined)?.rounds;
+	logger.success('rounds', rows?.length);
+	if (!rows) return [];
+	return rows.map((round: any) => ({
 		round: Number(round.round),
 		winnerSide: Number(round.winnerSide ?? 0),
 		status: mapStatus(round.status ?? 0),
@@ -107,11 +133,27 @@ export const fetchBetsByPlayer = async (player: Address): Promise<StonesBet[]> =
 
 export const fetchWinnerSide = async (round: number): Promise<number> => {
 	logger.start('fetching winner side', round);
-	const data: ExecutionResult<StonesWinnerQuery> = await execute(StonesWinnerDocument, { address: STONES, round });
-	logger.success('winner side', data.data?.winnerCalculateds.length);
-	if (data.data && data.data.winnerCalculateds.length > 0) {
-		return Number(data.data.winnerCalculateds[0].side);
+	const data = await execute(StonesRoundOutcomeDocument, { address: STONES, round });
+	const payload = data.data as
+		| {
+				winnerCalculateds?: { side: string | number }[];
+				rounds?: { winnerSide?: string | number | null }[];
+		  }
+		| undefined;
+
+	const fromEvent = payload?.winnerCalculateds?.[0]?.side;
+	if (fromEvent !== undefined && fromEvent !== null && Number(fromEvent) >= 1 && Number(fromEvent) <= 5) {
+		logger.success('winner side', 'winnerCalculated');
+		return Number(fromEvent);
 	}
+
+	const fromRound = payload?.rounds?.[0]?.winnerSide;
+	if (fromRound !== undefined && fromRound !== null && String(fromRound) !== '' && Number(fromRound) >= 1 && Number(fromRound) <= 5) {
+		logger.success('winner side', 'round.winnerSide');
+		return Number(fromRound);
+	}
+
+	logger.success('winner side', 0);
 	return 0;
 };
 

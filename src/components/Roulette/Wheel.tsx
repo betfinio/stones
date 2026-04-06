@@ -3,15 +3,16 @@ import { Bet } from '@betfinio/components/icons';
 import { BetValue } from '@betfinio/components/shared';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
+import { wagmiConfig } from 'betfinio_context/config';
 import { AnimatePresence, motion, useAnimation } from 'motion/react';
-import { type FC, useEffect, useRef, useState } from 'react';
+import { type FC, useCallback, useEffect, useRef, useState } from 'react';
 import { useAccount, useWatchContractEvent } from 'wagmi';
 import { EffectsLayer } from '@/src/components/Roulette/EffectsLayer.tsx';
 import Time from '@/src/components/Roulette/Time';
 import WinnerInfo from '@/src/components/Roulette/WinnerInfo.tsx';
 import logger from '@/src/config/logger';
 import { PvPGameABI } from '@/src/lib/abi/PvPGameABI.ts';
-import { getRoundTimes } from '@/src/lib/api';
+import { fetchStonesRoundProbabilityWeights, getRoundTimes } from '@/src/lib/api';
 import { STONES } from '@/src/lib/global.ts';
 import {
 	useActualRound,
@@ -25,8 +26,10 @@ import {
 	useTotalProbability,
 } from '@/src/lib/query';
 import { useSelectedStone } from '@/src/lib/query/state.ts';
+import { computeWinningSideFromVrf } from '@/src/lib/stones-vrf.ts';
 import { RoundStatusEnum } from '@/src/lib/types.ts';
 import { shootConfetti } from '@/src/lib/utils.ts';
+import { persistVrfWinnerSide } from '@/src/lib/vrf-winner-session';
 import arrowdown from '../../assets/Roulette/arrow-down.svg';
 import neonImage from '../../assets/Roulette/neon-glow.png';
 import ComplexRoulette from './ComplexRoulette';
@@ -74,16 +77,23 @@ const Wheel = () => {
 	const [showWinnerMessage, setShowWinnerMessage] = useState(false);
 	const [showCountdown, setShowCountdown] = useState(true);
 	const containerRef = useRef<HTMLDivElement>(null);
+	const currentRoundRef = useRef(currentRound);
+	const landedFromVrfRoundRef = useRef<number | null>(null);
 
 	const [_, end] = getRoundTimes(currentRound, interval);
 
-	// Navigation helper
-	const jumpToCurrentRound = () => {
+	currentRoundRef.current = currentRound;
+
+	useEffect(() => {
+		landedFromVrfRoundRef.current = null;
+	}, [currentRound]);
+
+	// Navigation helper (stable reference — was inline and retriggered sync effects every render)
+	const jumpToCurrentRound = useCallback(() => {
 		queryClient.setQueryData(['stones', 'currentRound'], actualRound);
 		const updatedRound = queryClient.getQueryData<number>(['stones', 'currentRound']) || actualRound;
 		navigate({ to: '/games/stones', search: { round: updatedRound } });
-		// queryClient.invalidateQueries({ queryKey: ['stones', 'currentRound'] });
-	};
+	}, [queryClient, actualRound, navigate]);
 
 	// Effects
 	useEffect(() => {
@@ -104,14 +114,14 @@ const Wheel = () => {
 			}
 			setShowWinnerMessage(true);
 			setShowCountdown(false);
-			if (winner) {
+			if (winner > 0 && winner !== selectedStone) {
 				setSelectedStone(winner);
 			}
 		} else if (actualRound === currentRound) {
 			setShowCountdown(true);
 			setShowWinnerMessage(false);
 		}
-	}, [status, currentRound, end, actualRound, winner, bank, bets.length, isLoading, areBetsLoading]);
+	}, [status, currentRound, end, actualRound, winner, bank, bets.length, isLoading, areBetsLoading, setSelectedStone, selectedStone, jumpToCurrentRound]);
 
 	useEffect(() => {
 		const angle = crystals.find((crystal) => crystal.name === selectedStone)?.angle || 0;
@@ -124,13 +134,48 @@ const Wheel = () => {
 		address: STONES,
 		eventName: 'RandomnessRequested',
 		strict: true,
-		onLogs: async (logs) => {
+		onLogs: (logs) => {
 			logger.warn('RandomnessRequested detected', logs[0]);
 			const contextId = Number(logs[0].args.contextId);
-			if (contextId !== currentRound) return;
+			if (contextId !== currentRoundRef.current) return;
 			setShowCountdown(false);
 			setShowWinnerMessage(false);
 			startSpin();
+		},
+	});
+	useWatchContractEvent({
+		abi: PvPGameABI,
+		address: STONES,
+		eventName: 'RandomnessFulfilled',
+		strict: true,
+		onLogs: async (logs) => {
+			logger.warn('RandomnessFulfilled detected', logs[0]);
+			const contextId = Number(logs[0].args.contextId);
+			if (contextId !== currentRoundRef.current) return;
+			const randomWord = logs[0].args.randomWord;
+			if (randomWord === undefined) return;
+
+			const weights = await fetchStonesRoundProbabilityWeights(contextId, wagmiConfig);
+			if (!weights) return;
+
+			const side = computeWinningSideFromVrf(randomWord, weights.sides, weights.total);
+			if (side < 1 || side > 5) return;
+
+			landedFromVrfRoundRef.current = contextId;
+			queryClient.setQueryData(['stones', 'round', contextId, 'winner'], side);
+			persistVrfWinnerSide(contextId, side);
+
+			const angle = crystals.find((crystal) => crystal.name === side)?.angle || 0;
+			const roundBets = queryClient.getQueryData<typeof bets>(['stones', 'round', contextId, 'bets']) ?? [];
+
+			const currentSelected = queryClient.getQueryData<number>(['stones', 'selected']) ?? 0;
+			if (currentSelected !== side) await stopSpin(-angle);
+			setSelectedStone(side);
+			if (roundBets.find((bet) => bet.side === side && bet.player.toLowerCase() === address.toLowerCase())) {
+				shootConfetti();
+			}
+			setShowWinnerMessage(true);
+			await queryClient.invalidateQueries({ queryKey: ['stones'] });
 		},
 	});
 	useWatchContractEvent({
@@ -140,20 +185,39 @@ const Wheel = () => {
 		strict: true,
 		onLogs: async (logs) => {
 			logger.warn('BetResolved detected', logs[0]);
+			const roundId = Number(logs[0].args.roundId);
+			if (roundId !== currentRoundRef.current) return;
+
 			// result = winning side (1-5) for stones
 			const side = Number(logs[0].args.result);
 			if (side < 1 || side > 5) return;
-			// Set winner in cache immediately so WinnerSettled doesn't wait for subgraph
-			queryClient.setQueryData(['stones', 'round', currentRound, 'winner'], side);
-			const angle = crystals.find((crystal) => crystal.name === side)?.angle || 0;
-			stopSpin(-angle).then(async () => {
-				setSelectedStone(side);
-				if (bets.find((bet) => bet.side === side && bet.player === address)) {
-					shootConfetti();
-				}
+
+			if (landedFromVrfRoundRef.current === roundId) {
 				setShowWinnerMessage(true);
 				await queryClient.invalidateQueries({ queryKey: ['stones'] });
-			});
+				return;
+			}
+
+			const alreadyLandedSide = queryClient.getQueryData<number>(['stones', 'selected']) ?? 0;
+			if (alreadyLandedSide === side) {
+				setShowWinnerMessage(true);
+				await queryClient.invalidateQueries({ queryKey: ['stones'] });
+				return;
+			}
+
+			queryClient.setQueryData(['stones', 'round', roundId, 'winner'], side);
+			persistVrfWinnerSide(roundId, side);
+			const angle = crystals.find((crystal) => crystal.name === side)?.angle || 0;
+			const roundBets = queryClient.getQueryData<typeof bets>(['stones', 'round', roundId, 'bets']) ?? [];
+
+			const currentSelected = queryClient.getQueryData<number>(['stones', 'selected']) ?? 0;
+			if (currentSelected !== side) await stopSpin(-angle);
+			setSelectedStone(side);
+			if (roundBets.find((bet) => bet.side === side && bet.player.toLowerCase() === address.toLowerCase())) {
+				shootConfetti();
+			}
+			setShowWinnerMessage(true);
+			await queryClient.invalidateQueries({ queryKey: ['stones'] });
 		},
 	});
 

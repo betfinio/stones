@@ -1,6 +1,6 @@
 import { SonnerToaster, TooltipProvider, toast } from '@betfinio/components/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router';
 import { AnimatePresence } from 'motion/react';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -29,18 +29,20 @@ export const Route = createFileRoute('/games/stones/')({
 });
 
 export function StonesPage() {
-	const search = Route.useSearch();
+	// Host shell registers `/games/stones` without this file route — read search from the active route.
+	const search = useSearch({ strict: false }) as { round?: number };
+	const round = Number(search.round) || 0;
 	const { data: currentRound = 0 } = useCurrentRound();
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
 	const { t } = useTranslation('stones', { keyPrefix: 'winner' });
 	useEffect(() => {
-		if (search.round === 0 && currentRound > 0) {
-			navigate({ to: '/games/stones', search: { round: currentRound } });
+		if (round === 0 && currentRound > 0) {
+			void navigate({ to: '/games/stones', search: { round: currentRound } });
 		} else {
-			queryClient.setQueryData(['stones', 'currentRound'], search.round);
+			queryClient.setQueryData(['stones', 'currentRound'], round);
 		}
-	}, [search, currentRound]);
+	}, [round, currentRound, navigate, queryClient]);
 
 	useWatchContractEvent({
 		abi: PvPGameABI,

@@ -1,5 +1,5 @@
 query StonesRounds($address: Bytes) {
-	rounds(where: { address: $address, status_not: "cancelled" }, orderBy: round, orderDirection: desc, first: 1000) {
+	rounds(where: { address: $address }, orderBy: round, orderDirection: desc, first: 1000) {
 		round
 		address
 		betsAmount
@@ -66,5 +66,15 @@ query StonesWinner($address: Bytes, $round: BigInt) {
 		side
 		round
 		transactionHash
+	}
+}
+
+# Also used from gql/index.ts via graphql parse (keep in sync with StonesRoundOutcome there).
+query StonesRoundOutcome($address: Bytes!, $round: BigInt!) {
+	rounds(where: { address: $address, round: $round }, first: 1) {
+		winnerSide
+	}
+	winnerCalculateds(where: { address: $address, round: $round }, first: 1) {
+		side
 	}
 }

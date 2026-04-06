@@ -7,7 +7,17 @@ import type { WriteContractErrorType, WriteContractReturnType } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
 import { useConfig } from 'wagmi';
 import logger from '@/src/config/logger';
-import { type PlaceBetParams, placeBet, type RefundRoundParams, refundRound, type SpinParams, spin } from '@/src/lib/api';
+import {
+	type PlaceBetParams,
+	placeBet,
+	type RefundRoundParams,
+	type ResolveRoundParams,
+	refundRound,
+	resolveRound,
+	type SpinParams,
+	spin,
+} from '@/src/lib/api';
+import { clearVrfWinnerSide } from '@/src/lib/vrf-winner-session';
 
 export const usePlaceBet = () => {
 	const config = useConfig();
@@ -52,15 +62,18 @@ export const usePlaceBet = () => {
 
 export const useSpin = () => {
 	const config = useConfig();
+	const queryClient = useQueryClient();
 	const { t } = useTranslation('stones', { keyPrefix: 'toasts.spin' });
 	return useMutation<WriteContractReturnType, WriteContractErrorType, SpinParams>({
 		mutationKey: ['stones', 'spin'],
 		mutationFn: (params) => spin(params, wagmiConfig),
 		onSuccess: async (data) => {
 			logger.success('transaction submitted');
+			void queryClient.invalidateQueries({ queryKey: ['stones'] });
 
 			const promise = async () => {
 				await waitForTransactionReceipt(config.getClient(), { hash: data });
+				await queryClient.invalidateQueries({ queryKey: ['stones'] });
 			};
 
 			toast.promise(promise, {
@@ -76,6 +89,40 @@ export const useSpin = () => {
 		},
 		onMutate: () => {
 			logger.start('spinning');
+		},
+	});
+};
+
+export const useResolveRound = () => {
+	const config = useConfig();
+	const { t } = useTranslation('stones', { keyPrefix: 'toasts.settle' });
+	const queryClient = useQueryClient();
+	return useMutation<WriteContractReturnType, WriteContractErrorType, ResolveRoundParams>({
+		mutationKey: ['stones', 'resolveRound'],
+		mutationFn: (params) => resolveRound(params, wagmiConfig),
+		onSuccess: async (data, variables) => {
+			logger.success('resolve round submitted');
+			void queryClient.invalidateQueries({ queryKey: ['stones'] });
+
+			const promise = async () => {
+				await waitForTransactionReceipt(config.getClient(), { hash: data });
+				clearVrfWinnerSide(variables.round);
+				await queryClient.invalidateQueries({ queryKey: ['stones'] });
+			};
+
+			toast.promise(promise, {
+				loading: t('loading'),
+				success: t('success'),
+				action: getTransactionLink(data),
+			});
+
+			logger.success('resolve round finished');
+		},
+		onError: (error) => {
+			logger.error(error);
+		},
+		onMutate: () => {
+			logger.start('resolving round');
 		},
 	});
 };
