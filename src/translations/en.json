@@ -112,5 +112,15 @@
 	"status": {
 		"waiting": "Waiting",
 		"refunded": "Refunded"
+	},
+	"toasts": {
+		"spin": {
+			"loading": "Spinning",
+			"success": "Spin requested"
+		},
+		"refund": {
+			"loading": "Refunding round...",
+			"success": "Round refunded"
+		}
 	}
 }

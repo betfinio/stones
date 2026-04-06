@@ -5,6 +5,7 @@ import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import BetsAmountCell from '@/src/components/TableBet/columns/BetsAmountCell.tsx';
 import BetsCountCell from '@/src/components/TableBet/columns/BetsCountCell.tsx';
+import RoundActions from '@/src/components/TableBet/columns/RoundActions.tsx';
 import RoundCell from '@/src/components/TableBet/columns/RoundCell.tsx';
 import WinnerCell from '@/src/components/TableBet/columns/WinnerCell.tsx';
 import { useCurrentRound, useRounds } from '@/src/lib/query';
@@ -41,6 +42,12 @@ const AllRoundsTable = () => {
 			id: 'winner',
 			header: t('winner'),
 			cell: (props) => <WinnerCell round={props.getValue()} />,
+		}),
+		columnHelper.accessor('round', {
+			id: 'actions',
+			header: '',
+			meta: { className: 'w-[30px]' },
+			cell: (props) => <RoundActions round={props.getValue()} />,
 		}),
 	];
 

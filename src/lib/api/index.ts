@@ -47,6 +47,20 @@ export const spin = async (params: SpinParams, config: Config) => {
 	return writeContract(config, request);
 };
 
+export interface RefundRoundParams {
+	round: number;
+}
+
+export const refundRound = async (params: RefundRoundParams, config: Config) => {
+	const { request } = await simulateContract(config, {
+		abi: PvPGameABI,
+		address: STONES,
+		functionName: 'refundRound',
+		args: [BigInt(params.round)],
+	});
+	return writeContract(config, request);
+};
+
 // ═══════════════════════════════════════════════════════════════════════════
 // READ OPERATIONS — PvPGame
 // ═══════════════════════════════════════════════════════════════════════════

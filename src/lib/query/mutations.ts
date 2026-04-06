@@ -7,7 +7,7 @@ import type { WriteContractErrorType, WriteContractReturnType } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
 import { useConfig } from 'wagmi';
 import logger from '@/src/config/logger';
-import { type PlaceBetParams, placeBet, type SpinParams, spin } from '@/src/lib/api';
+import { type PlaceBetParams, placeBet, type RefundRoundParams, refundRound, type SpinParams, spin } from '@/src/lib/api';
 
 export const usePlaceBet = () => {
 	const config = useConfig();
@@ -52,6 +52,7 @@ export const usePlaceBet = () => {
 
 export const useSpin = () => {
 	const config = useConfig();
+	const { t } = useTranslation('stones', { keyPrefix: 'toasts.spin' });
 	return useMutation<WriteContractReturnType, WriteContractErrorType, SpinParams>({
 		mutationKey: ['stones', 'spin'],
 		mutationFn: (params) => spin(params, wagmiConfig),
@@ -63,8 +64,8 @@ export const useSpin = () => {
 			};
 
 			toast.promise(promise, {
-				loading: 'Spinning',
-				success: 'Requested',
+				loading: t('loading'),
+				success: t('success'),
 				action: getTransactionLink(data),
 			});
 
@@ -75,6 +76,37 @@ export const useSpin = () => {
 		},
 		onMutate: () => {
 			logger.start('spinning');
+		},
+	});
+};
+
+export const useRefundRound = () => {
+	const config = useConfig();
+	const { t } = useTranslation('stones', { keyPrefix: 'toasts.refund' });
+	const queryClient = useQueryClient();
+	return useMutation<WriteContractReturnType, WriteContractErrorType, RefundRoundParams>({
+		mutationKey: ['stones', 'refundRound'],
+		mutationFn: (params) => refundRound(params, wagmiConfig),
+		onSuccess: async (data) => {
+			logger.success('transaction submitted');
+
+			const promise = async () => {
+				await waitForTransactionReceipt(config.getClient(), { hash: data });
+			};
+
+			toast.promise(promise, {
+				loading: t('loading'),
+				success: t('success'),
+				action: getTransactionLink(data),
+			});
+
+			queryClient.invalidateQueries({ queryKey: ['stones'] });
+		},
+		onError: (error) => {
+			logger.error(error);
+		},
+		onMutate: () => {
+			logger.start('refunding round');
 		},
 	});
 };

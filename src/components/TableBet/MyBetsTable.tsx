@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
 import BetResult from '@/src/components/TableBet/columns/BetResult.tsx';
 import BetsAmountCell from '@/src/components/TableBet/columns/BetsAmountCell.tsx';
+import RoundActions from '@/src/components/TableBet/columns/RoundActions.tsx';
 import RoundCell from '@/src/components/TableBet/columns/RoundCell.tsx';
 import WinnerCell from '@/src/components/TableBet/columns/WinnerCell.tsx';
 import { useCurrentRound, usePlayerBets } from '@/src/lib/query';
@@ -64,6 +65,12 @@ const MyBetsTable = () => {
 			id: 'winner',
 			header: t('winner'),
 			cell: (props) => <WinnerCell round={props.row.original.round ?? 0} />,
+		}),
+		columnHelper.display({
+			id: 'actions',
+			header: '',
+			meta: { className: 'w-[30px]' },
+			cell: (props) => <RoundActions round={props.row.original.round ?? 0} />,
 		}),
 	];
 
