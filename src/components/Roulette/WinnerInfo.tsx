@@ -1,47 +1,123 @@
 import { ZeroAddress } from '@betfinio/abi';
 import { BetValue } from '@betfinio/components/shared';
+import { Button } from '@betfinio/components/ui';
 import { cx } from 'class-variance-authority';
 import { motion } from 'motion/react';
-import { type FC, useMemo } from 'react';
+import { type CSSProperties, type FC, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
-import { useRoundBank, useRoundBets, useRoundBetsByPlayer, useRoundStatus, useRoundWinner, useSideBank, useSideBonusShares } from '@/src/lib/query';
+import { getRoundTimes } from '@/src/lib/api';
+import { useInterval, useRoundBank, useRoundBets, useRoundStatus, useRoundWinner } from '@/src/lib/query';
+import { useResolveRound, useSpin } from '@/src/lib/query/mutations.ts';
+import { RoundStatusEnum } from '@/src/lib/types';
+
+const winnerMessageWrapClass = 'z-[6] max-w-[min(92vw,16rem)] sm:max-w-[min(90vw,20rem)] px-2 text-center text-pretty break-words leading-snug';
+
+function winnerMessageFontStyle(scale: number): CSSProperties {
+	return { fontSize: `${Math.max(11, 13 * scale)}px`, lineHeight: 1.35 };
+}
 
 const WinnerInfo: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 	const { data: status, isLoading: isStatusLoading } = useRoundStatus(round);
+	const { data: previewWinner = 0 } = useRoundWinner(round);
+	const { data: interval = 300 } = useInterval();
+	const { mutate: settle, isPending: isSettling } = useResolveRound();
+	const { mutate: requestSpin, isPending: isSpinning } = useSpin();
 
 	const { t } = useTranslation('stones', { keyPrefix: 'winner' });
+
+	const [, roundEnd] = getRoundTimes(round, interval);
+	const roundEnded = roundEnd > 0 && roundEnd <= Math.floor(Date.now() / 1000);
+	const winnerKnown = previewWinner >= 1 && previewWinner <= 5;
+	const canRequestSpin = status === RoundStatusEnum.Open && roundEnded && !winnerKnown;
+
+	const settleCallToAction = () => (
+		<div className={cx(winnerMessageWrapClass, 'flex flex-col items-center gap-2')} style={winnerMessageFontStyle(scale)}>
+			<span className="font-light text-tertiary-foreground">{t('pendingSettlement')}</span>
+			<Button type="button" size="sm" variant="secondary" className="shrink-0" disabled={isSettling} onClick={() => settle({ round })}>
+				{t('settleRound')}
+			</Button>
+		</div>
+	);
 
 	const getContent = () => {
 		if (isStatusLoading) {
 			return null;
 		}
-		if (status === 2) {
-			// winner selected, but not distributed
-			return <WinnerNotDistributed scale={scale} round={round} />;
-		}
-		if (status === 1) {
-			// wheel is spinning
-			return <div>{t('winnerIsBeingDecided')}</div>;
-		}
-		return (
-			<div
-				className={cx('flex flex-col')}
-				style={{
-					fontSize: `${17 * scale * 2}px`,
-					lineHeight: `${17 * scale * 2}px`,
-				}}
-			>
-				<span>{t('roundIsOver')}!</span>
-				<span
+		if (status === RoundStatusEnum.Cancelled) {
+			return (
+				<div
+					className={cx('flex flex-col')}
 					style={{
-						fontSize: `${10 * scale * 2}px`,
-						lineHeight: `${14 * scale * 2}px`,
+						fontSize: `${17 * scale * 2}px`,
+						lineHeight: `${17 * scale * 2}px`,
 					}}
-					className={'font-light text-tertiary-foreground'}
 				>
-					{t('waitingForSpin')}!
-				</span>
+					<span>{t('roundCancelled')}</span>
+					<span
+						style={{
+							fontSize: `${10 * scale * 2}px`,
+							lineHeight: `${14 * scale * 2}px`,
+						}}
+						className={'font-light text-tertiary-foreground'}
+					>
+						{t('betsRefunded')}
+					</span>
+				</div>
+			);
+		}
+		if (status === RoundStatusEnum.Settled) {
+			return <WinnerSettled scale={scale} round={round} />;
+		}
+
+		// VRF in flight — no winning side in UI yet
+		if (status === RoundStatusEnum.SpinRequested && !winnerKnown) {
+			return (
+				<div className={winnerMessageWrapClass} style={winnerMessageFontStyle(scale)}>
+					{t('winnerIsBeingDecided')}
+				</div>
+			);
+		}
+
+		// Winner is known ( indexer, chain, cache, or session ) while round is not settled —
+		// handles ResultReady and stale Open after VRF before status refetches.
+		if (winnerKnown) {
+			return settleCallToAction();
+		}
+
+		if (status === RoundStatusEnum.ResultReady) {
+			return (
+				<div className={winnerMessageWrapClass} style={winnerMessageFontStyle(scale)}>
+					{t('winnerIsBeingDecided')}
+				</div>
+			);
+		}
+
+		return (
+			<div className={cx('flex flex-col items-center gap-2', winnerMessageWrapClass)}>
+				<div
+					className="flex flex-col items-center"
+					style={{
+						fontSize: `${17 * scale * 2}px`,
+						lineHeight: `${17 * scale * 2}px`,
+					}}
+				>
+					<span>{t('roundIsOver')}!</span>
+					<span
+						style={{
+							fontSize: `${10 * scale * 2}px`,
+							lineHeight: `${14 * scale * 2}px`,
+						}}
+						className={'font-light text-tertiary-foreground'}
+					>
+						{t('waitingForSpin')}!
+					</span>
+				</div>
+				{canRequestSpin ? (
+					<Button type="button" size="sm" variant="secondary" className="shrink-0" disabled={isSpinning} onClick={() => requestSpin({ round })}>
+						{t('spinRound')}
+					</Button>
+				) : null}
 			</div>
 		);
 	};
@@ -72,50 +148,25 @@ const WinnerInfo: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 	);
 };
 
-const WinnerNotDistributed: FC<{ round: number; scale: number }> = ({ round, scale }) => {
+/**
+ * V2: Read payout directly from bet clones (set on-chain during resolution).
+ * No formula needed — Bet.payout() is the definitive source.
+ */
+const WinnerSettled: FC<{ round: number; scale: number }> = ({ round, scale }) => {
 	const { t } = useTranslation('stones', { keyPrefix: 'winner' });
 
 	const { address = ZeroAddress } = useAccount();
-	const { data: winnerSide = 1, isFetching } = useRoundWinner(round);
 	const { data: bank = 0n } = useRoundBank(round);
-	const winBank = (bank * 914n) / 1000n;
-	const bonusBank = (bank * 5n) / 100n;
-	const { data: sideBank = [1n, 1n, 1n, 1n, 1n] } = useSideBank(round);
-	const { data: sideBonusShares = [1n, 1n, 1n, 1n, 1n] } = useSideBonusShares(round);
-	const { data: playerBets = [], isFetching: isBetsFetching } = useRoundBetsByPlayer(round, address);
 	const { data: allBets = [], isFetching: isAllBetsFetching } = useRoundBets(round);
 
-	const { win, bonus } = useMemo(() => {
-		const allWinBets = allBets.filter((bet) => bet.side === winnerSide);
-		const sortedWinBets = allWinBets.sort((a, b) => Number(a.created) - Number(b.created));
-		const totalBonusShares = sideBonusShares[winnerSide - 1];
-		const totalWinBetsCount = allWinBets.length;
+	const myWin = useMemo(() => {
+		const myBets = allBets.filter((bet) => bet.player.toLowerCase() === address.toLowerCase());
+		return myBets.reduce((acc, bet) => acc + (bet.payout ?? 0n), 0n);
+	}, [allBets, address]);
 
-		const { bonus: totalBonus, amount: totalAmount } = sortedWinBets.reduce(
-			(acc, bet, index) => {
-				if (bet.player.toLowerCase() === address.toLowerCase()) {
-					const betAmount = BigInt(bet.amount);
-					const bonusShare = betAmount * BigInt(totalWinBetsCount - index);
-					return { bonus: acc.bonus + bonusShare, amount: acc.amount + betAmount };
-				}
-				return acc;
-			},
-			{ bonus: 0n, amount: 0n },
-		);
+	if (isAllBetsFetching) return null;
 
-		const bonusBank = (bank * 5n) / 100n;
-
-		const myBonus = totalBonusShares > 0n ? (totalBonus * bonusBank) / totalBonusShares : 0n;
-
-		const totalWinBank = (bank * 914n) / 1000n;
-		const sideTotalBank = sideBank[winnerSide - 1];
-		const myWin = sideTotalBank > 0n ? (totalAmount * totalWinBank) / sideTotalBank : 0n;
-		return { win: myWin, bonus: myBonus };
-	}, [round, winnerSide, bank, sideBank, sideBonusShares, playerBets, allBets]);
-
-	if (isFetching || isBetsFetching || isAllBetsFetching) return null;
-
-	if (win > 0) {
+	if (myWin > 0n) {
 		return (
 			<motion.div
 				initial={{ scale: 0, y: -7 }}
@@ -124,10 +175,7 @@ const WinnerNotDistributed: FC<{ round: number; scale: number }> = ({ round, sca
 				className={'z-6 flex flex-col items-center text-sm sm:text-base lg:text-2xl'}
 			>
 				{t('win')}:
-				<BetValue prefix={'Win: '} className={'text-secondary-foreground scale-110'} value={BigInt(win)} withIcon />
-				<div className={'text-bonus! scale-[0.9] flex flex-row items-center gap-1'}>
-					+<BetValue prefix={'Bonus: '} iconClassName={'text-bonus!'} value={BigInt(bonus)} withIcon />
-				</div>
+				<BetValue prefix={'Win: '} className={'text-secondary-foreground scale-110'} value={myWin} withIcon />
 			</motion.div>
 		);
 	}
@@ -149,12 +197,7 @@ const WinnerNotDistributed: FC<{ round: number; scale: number }> = ({ round, sca
 				className={'font-light text-tertiary-foreground flex flex-row justify-center items-center gap-1'}
 			>
 				{t('couldWin')}:
-				<BetValue className={'text-secondary-foreground '} value={BigInt(winBank)} withIcon />
-			</div>
-
-			<div className="text-bonus flex items-center justify-center text-xs mt-1 font-semibold gap-1">
-				<BetValue prefix={'Bonus: '} value={bonusBank} withIcon iconClassName={'text-bonus! w-3! h-3!'} />
-				<span className={'uppercase'}>{t('bonus')}</span>
+				<BetValue className={'text-secondary-foreground '} value={bank} withIcon />
 			</div>
 		</div>
 	);

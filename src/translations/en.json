@@ -1,4 +1,5 @@
 {
+	"feeStaking": "All bets are subject of <b>{{fee}}% fee</b> which is distributed into <pool><b>Liquidity Pool</b></pool>.",
 	"title": "Template",
 	"header": {
 		"roundId": "Round ID",
@@ -23,7 +24,13 @@
 		"lose": "You didn't win",
 		"win": "You win",
 		"couldWin": "You could win",
-		"bonus": "Bonus"
+		"bonus": "Bonus",
+		"roundCancelled": "Round was cancelled",
+		"betsRefunded": "All bets have been refunded",
+		"roundCancelledToast": "Round was cancelled — not enough participants. Your bet has been refunded.",
+		"pendingSettlement": "Winner decided. Settle the round to pay out.",
+		"settleRound": "Settle round",
+		"spinRound": "Spin the wheel"
 	},
 	"controls": {
 		"betAmount": "Bet amount",
@@ -107,6 +114,21 @@
 		"bonus": "Bonus"
 	},
 	"status": {
-		"waiting": "Waiting"
+		"waiting": "Waiting",
+		"refunded": "Refunded"
+	},
+	"toasts": {
+		"spin": {
+			"loading": "Spinning",
+			"success": "Spin requested"
+		},
+		"settle": {
+			"loading": "Settling round...",
+			"success": "Round settled"
+		},
+		"refund": {
+			"loading": "Refunding round...",
+			"success": "Round refunded"
+		}
 	}
 }

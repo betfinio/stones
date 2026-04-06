@@ -7,7 +7,17 @@ import type { WriteContractErrorType, WriteContractReturnType } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
 import { useConfig } from 'wagmi';
 import logger from '@/src/config/logger';
-import { type DistributeParams, distribute, executeResult, type PlaceBetParams, placeBet, type SpinParams, settleLostBets, spin } from '@/src/lib/api';
+import {
+	type PlaceBetParams,
+	placeBet,
+	type RefundRoundParams,
+	type ResolveRoundParams,
+	refundRound,
+	resolveRound,
+	type SpinParams,
+	spin,
+} from '@/src/lib/api';
+import { clearVrfWinnerSide } from '@/src/lib/vrf-winner-session';
 
 export const usePlaceBet = () => {
 	const config = useConfig();
@@ -52,19 +62,23 @@ export const usePlaceBet = () => {
 
 export const useSpin = () => {
 	const config = useConfig();
+	const queryClient = useQueryClient();
+	const { t } = useTranslation('stones', { keyPrefix: 'toasts.spin' });
 	return useMutation<WriteContractReturnType, WriteContractErrorType, SpinParams>({
 		mutationKey: ['stones', 'spin'],
 		mutationFn: (params) => spin(params, wagmiConfig),
 		onSuccess: async (data) => {
 			logger.success('transaction submitted');
+			void queryClient.invalidateQueries({ queryKey: ['stones'] });
 
 			const promise = async () => {
 				await waitForTransactionReceipt(config.getClient(), { hash: data });
+				await queryClient.invalidateQueries({ queryKey: ['stones'] });
 			};
 
 			toast.promise(promise, {
-				loading: 'Spinning',
-				success: 'Requested',
+				loading: t('loading'),
+				success: t('success'),
 				action: getTransactionLink(data),
 			});
 
@@ -74,16 +88,52 @@ export const useSpin = () => {
 			logger.error(error);
 		},
 		onMutate: () => {
-			logger.start('placing bet');
+			logger.start('spinning');
 		},
 	});
 };
 
-export const useDistribute = () => {
+export const useResolveRound = () => {
 	const config = useConfig();
-	return useMutation<WriteContractReturnType, WriteContractReturnType, DistributeParams>({
-		mutationKey: ['stones', 'spin'],
-		mutationFn: (params) => distribute(params, wagmiConfig),
+	const { t } = useTranslation('stones', { keyPrefix: 'toasts.settle' });
+	const queryClient = useQueryClient();
+	return useMutation<WriteContractReturnType, WriteContractErrorType, ResolveRoundParams>({
+		mutationKey: ['stones', 'resolveRound'],
+		mutationFn: (params) => resolveRound(params, wagmiConfig),
+		onSuccess: async (data, variables) => {
+			logger.success('resolve round submitted');
+			void queryClient.invalidateQueries({ queryKey: ['stones'] });
+
+			const promise = async () => {
+				await waitForTransactionReceipt(config.getClient(), { hash: data });
+				clearVrfWinnerSide(variables.round);
+				await queryClient.invalidateQueries({ queryKey: ['stones'] });
+			};
+
+			toast.promise(promise, {
+				loading: t('loading'),
+				success: t('success'),
+				action: getTransactionLink(data),
+			});
+
+			logger.success('resolve round finished');
+		},
+		onError: (error) => {
+			logger.error(error);
+		},
+		onMutate: () => {
+			logger.start('resolving round');
+		},
+	});
+};
+
+export const useRefundRound = () => {
+	const config = useConfig();
+	const { t } = useTranslation('stones', { keyPrefix: 'toasts.refund' });
+	const queryClient = useQueryClient();
+	return useMutation<WriteContractReturnType, WriteContractErrorType, RefundRoundParams>({
+		mutationKey: ['stones', 'refundRound'],
+		mutationFn: (params) => refundRound(params, wagmiConfig),
 		onSuccess: async (data) => {
 			logger.success('transaction submitted');
 
@@ -92,80 +142,18 @@ export const useDistribute = () => {
 			};
 
 			toast.promise(promise, {
-				loading: 'Distributing',
-				success: 'Distributed',
+				loading: t('loading'),
+				success: t('success'),
 				action: getTransactionLink(data),
 			});
-			logger.success('finished');
+
+			queryClient.invalidateQueries({ queryKey: ['stones'] });
 		},
 		onError: (error) => {
-			toast.error('Distribution failed');
 			logger.error(error);
 		},
 		onMutate: () => {
-			logger.start('placing bet');
-		},
-	});
-};
-
-export const useExecuteResult = (round: number) => {
-	const queryClient = useQueryClient();
-	const config = useConfig();
-	return useMutation<WriteContractReturnType, WriteContractErrorType, DistributeParams>({
-		mutationKey: ['stones', 'executeResult'],
-		mutationFn: (params) => executeResult(params, wagmiConfig),
-		onSuccess: async (data) => {
-			logger.success('executeResult transaction submitted');
-
-			const promise = async () => {
-				await waitForTransactionReceipt(config.getClient(), { hash: data });
-			};
-
-			toast.promise(promise, {
-				loading: 'Executing result...',
-				success: () => {
-					queryClient.invalidateQueries({ queryKey: ['stones', 'round', round, 'distributed'] });
-					return 'Result executed';
-				},
-				action: getTransactionLink(data),
-			});
-			logger.success('executeResult finished');
-		},
-		onError: (error) => {
-			toast.error('Execute result failed');
-			logger.error(error);
-		},
-		onMutate: () => {
-			logger.start('executing result');
-		},
-	});
-};
-
-export const useSettleLostBets = () => {
-	const config = useConfig();
-	return useMutation<WriteContractReturnType, WriteContractErrorType, DistributeParams>({
-		mutationKey: ['stones', 'settleLostBets'],
-		mutationFn: (params) => settleLostBets(params, wagmiConfig),
-		onSuccess: async (data) => {
-			logger.success('settleLostBets transaction submitted');
-
-			const promise = async () => {
-				await waitForTransactionReceipt(config.getClient(), { hash: data });
-			};
-
-			toast.promise(promise, {
-				loading: 'Settling lost bets...',
-				success: 'Lost bets settled',
-				action: getTransactionLink(data),
-			});
-			logger.success('settleLostBets finished');
-		},
-		onError: (error) => {
-			toast.error('Settle lost bets failed');
-			logger.error(error);
-		},
-		onMutate: () => {
-			logger.start('settling lost bets');
+			logger.start('refunding round');
 		},
 	});
 };

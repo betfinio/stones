@@ -1,346 +1,338 @@
-import { arrayFrom, PartnerABI, StonesABI, StonesBetABI } from '@betfinio/abi';
+import { arrayFrom } from '@betfinio/abi';
 import type { QueryClient } from '@tanstack/react-query';
-import { type Config, multicall, readContract, simulateContract, writeContract } from '@wagmi/core';
-import { type Address, encodeAbiParameters, parseAbiParameters, parseEther } from 'viem';
+import { type Config, readContract, simulateContract, writeContract } from '@wagmi/core';
+import { type Address, decodeAbiParameters, encodeAbiParameters, parseAbiParameters, parseEther } from 'viem';
+import { multicall } from 'viem/actions';
 import logger from '@/src/config/logger';
-import { PARTNER, ROUND_DURATION, STONES } from '@/src/lib/global';
+import { BetABI } from '@/src/lib/abi/BetABI';
+import { CoreBetABI } from '@/src/lib/abi/CoreBetABI';
+import { PvPGameABI } from '@/src/lib/abi/PvPGameABI';
+import { StonesStrategyABI } from '@/src/lib/abi/StonesStrategyABI';
+import { CORE, PARTNER, STONES, STONES_STRATEGY } from '@/src/lib/global';
 import type { StoneInfo, StonesBet } from '@/src/lib/types';
 
-export const fetchCurrentRound = async (config: Config): Promise<number> => {
-	if (!config) throw new Error('Config is required');
-
-	const number = Number(
-		await readContract(config, {
-			abi: StonesABI,
-			address: STONES,
-			functionName: 'getCurrentRound',
-			args: [],
-		}),
-	);
-
-	return number;
-};
-
-export const fetchRoundBank = async (round: number, config: Config): Promise<bigint> => {
-	if (!config) throw new Error('Config is required');
-	return (await readContract(config, {
-		abi: StonesABI,
-		address: STONES,
-		functionName: 'getRoundBank',
-		args: [BigInt(round)],
-	})) as bigint;
-};
-export const fetchRoundSideBank = async (round: number, config: Config): Promise<bigint[]> => {
-	if (!config) throw new Error('Config is required');
-	logger.start('fetching round side bank', round);
-	const data = await multicall(config, {
-		contracts: arrayFrom(5).map((_, i) => ({
-			address: STONES,
-			abi: StonesABI,
-			functionName: 'roundBankBySide',
-			args: [BigInt(round), BigInt(i + 1)],
-		})),
-	});
-	logger.success('side bank', data.length);
-	return data.map((item) => item.result as bigint);
-};
-
-export const fetchRoundSideBonusShares = async (round: number, config: Config): Promise<bigint[]> => {
-	if (!config) throw new Error('Config is required');
-	logger.start('fetching round side bonus shares', round);
-	const data = await multicall(config, {
-		contracts: arrayFrom(5).map((_, i) => ({
-			address: STONES,
-			abi: StonesABI,
-			functionName: 'roundBonusSharesBySide',
-			args: [BigInt(round), BigInt(i + 1)],
-		})),
-	});
-	logger.success('side bonus shares', data.length);
-	return data.map((item) => item.result as bigint);
-};
-export const fetchRoundSideBetsCount = async (round: number, config: Config): Promise<bigint[]> => {
-	if (!config) throw new Error('Config is required');
-	logger.start('fetching round side bank', round);
-	const data = await multicall(config, {
-		contracts: arrayFrom(5).map((_, i) => ({
-			address: STONES,
-			abi: StonesABI,
-			functionName: 'getRoundBetsCountBySide',
-			args: [BigInt(round), BigInt(i + 1)],
-		})),
-	});
-	logger.success('side bank', data.length);
-	return data.map((item) => item.result as bigint);
-};
-export const fetchRoundBets = async (round: number, config: Config): Promise<StonesBet[]> => {
-	if (!config) throw new Error('Config is required');
-	logger.start('fetching round bets count', round);
-	const betsCount = await readContract(config, {
-		address: STONES,
-		abi: StonesABI,
-		functionName: 'getRoundBetsCount',
-		args: [BigInt(round)],
-	});
-	logger.success('betsCount', betsCount);
-	logger.start('fetching bets');
-	const betsData = await multicall(config, {
-		contracts: arrayFrom(Number(betsCount)).map((_, i) => ({
-			address: STONES,
-			abi: StonesABI,
-			functionName: 'roundBets',
-			args: [BigInt(round), BigInt(i)],
-		})),
-	});
-
-	logger.success('bets', betsData.length, round);
-	const bets = betsData.map((bet) => bet.result as Address).reverse();
-
-	return await Promise.all(bets.map((bet) => fetchBetInfo(bet, config)));
-};
-
-export const fetchBetInfo = async (bet: Address, config: Config): Promise<StonesBet> => {
-	if (!config) throw new Error('Config is required');
-
-	const info = (await readContract(config, {
-		address: bet,
-		abi: StonesBetABI,
-		functionName: 'getBetInfo',
-	})) as [Address, Address, bigint, bigint, bigint, bigint];
-	const side = (await readContract(config, {
-		address: bet,
-		abi: StonesBetABI,
-		functionName: 'getSide',
-	})) as bigint;
-	return {
-		side: Number(side),
-		amount: info[2],
-		address: bet,
-		result: info[3],
-		status: info[4],
-		created: info[5],
-		game: info[1],
-		player: info[0],
-	} as StonesBet;
-};
-
-export const fetchRoundStatus = async (round: number, config: Config): Promise<number> => {
-	if (!config) throw new Error('Config is required');
-	return Number(
-		await readContract(config, {
-			abi: StonesABI,
-			address: STONES,
-			functionName: 'roundStatus',
-			args: [BigInt(round)],
-		}),
-	);
-};
-export const fetchDistributedInRound = async (round: number, config: Config): Promise<bigint> => {
-	if (!config) throw new Error('Config is required');
-	return (await readContract(config, {
-		abi: StonesABI,
-		address: STONES,
-		functionName: 'distributedInRound',
-		args: [BigInt(round)],
-	})) as bigint;
-};
-
-export const fetchRoundStones = async (round: number, config: Config): Promise<StoneInfo[]> => {
-	if (round === 0) return [];
-	const probabilities = await multicall(config, {
-		contracts: arrayFrom(6).map((_, i) => ({
-			abi: StonesABI,
-			address: STONES,
-			functionName: 'roundProbabilities',
-			args: [BigInt(round), BigInt(i)],
-		})),
-	});
-	const banks = await multicall(config, {
-		contracts: arrayFrom(6).map((_, i) => ({
-			abi: StonesABI,
-			address: STONES,
-			functionName: 'roundBankBySide',
-			args: [BigInt(round), BigInt(i)],
-		})),
-	});
-	return arrayFrom(5).map(
-		(_, i) =>
-			({
-				bank: banks[i + 1].result as bigint,
-				probability: probabilities[i + 1].result as bigint,
-				round,
-				side: i + 1,
-				totalProbability: probabilities[0].result as bigint,
-			}) as StoneInfo,
-	);
-};
+// ═══════════════════════════════════════════════════════════════════════════
+// WRITE OPERATIONS
+// ═══════════════════════════════════════════════════════════════════════════
 
 export interface PlaceBetParams {
 	amount: number;
-	side: number; // 1-5,
+	side: number; // 1-5
 	round: number;
+	player: Address;
 }
+
 export const placeBet = async (params: PlaceBetParams, config: Config) => {
-	if (!config) throw new Error('Config is required');
-	const data = encodeAbiParameters(parseAbiParameters('uint256 amount, uint256 side, uint256 round'), [
-		BigInt(params.amount),
-		BigInt(params.side),
-		BigInt(params.round),
-	]);
-	await simulateContract(config, {
-		address: PARTNER,
-		abi: PartnerABI,
-		functionName: 'placeBet',
-		args: [STONES, parseEther(params.amount.toString()), data],
+	const data = encodeAbiParameters(parseAbiParameters('uint256 roundId, uint256 side'), [BigInt(params.round), BigInt(params.side)]);
+	const { request } = await simulateContract(config, {
+		abi: CoreBetABI,
+		address: CORE,
+		functionName: 'bet',
+		args: [params.player, params.player, STONES, parseEther(params.amount.toString()), data, PARTNER],
 	});
-	return writeContract(config, {
-		address: PARTNER,
-		abi: PartnerABI,
-		functionName: 'placeBet',
-		args: [STONES, parseEther(params.amount.toString()), data],
-	});
+	return writeContract(config, request);
 };
+
 export interface SpinParams {
 	round: number;
 }
 
 export const spin = async (params: SpinParams, config: Config) => {
-	if (!config) throw new Error('Config is required');
-	await simulateContract(config, {
+	const { request } = await simulateContract(config, {
+		abi: PvPGameABI,
 		address: STONES,
-		abi: StonesABI,
-		functionName: 'roll',
+		functionName: 'spin',
 		args: [BigInt(params.round)],
 	});
-	return writeContract(config, {
-		address: STONES,
-		abi: StonesABI,
-		functionName: 'roll',
-		args: [BigInt(params.round)],
-	});
+	return writeContract(config, request);
 };
-export interface DistributeParams {
+
+export interface ResolveRoundParams {
 	round: number;
 }
 
-export const executeResult = async (params: DistributeParams, config: Config) => {
-	if (!config) throw new Error('Config is required');
-
-	await simulateContract(config, {
+export const resolveRound = async (params: ResolveRoundParams, config: Config) => {
+	const { request } = await simulateContract(config, {
+		abi: PvPGameABI,
 		address: STONES,
-		abi: StonesABI,
-		functionName: 'executeResult',
-		args: [BigInt(params.round), 0n, 100n],
+		functionName: 'resolveRound',
+		args: [BigInt(params.round)],
 	});
-
-	return writeContract(config, {
-		abi: StonesABI,
-		address: STONES,
-		functionName: 'executeResult',
-		args: [BigInt(params.round), 0n, 100n],
-	});
+	return writeContract(config, request);
 };
 
-export const settleLostBets = async (params: DistributeParams, config: Config) => {
-	if (!config) throw new Error('Config is required');
+/** Side probability weights (1–5) + total; mirrors StonesStrategy storage for VRF winner preview. */
+export const fetchStonesRoundProbabilityWeights = async (
+	round: number,
+	config: Config,
+): Promise<{ total: bigint; sides: readonly [bigint, bigint, bigint, bigint, bigint] } | null> => {
+	const total = await fetchTotalProbability(round, config);
+	if (total === 0n) return null;
 
-	await simulateContract(config, {
-		address: STONES,
-		abi: StonesABI,
-		functionName: 'settleLostBets',
-		args: [BigInt(params.round), 0n, 100n],
+	const probResults = await multicall(config.getClient(), {
+		contracts: arrayFrom(5).map((_, i) => ({
+			address: STONES_STRATEGY,
+			abi: StonesStrategyABI,
+			functionName: 'sideProbabilities' as const,
+			args: [BigInt(round), BigInt(i + 1)],
+		})),
 	});
 
-	return writeContract(config, {
-		abi: StonesABI,
-		address: STONES,
-		functionName: 'settleLostBets',
-		args: [BigInt(params.round), 0n, 100n],
-	});
+	const sides = arrayFrom(5).map((_, i) => (probResults[i].result as bigint) ?? 0n) as [bigint, bigint, bigint, bigint, bigint];
+	return { total, sides };
 };
 
-export const distribute = async (params: DistributeParams, config: Config) => {
-	if (!config) throw new Error('Config is required');
+export interface RefundRoundParams {
+	round: number;
+}
 
-	await simulateContract(config, {
+export const refundRound = async (params: RefundRoundParams, config: Config) => {
+	const { request } = await simulateContract(config, {
+		abi: PvPGameABI,
 		address: STONES,
-		abi: StonesABI,
-		functionName: 'settleLostBets',
-		args: [BigInt(params.round), 0n, 100n],
+		functionName: 'refundRound',
+		args: [BigInt(params.round)],
 	});
-
-	await simulateContract(config, {
-		address: STONES,
-		abi: StonesABI,
-		functionName: 'executeResult',
-		args: [BigInt(params.round), 0n, 100n],
-	});
-	await writeContract(config, {
-		abi: StonesABI,
-		address: STONES,
-		functionName: 'settleLostBets',
-		args: [BigInt(params.round), 0n, 100n],
-	});
-	return writeContract(config, {
-		abi: StonesABI,
-		address: STONES,
-		functionName: 'executeResult',
-		args: [BigInt(params.round), 0n, 100n],
-	});
+	return writeContract(config, request);
 };
 
-export const getRoundTimes = (round: number): number[] => {
-	const start = round * 60 * ROUND_DURATION;
-	const end = start + 60 * ROUND_DURATION;
-	return [start, end];
+// ═══════════════════════════════════════════════════════════════════════════
+// READ OPERATIONS — PvPGame
+// ═══════════════════════════════════════════════════════════════════════════
+
+export const fetchCurrentRound = async (config: Config): Promise<number> => {
+	return Number(
+		await readContract(config, {
+			abi: PvPGameABI,
+			address: STONES,
+			functionName: 'getCurrentRoundId',
+		}),
+	);
 };
 
-export const getActualRound = () => {
-	return Math.floor(Date.now() / 1000 / 60);
+export const fetchInterval = async (config: Config): Promise<number> => {
+	return Number(
+		await readContract(config, {
+			abi: PvPGameABI,
+			address: STONES,
+			functionName: 'INTERVAL',
+		}),
+	);
 };
 
-export const fetchRoundWinner = async (round: number, config: Config): Promise<number> => {
-	logger.start('fetching round winner', round);
-	const data = await readContract(config, {
+export const fetchRoundStatus = async (round: number, config: Config): Promise<number> => {
+	const roundInfo = (await readContract(config, {
+		abi: PvPGameABI,
 		address: STONES,
-		abi: StonesABI,
-		functionName: 'roundWinnerSide',
+		functionName: 'getRound',
 		args: [BigInt(round)],
-	});
-	logger.success('winner', data);
+	})) as [Address[], bigint, bigint, bigint, number];
+	return roundInfo[4];
+};
 
-	return Number(data);
+/** Sum of full bet amounts on PvPGame (kept after cancel/refund; strategy weights are cleared). */
+export const fetchRoundTotalBankFromGame = async (round: number, config: Config): Promise<bigint> => {
+	const roundInfo = (await readContract(config, {
+		abi: PvPGameABI,
+		address: STONES,
+		functionName: 'getRound',
+		args: [BigInt(round)],
+	})) as [Address[], bigint, bigint, bigint, number];
+	return roundInfo[1];
+};
+
+export const fetchRoundBets = async (round: number, config: Config): Promise<StonesBet[]> => {
+	logger.start('fetching round bets', round);
+	const roundInfo = (await readContract(config, {
+		abi: PvPGameABI,
+		address: STONES,
+		functionName: 'getRound',
+		args: [BigInt(round)],
+	})) as [Address[], bigint, bigint, bigint, number];
+
+	const betAddresses = roundInfo[0];
+	if (betAddresses.length === 0) return [];
+
+	// Multicall: player, amount, data, payout, result for each bet
+	const prepared = betAddresses.flatMap((bet) => [
+		{ abi: BetABI, address: bet, functionName: 'player' as const },
+		{ abi: BetABI, address: bet, functionName: 'amount' as const },
+		{ abi: BetABI, address: bet, functionName: 'data' as const },
+		{ abi: BetABI, address: bet, functionName: 'payout' as const },
+		{ abi: BetABI, address: bet, functionName: 'result' as const },
+	]);
+
+	const result = await multicall(config.getClient(), {
+		contracts: prepared as any,
+	});
+
+	const stride = 5;
+	const bets: StonesBet[] = [];
+	for (let i = 0; i < betAddresses.length; i++) {
+		const player = (result[i * stride].result as Address) ?? ('0x0' as Address);
+		const amount = (result[i * stride + 1].result as bigint) ?? 0n;
+		const data = (result[i * stride + 2].result as `0x${string}`) ?? '0x';
+		const payout = (result[i * stride + 3].result as bigint) ?? 0n;
+		const betResult = (result[i * stride + 4].result as bigint) ?? 0n;
+
+		let side = 0;
+		if (data && data !== '0x') {
+			try {
+				const decoded = decodeAbiParameters([{ type: 'uint256' }, { type: 'uint256' }], data);
+				side = Number(decoded[1]);
+			} catch {
+				side = 0;
+			}
+		}
+
+		bets.push({
+			player,
+			address: betAddresses[i],
+			amount,
+			side,
+			created: 0n,
+			payout,
+			result: betResult,
+		});
+	}
+
+	logger.success('round bets', bets.length);
+	return bets;
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// READ OPERATIONS — StonesStrategy
+// ═══════════════════════════════════════════════════════════════════════════
+
+// should be used as a display of round bank since not affected by fee deduction
+export const fetchTotalProbability = async (round: number, config: Config): Promise<bigint> => {
+	return (await readContract(config, {
+		abi: StonesStrategyABI,
+		address: STONES_STRATEGY,
+		functionName: 'totalProbability',
+		args: [BigInt(round)],
+	})) as bigint;
+};
+
+export const fetchRoundBank = async (round: number, config: Config): Promise<bigint> => {
+	return (await readContract(config, {
+		abi: StonesStrategyABI,
+		address: STONES_STRATEGY,
+		functionName: 'roundBank',
+		args: [BigInt(round)],
+	})) as bigint;
+};
+
+export const fetchRoundSideBank = async (round: number, config: Config): Promise<bigint[]> => {
+	logger.start('fetching round side bank', round);
+	const data = await multicall(config.getClient(), {
+		contracts: arrayFrom(5).map((_, i) => ({
+			address: STONES_STRATEGY,
+			abi: StonesStrategyABI,
+			functionName: 'sideBanks' as const,
+			args: [BigInt(round), BigInt(i + 1)],
+		})),
+	});
+	logger.success('side bank', data.length);
+	return data.map((item) => (item.result as bigint) ?? 0n);
+};
+
+export const fetchRoundStones = async (round: number, config: Config): Promise<StoneInfo[]> => {
+	if (round === 0) return [];
+
+	const [probResults, totalProb] = await Promise.all([
+		multicall(config.getClient(), {
+			contracts: arrayFrom(5).map((_, i) => ({
+				address: STONES_STRATEGY,
+				abi: StonesStrategyABI,
+				functionName: 'sideProbabilities' as const,
+				args: [BigInt(round), BigInt(i + 1)],
+			})),
+		}),
+		readContract(config, {
+			abi: StonesStrategyABI,
+			address: STONES_STRATEGY,
+			functionName: 'totalProbability',
+			args: [BigInt(round)],
+		}) as Promise<bigint>,
+	]);
+
+	const sideBanks = await fetchRoundSideBank(round, config);
+
+	return arrayFrom(5).map((_, i) => {
+		const prob = (probResults[i].result as bigint) ?? 0n;
+		return {
+			bank: sideBanks[i],
+			probability: prob,
+			round,
+			side: i + 1,
+			totalProbability: totalProb,
+		};
+	});
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// READ OPERATIONS — Bet clone
+// ═══════════════════════════════════════════════════════════════════════════
+
+export const fetchBetInfo = async (bet: Address, config: Config): Promise<StonesBet> => {
+	const [player, amount, data] = await Promise.all([
+		readContract(config, { abi: BetABI, address: bet, functionName: 'player' }) as Promise<Address>,
+		readContract(config, { abi: BetABI, address: bet, functionName: 'amount' }) as Promise<bigint>,
+		readContract(config, { abi: BetABI, address: bet, functionName: 'data' }) as Promise<`0x${string}`>,
+	]);
+
+	let side = 0;
+	if (data && data !== '0x') {
+		try {
+			const decoded = decodeAbiParameters([{ type: 'uint256' }, { type: 'uint256' }], data);
+			side = Number(decoded[1]);
+		} catch {
+			side = 0;
+		}
+	}
+
+	return { player, address: bet, amount, side, created: 0n };
 };
 
 export const fetchBetResult = async (bet: Address, config: Config): Promise<bigint> => {
-	logger.start('fetching bet result', bet);
-	const data = (await readContract(config, {
+	return (await readContract(config, {
+		abi: BetABI,
 		address: bet,
-		abi: StonesBetABI,
-		functionName: 'getResult',
-		args: [],
+		functionName: 'result',
 	})) as bigint;
-	logger.success('result', data);
-	return data;
+};
+
+export const fetchBetPayout = async (bet: Address, config: Config): Promise<bigint> => {
+	return (await readContract(config, {
+		abi: BetABI,
+		address: bet,
+		functionName: 'payout',
+	})) as bigint;
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════════════════════════
+
+let cachedInterval: number | null = null;
+
+export const getInterval = async (config: Config): Promise<number> => {
+	if (cachedInterval !== null) return cachedInterval;
+	cachedInterval = await fetchInterval(config);
+	return cachedInterval;
+};
+
+export const getRoundTimes = (round: number, interval: number): number[] => {
+	const start = round * interval;
+	const end = start + interval;
+	return [start, end];
+};
+
+export const getActualRound = (interval: number): number => {
+	return Math.floor(Date.now() / 1000 / interval);
 };
 
 export const animateNewBet = (stone: number, _strength: number, queryClient: QueryClient, round: number) => {
 	queryClient.setQueryData(['stones', 'round', round, 'newBet'], { stone, strength: 0 });
-};
-
-export const fetchBetsResults = async (bets: StonesBet[], config: Config): Promise<StonesBet[]> => {
-	logger.start('fetching bets results', bets);
-	const data = await multicall(config, {
-		contracts: bets.map((bet) => ({
-			address: bet.address,
-			abi: StonesBetABI,
-			functionName: 'getResult',
-			args: [],
-		})),
-	});
-
-	return data.map((item, i) => ({
-		...bets[i],
-		result: item.result as bigint,
-	}));
 };
